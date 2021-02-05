@@ -36,6 +36,8 @@ namespace SkylinesRemotePython
             var source = _engine.CreateScriptSourceFromString(msg.script, SourceCodeKind.Statements);
             var compiled = source.Compile();
             compiled.Execute(_scope);
+
+            client.SendMessage(null, "c_script_end");
         }
     }
 }

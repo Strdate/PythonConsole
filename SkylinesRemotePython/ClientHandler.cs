@@ -14,6 +14,8 @@ namespace SkylinesRemotePython
         private Socket handler;
 
         private PythonEngine engine;
+
+        public delegate void MessageHandler(object obj, string type);
         public static void Accept(Socket listener, Socket handler)
         {
             ClientHandler client = new ClientHandler(listener, handler);
@@ -28,24 +30,36 @@ namespace SkylinesRemotePython
 
         private void HandleClient()
         {
-            byte[] data = new byte[handler.SendBufferSize];
             engine = new PythonEngine(this);
             while (true)
             {
-                int j = handler.Receive(data);
-
-                byte[] adata = new byte[j];
-                for (int i = 0; i < j; i++)
-                    adata[i] = data[i];
-
-                object deserialized = Deserialize(adata);
-                HandleMessage(deserialized);
+                HandleGeneralMessage( AwaitMessage() );
             }
         }
 
-        private void HandleMessage(object obj)
+        public MessageHeader AwaitMessage()
         {
-            MessageHeader msg = (MessageHeader)obj;
+            byte[] data = new byte[handler.SendBufferSize];
+            int j = handler.Receive(data);
+
+            byte[] adata = new byte[j];
+            for (int i = 0; i < j; i++)
+                adata[i] = data[i];
+
+            MessageHeader msg = (MessageHeader)Deserialize(adata);
+
+            if(msg.messageType == "s_exception")
+            {
+                string text = (string)msg.payload;
+                Console.WriteLine("Exception: " + text);
+                throw new Exception(text);
+            }
+
+            return msg;
+        }
+
+        private void HandleGeneralMessage(MessageHeader msg)
+        {
             Console.WriteLine("Server recieved a message: " + msg.messageType);
             switch(msg.messageType)
             {
@@ -55,6 +69,7 @@ namespace SkylinesRemotePython
 
         public void SendMessage(object obj, string type)
         {
+            Console.WriteLine("Sending message: " + type);
             MessageHeader msg = new MessageHeader();
             msg.payload = obj;
             msg.messageType = type;
