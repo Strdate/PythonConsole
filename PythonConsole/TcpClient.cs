@@ -13,15 +13,9 @@ namespace PythonConsole
 {
     public class TcpClient
     {
-        private static int launchCount = 0;
         private Socket socket;
         public TcpClient()
         {
-            launchCount++;
-            if(launchCount > 5)
-            {
-                return;
-            }
             Socket s = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             try
             {
@@ -30,8 +24,9 @@ namespace PythonConsole
             catch
             {
                 StartUpServer();
-                s.Connect(IPAddress.Parse("127.0.0.1"), 6672);
+                throw;
             }
+            s.ReceiveTimeout = 5000;
             socket = s;
         }
 
@@ -40,7 +35,10 @@ namespace PythonConsole
             string archivePath = Path.Combine(ModPath.Instsance.AssemblyPath,"SkylinesRemotePython.zip");
             string destPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SkylinesRemotePython");
 
-            ZipUtil.ExtractFileToDirectory(archivePath, destPath);
+            using (var unzip = new Unzip(archivePath))
+            {
+                unzip.ExtractToDirectory(destPath);
+            }
             var process = new Process
             {
                 StartInfo = new ProcessStartInfo
@@ -68,7 +66,7 @@ namespace PythonConsole
 
             MessageHeader msg = (MessageHeader)Deserialize(adata);
 
-            Console.WriteLine("In: " + msg.messageType);
+            UnityEngine.Debug.Log("In: " + msg.messageType);
 
             if (msg.messageType == "s_exception")
             {

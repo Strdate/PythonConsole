@@ -10,7 +10,9 @@ namespace PythonConsole
     {
         private static UIWindow _instance;
         
-        private string scriptText = "";
+        private string scriptText = "print(\"Hello world! :)\")";
+        private Vector2 scrollPosScript;
+        private Vector2 scrollPosOut;
         public static UIWindow Instance
         {
             get
@@ -22,6 +24,7 @@ namespace PythonConsole
                 if (!_instance)
                 {
                     _instance = new GameObject("Python Console Panel").AddComponent<UIWindow>();
+                    _instance.enabled = false;
                 }
                 return _instance;
             }
@@ -47,12 +50,18 @@ namespace PythonConsole
         {
             GUILayout.BeginVertical();
 
+            scrollPosScript = GUILayout.BeginScrollView(scrollPosScript);
             scriptText = GUILayout.TextArea(scriptText, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
-            if(GUILayout.Button("Execute"))
-            {
+            GUILayout.EndScrollView();
 
+            if(GUILayout.Button(PythonConsole.Instsance.CanExecuteScript ? "Execute" : "Busy..."))
+            {
+                PythonConsole.Instsance.ScheduleExecution(scriptText);
             }
+
+            scrollPosOut = GUILayout.BeginScrollView(scrollPosOut);
             GUILayout.TextArea(OutputText, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+            GUILayout.EndScrollView();
 
             GUILayout.EndVertical();
         }

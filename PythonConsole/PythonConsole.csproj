@@ -41,9 +41,6 @@
     <Reference Include="ICities">
       <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Cities_Skylines\Cities_Data\Managed\ICities.dll</HintPath>
     </Reference>
-    <Reference Include="Ionic.Zip">
-      <HintPath>..\..\Ionic.Zip.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -64,7 +61,7 @@
     <Compile Include="Threading.cs" />
     <Compile Include="UI\UIWindow.cs" />
     <Compile Include="Util\ModPath.cs" />
-    <Compile Include="Util\ZipUtil.cs" />
+    <Compile Include="Util\Unzip.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
