@@ -20,7 +20,7 @@ namespace SkylinesRemotePython
             };
             client.SendMessage(msg, "c_callfunc_CreateNode");
 
-            MessageHeader retMsg = client.AwaitMessage();
+            MessageHeader retMsg = client.GetMessage();
 
             if(retMsg.messageType != "s_ret_integer")
             {

@@ -11,10 +11,9 @@ using System.Text;
 
 namespace PythonConsole
 {
-    public class TcpClient
+    public class TcpClient : TcpConversation
     {
-        private Socket socket;
-        public TcpClient()
+        public static TcpClient CreateClient()
         {
             Socket s = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             try
@@ -27,10 +26,14 @@ namespace PythonConsole
                 throw;
             }
             s.ReceiveTimeout = 5000;
-            socket = s;
+            return new TcpClient(s);
+        }
+        protected TcpClient(Socket s) : base(s)
+        {
+            
         }
 
-        private void StartUpServer()
+        private static void StartUpServer()
         {
             string archivePath = Path.Combine(ModPath.Instsance.AssemblyPath,"SkylinesRemotePython.zip");
             string destPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SkylinesRemotePython");
@@ -55,49 +58,10 @@ namespace PythonConsole
             process.Start();
         }
 
-        public MessageHeader AwaitMessage()
+        public MessageHeader GetMessage()
         {
-            byte[] data = new byte[socket.SendBufferSize];
-            int j = socket.Receive(data);
-
-            byte[] adata = new byte[j];
-            for (int i = 0; i < j; i++)
-                adata[i] = data[i];
-
-            MessageHeader msg = (MessageHeader)Deserialize(adata);
-
-            UnityEngine.Debug.Log("In: " + msg.messageType);
-
-            if (msg.messageType == "s_exception")
-            {
-                string text = (string)msg.payload;
-                throw new Exception(text);
-            }
-
+            MessageHeader msg = AwaitMessage();
             return msg;
-        }
-
-        public void SendMessage(object obj, string type)
-        {
-            MessageHeader msg = new MessageHeader();
-            msg.payload = obj;
-            msg.messageType = type;
-            socket.Send(Serialize(msg));
-        }
-
-        public static object Deserialize(byte[] data)
-        {
-            using (var memoryStream = new MemoryStream(data))
-                return (new BinaryFormatter()).Deserialize(memoryStream);
-        }
-
-        public static byte[] Serialize(MessageHeader obj)
-        {
-            using (var memoryStream = new MemoryStream())
-            {
-                (new BinaryFormatter()).Serialize(memoryStream, obj);
-                return memoryStream.ToArray();
-            }
         }
     }
 }

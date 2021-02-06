@@ -31,7 +31,7 @@ namespace PythonConsole
         {
             try
             {
-                _client = new TcpClient();
+                _client = TcpClient.CreateClient();
                 _isClientReady = true;
             } catch
             {  }
@@ -49,7 +49,7 @@ namespace PythonConsole
             {
                 if (!_isClientReady)
                 {
-                    _client = new TcpClient();
+                    _client = TcpClient.CreateClient();
                     _isClientReady = true;
                 }
             } catch { }
@@ -67,7 +67,7 @@ namespace PythonConsole
                     _isRunning = true;
                     while (_isRunning)
                     {
-                        MessageHeader header = _client.AwaitMessage();
+                        MessageHeader header = _client.GetMessage();
                         switch (header.messageType)
                         {
                             case "c_output_message": UIWindow.Instance.Log((string)header.payload); break;

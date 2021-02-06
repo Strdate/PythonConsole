@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -13,5 +13,9 @@
   <ItemGroup>
     <ProjectReference Include="..\SkylinesPythonShared\SkylinesPythonShared.csproj" />
   </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="mkdir &quot;%25LOCALAPPDATA%25\Colossal Order\Cities_Skylines\Addons\Mods\$(SolutionName)&quot;&#xD;&#xA;del &quot;%25LOCALAPPDATA%25\Colossal Order\Cities_Skylines\Addons\Mods\$(SolutionName)\$(TargetFileName)&quot;&#xD;&#xA;xcopy /y &quot;$(TargetPath)&quot; &quot;%25LOCALAPPDATA%25\Colossal Order\Cities_Skylines\Addons\Mods\$(SolutionName)&quot;" />
+  </Target>
 
 </Project>
