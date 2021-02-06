@@ -22,6 +22,9 @@ namespace SkylinesRemotePython
             _engine = Python.CreateEngine();
             _scope = _engine.CreateScope();
 
+            _scope.SetVariable("Vector3", typeof(Vector3));
+            _scope.SetVariable("game", new GameAPI(client));
+
             var outputStream = new MemoryStream();
             var outputStreamWriter = new TcpStreamWriter(outputStream, client);
             _engine.Runtime.IO.SetOutput(outputStream, outputStreamWriter);
@@ -31,13 +34,24 @@ namespace SkylinesRemotePython
         {
             RunScriptMessage msg = (RunScriptMessage)obj;
 
-            // TODO check if state is valid
-
-            var source = _engine.CreateScriptSourceFromString(msg.script, SourceCodeKind.Statements);
-            var compiled = source.Compile();
-            compiled.Execute(_scope);
-
-            client.SendMessage(null, "c_script_end");
+            try
+            {
+                var source = _engine.CreateScriptSourceFromString(msg.script, SourceCodeKind.Statements);
+                var compiled = source.Compile();
+                try
+                {
+                    compiled.Execute(_scope);
+                    client.SendMessage(null, "c_script_end");
+                }
+                catch(Exception ex)
+                {
+                    client.SendMessage(ex.Message, "c_exception");
+                }
+            }
+            catch(Exception ex)
+            {
+                client.SendMessage(ex.Message, "c_failed_to_compile");
+            }
         }
     }
 }

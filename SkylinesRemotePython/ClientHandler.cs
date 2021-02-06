@@ -15,7 +15,6 @@ namespace SkylinesRemotePython
 
         private PythonEngine engine;
 
-        public delegate void MessageHandler(object obj, string type);
         public static void Accept(Socket listener, Socket handler)
         {
             ClientHandler client = new ClientHandler(listener, handler);
@@ -48,7 +47,9 @@ namespace SkylinesRemotePython
 
             MessageHeader msg = (MessageHeader)Deserialize(adata);
 
-            if(msg.messageType == "s_exception")
+            Console.WriteLine("In: " + msg.messageType);
+
+            if (msg.messageType == "s_exception")
             {
                 string text = (string)msg.payload;
                 Console.WriteLine("Exception: " + text);
@@ -60,7 +61,6 @@ namespace SkylinesRemotePython
 
         private void HandleGeneralMessage(MessageHeader msg)
         {
-            Console.WriteLine("Server recieved a message: " + msg.messageType);
             switch(msg.messageType)
             {
                 case "s_script_run": engine.RunScript(msg.payload); break;

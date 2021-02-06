@@ -27,7 +27,7 @@ namespace PythonConsole
             }
         }
 
-        public string OutputText { get; set; } = "";
+        private string OutputText { get; set; } = "";
 
         void OnGUI()
         {
@@ -36,6 +36,11 @@ namespace PythonConsole
 
             Rect windowRect = new Rect((Screen.width - Width) / 2, (Screen.height - Height) / 2, Width, Height);
             GUI.Window(664, windowRect, _populateWindow, "Python Console");
+        }
+
+        public void Log(string text)
+        {
+            OutputText = OutputText + text;
         }
 
         private void _populateWindow(int num)

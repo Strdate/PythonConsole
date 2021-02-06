@@ -5,10 +5,10 @@ using System.Text;
 
 namespace SkylinesRemotePython
 {
-    public class Game
+    public class GameAPI
     {
         private ClientHandler client;
-        public Game(ClientHandler client)
+        public GameAPI(ClientHandler client)
         {
             this.client = client;
         }

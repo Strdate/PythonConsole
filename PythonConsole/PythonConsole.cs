@@ -1,6 +1,4 @@
-﻿using IronPython.Hosting;
-using Microsoft.Scripting;
-using Microsoft.Scripting.Hosting;
+﻿using SkylinesPythonShared;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -22,18 +20,13 @@ namespace PythonConsole
             }
         }
 
-        private ScriptEngine _engine;
-        private ScriptScope _scope;
+        private TcpClient _client;
         private string _scheduledScript;
+        private bool _isRunning;
 
         public PythonConsole()
         {
-            _engine = Python.CreateEngine();
-            _scope = _engine.CreateScope();
-
-            var outputStream = new MemoryStream();
-            var outputStreamWriter = new TextAreaStreamWriter(outputStream);
-            _engine.Runtime.IO.SetOutput(outputStream, outputStreamWriter);
+            _client = new TcpClient();
         }
 
         public void ScheduleExecution(string script)
@@ -45,9 +38,30 @@ namespace PythonConsole
         {
             if(_scheduledScript != null)
             {
-                var source = _engine.CreateScriptSourceFromString(_scheduledScript, SourceCodeKind.Statements);
-                var compiled = source.Compile();
-                compiled.Execute(_scope);
+                RunScriptMessage msg = new RunScriptMessage();
+                msg.script = _scheduledScript;
+                _client.SendMessage(msg, "s_script_run");
+                _isRunning = true;
+                while(_isRunning)
+                {
+                    MessageHeader header = _client.AwaitMessage();
+                    switch(header.messageType)
+                    {
+                        case "c_output_message": UIWindow.Instance.Log((string)header.payload); break;
+                        case "c_failed_to_compile":
+                            UIWindow.Instance.Log("Failed to compile:" + (string)header.payload + "\n");
+                            _isRunning = false; break;
+                        case "c_script_end":
+                            UIWindow.Instance.Log("== EXECUTION COMPLETE ==\n");
+                            _isRunning = false; break;
+                        default:
+                            if (header.messageType.StartsWith("c_callfunc_"))
+                            {
+                                HandleCall.HandleAPICall(header.payload, header.messageType);
+                            }
+                            break;
+                    }
+                }
             }
         }
     }
