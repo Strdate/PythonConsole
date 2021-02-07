@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace SkylinesPythonShared
+namespace SkylinesPythonShared.API
 {
+    [Serializable]
     public class Vector3
     {
         public double X { get; set; }
@@ -18,8 +19,25 @@ namespace SkylinesPythonShared
             this.Z = Z;
         }
 
-        public double Magnitude => Math.Pow(X * X + Y * Y + Z * Z, 1 / 3);
+        public double Magnitude => Math.Sqrt(X * X + Y * Y + Z * Z);
 
         public Vector3 Normalized => new Vector3(X / Magnitude, Y / Magnitude, Z / Magnitude);
+
+        public override bool Equals(object obj)
+        {
+            return obj is Vector3 vector &&
+                   X == vector.X &&
+                   Y == vector.Y &&
+                   Z == vector.Z;
+        }
+
+        public override int GetHashCode()
+        {
+            int hashCode = -307843816;
+            hashCode = hashCode * -1521134295 + X.GetHashCode();
+            hashCode = hashCode * -1521134295 + Y.GetHashCode();
+            hashCode = hashCode * -1521134295 + Z.GetHashCode();
+            return hashCode;
+        }
     }
 }

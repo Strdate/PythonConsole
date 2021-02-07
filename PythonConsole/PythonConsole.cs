@@ -72,7 +72,7 @@ namespace PythonConsole
                         {
                             case "c_output_message": UIWindow.Instance.Log((string)header.payload); break;
                             case "c_exception":
-                                UIWindow.Instance.Log("Exception: " + (string)header.payload);
+                                UIWindow.Instance.Log("Exception: " + (string)header.payload + "\n");
                                 _isRunning = false; break;
                             case "c_failed_to_compile":
                                 UIWindow.Instance.Log("Failed to compile:" + (string)header.payload + "\n");
@@ -84,7 +84,7 @@ namespace PythonConsole
                             default:
                                 if (header.messageType.StartsWith("c_callfunc_"))
                                 {
-                                    HandleCall.HandleAPICall(header.payload, header.messageType);
+                                    HandleCall.HandleAPICall(header.payload, header.messageType, _client);
                                 }
                                 break;
                         }

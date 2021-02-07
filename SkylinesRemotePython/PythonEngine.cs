@@ -2,6 +2,8 @@
 using Microsoft.Scripting;
 using Microsoft.Scripting.Hosting;
 using SkylinesPythonShared;
+using SkylinesPythonShared.API;
+using SkylinesRemotePython.API;
 using System;
 using System.Collections.Generic;
 using System.IO;

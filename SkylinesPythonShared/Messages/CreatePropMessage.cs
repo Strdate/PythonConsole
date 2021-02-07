@@ -7,8 +7,10 @@ using System.Text;
 namespace SkylinesPythonShared
 {
     [Serializable]
-    public class CreateNodeMessage
+    public class CreatePropMessage
     {
         public Vector3 Position { get; set; }
+        public string Type { get; set; }
+        public double Angle { get; set; }
     }
 }
