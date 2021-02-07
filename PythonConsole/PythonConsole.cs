@@ -45,7 +45,7 @@ namespace PythonConsole
 
         public void SimulationStep()
         {
-            if(!UnityPythonObject.Instance.scriptEditor.Visible)
+            if(!(UnityPythonObject.Instance?.scriptEditor?.Visible ?? false))
             {
                 return;
             }

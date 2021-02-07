@@ -12,7 +12,7 @@ namespace PythonConsole
         private const string OutputAreaControlName = "PythonScriptOutputTextArea";
         private const string ExampleScriptFileName = "Script.py";
 
-        private const float HeaderHeight = 120.0f;
+        private const float HeaderHeight = 90.0f;
         private const float FooterHeight = 60.0f;
         private const float OutputHeight = 180.0f;
 
@@ -34,8 +34,8 @@ namespace PythonConsole
         private string projectWorkspacePath = string.Empty;
 
         private bool renamingFile;
+        private bool deletingFile;
         private string newFileName;
-        private ScriptEditorFile renamedFile;
 
         private ScriptEditorFile currentFile;
 
@@ -202,7 +202,8 @@ namespace PythonConsole
 
             foreach (var file in projectFiles)
             {
-                if (GUILayout.Button(Path.GetFileName(file.Path), GUILayout.ExpandWidth(false)))
+                string caption = Path.GetFileName(file.Path);
+                if (GUILayout.Button(currentFile == file ? "= " + caption + " =" : caption, GUILayout.ExpandWidth(false)))
                 {
                     AbortActions();
                     currentFile = file;
@@ -300,12 +301,12 @@ namespace PythonConsole
                 try
                 {
                     GUILayout.Label("New name:", GUILayout.ExpandWidth(false));
-                    newFileName = GUILayout.TextField(newFileName, GUILayout.Width(100));
+                    newFileName = GUILayout.TextField(newFileName, GUILayout.Width(150));
                     if (GUILayout.Button("OK"))
                     {
-                        string newPath = Path.Combine(Path.GetDirectoryName(renamedFile.Path), newFileName + ".py");
-                        File.Move(renamedFile.Path, newPath);
-                        renamedFile.Rename(newPath);
+                        string newPath = Path.Combine(Path.GetDirectoryName(currentFile.Path), newFileName + ".py");
+                        File.Move(currentFile.Path, newPath);
+                        currentFile.Rename(newPath);
                         AbortActions();
                     }
                     if (GUILayout.Button("Cancel"))
@@ -318,47 +319,65 @@ namespace PythonConsole
                     lastError = ex.Message;
                     return;
                 }
+            } else if(deletingFile)
+            {
+                GUILayout.Label("Delete?", GUILayout.ExpandWidth(false));
+                if (GUILayout.Button("Yes"))
+                {
+                    try
+                    {
+                        File.Delete(currentFile.Path);
+                    }
+                    catch (Exception ex)
+                    {
+                        lastError = ex.Message;
+                        return;
+                    }
+                    ReloadProjectWorkspace();
+                }
+                if (GUILayout.Button("No"))
+                {
+                    AbortActions();
+                }
             }
             else
             {
                 if (GUILayout.Button("Rename"))
                 {
                     renamingFile = true;
-                    renamedFile = currentFile;
-                    newFileName = Path.GetFileNameWithoutExtension(renamedFile.Path);
+                    newFileName = Path.GetFileNameWithoutExtension(currentFile.Path);
                 }
-            }
+                if (GUILayout.Button("Delete"))
+                {
+                    deletingFile = true;
+                }
+                if (currentFile == null)
+                {
+                    GUI.enabled = false;
+                }
+                if (GUILayout.Button("Save"))
+                {
+                    try
+                    {
+                        AbortActions();
+                        SaveProjectFile(currentFile);
+                    }
+                    catch (Exception ex)
+                    {
+                        lastError = ex.Message;
+                        return;
+                    }
 
-            GUILayout.Space(5);
+                    lastError = string.Empty;
+                }
 
-            if (currentFile == null)
-            {
-                GUI.enabled = false;
-            }
+                GUI.enabled = true;
 
-
-            if (GUILayout.Button("Save"))
-            {
-                try
+                if (GUILayout.Button("Save all"))
                 {
                     AbortActions();
-                    SaveProjectFile(currentFile);
+                    SaveAllProjectFiles();
                 }
-                catch (Exception ex)
-                {
-                    lastError = ex.Message;
-                    return;
-                }
-
-                lastError = string.Empty;
-            }
-
-            GUI.enabled = true;
-
-            if (GUILayout.Button("Save all"))
-            {
-                AbortActions();
-                SaveAllProjectFiles();
             }
 
             GUILayout.EndHorizontal();
@@ -384,7 +403,7 @@ namespace PythonConsole
         private void AbortActions()
         {
             renamingFile = false;
-            renamedFile = null;
+            deletingFile = false;
         }
     }
 }
