@@ -29,12 +29,12 @@ namespace PythonConsole
         public bool CanExecuteScript => !_isRunning && _isClientReady;
         public PythonConsole()
         {
-            try
+            /*try
             {
                 _client = TcpClient.CreateClient();
                 _isClientReady = true;
             } catch
-            {  }
+            {  }*/
             
         }
 
@@ -45,6 +45,11 @@ namespace PythonConsole
 
         public void SimulationStep()
         {
+            if(!UnityPythonObject.Instance.scriptEditor.Visible)
+            {
+                return;
+            }
+
             try
             {
                 if (!_isClientReady)
@@ -72,10 +77,10 @@ namespace PythonConsole
                         {
                             case "c_output_message": UnityPythonObject.Instance.Print((string)header.payload); break;
                             case "c_exception":
-                                UnityPythonObject.Instance.PrintError((string)header.payload + "\n");
+                                UnityPythonObject.Instance.PrintError((string)header.payload);
                                 _isRunning = false; break;
                             case "c_failed_to_compile":
-                                UnityPythonObject.Instance.Print("Failed to compile:" + (string)header.payload + "\n");
+                                UnityPythonObject.Instance.PrintError("Failed to compile: " + (string)header.payload);
                                 _isRunning = false; break;
                             case "c_script_end":
                                 timer.Stop();

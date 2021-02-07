@@ -1,4 +1,4 @@
-﻿namespace ModTools.Scripting
+﻿namespace PythonConsole
 {
     internal sealed class ScriptEditorFile
     {
@@ -33,8 +33,13 @@ namespace ModTools.Scripting
             Path = path ?? string.Empty;
         }
 
+        public void Rename(string path)
+        {
+            Path = path;
+        }
+
         public string Source { get; set; }
 
-        public string Path { get; }
+        public string Path { get; private set; }
     }
 }

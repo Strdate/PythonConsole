@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 using ColossalFramework.Plugins;
 using ICities;
 
-namespace ModTools.Utils
+namespace PythonConsole
 {
     internal static class FileUtil
     {

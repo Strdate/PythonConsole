@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace ModTools.UI
+namespace PythonConsole
 {
     internal abstract class GUIWindow : MonoBehaviour, IDestroyableObject, IUIObject
     {

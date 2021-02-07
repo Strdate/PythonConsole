@@ -7,10 +7,12 @@ using System.Text;
 namespace SkylinesPythonShared
 {
     [Serializable]
-    public class CreatePropMessage
+    public class NetNodeMessage
     {
-        public Vector Position { get; set; }
-        public string Type { get; set; }
-        public double Angle { get; set; }
+        public ushort id { get; set; }
+
+        public string prefab_name { get; set; }
+
+        public Vector position { get; set; }
     }
 }

@@ -1,18 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using ModTools.UI;
-using ModTools.Utils;
 using PythonConsole;
 using UnityEngine;
 
-namespace ModTools.Scripting
+namespace PythonConsole
 {
     internal sealed class ScriptEditor : GUIWindow
     {
         private const string TextAreaControlName = "PythonScriptEditorTextArea";
         private const string OutputAreaControlName = "PythonScriptOutputTextArea";
-        private const string ExampleScriptFileName = "ExampleScript.py";
+        private const string ExampleScriptFileName = "Script.py";
 
         private const float HeaderHeight = 120.0f;
         private const float FooterHeight = 60.0f;
@@ -35,10 +33,14 @@ namespace ModTools.Scripting
 
         private string projectWorkspacePath = string.Empty;
 
+        private bool renamingFile;
+        private string newFileName;
+        private ScriptEditorFile renamedFile;
+
         private ScriptEditorFile currentFile;
 
         public ScriptEditor()
-            : base("Script Editor", new Rect(16.0f, 16.0f, 640.0f, 480.0f))
+            : base("Python Console", new Rect(16.0f, 16.0f, 640.0f, 480.0f))
         {
             headerArea = new GUIArea(this)
                 .OffsetBy(vertical: 32f)
@@ -64,7 +66,9 @@ namespace ModTools.Scripting
 
         public void ReloadProjectWorkspace()
         {
-            projectWorkspacePath = UnityPythonObject.Instance.Config.ScriptWorkspacePath;
+            AbortActions();
+            string configPath = UnityPythonObject.Instance.Config.ScriptWorkspacePath;
+            projectWorkspacePath = configPath == null || configPath == "" ? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),"SkylinesPython") : configPath;
             if (projectWorkspacePath.Length == 0)
             {
                 lastError = "Invalid project workspace path";
@@ -74,19 +78,24 @@ namespace ModTools.Scripting
             var exampleFileExists = false;
 
             projectFiles.Clear();
+            System.IO.Directory.CreateDirectory(projectWorkspacePath);
 
             try
             {
                 foreach (var file in FileUtil.ListFilesInDirectory(projectWorkspacePath))
                 {
-                    if (Path.GetExtension(file) == ".cs")
+                    if (Path.GetExtension(file) == ".py")
                     {
+                        var fileContent = new ScriptEditorFile(File.ReadAllText(file), file);
+                        projectFiles.Add(fileContent);
                         if (Path.GetFileName(file) == ExampleScriptFileName)
                         {
                             exampleFileExists = true;
+                            if (currentFile == null)
+                            {
+                                currentFile = fileContent;
+                            }
                         }
-
-                        projectFiles.Add(new ScriptEditorFile(File.ReadAllText(file), file));
                     }
                 }
 
@@ -95,6 +104,10 @@ namespace ModTools.Scripting
                     var exampleFile = new ScriptEditorFile(ScriptEditorFile.DefaultSource, Path.Combine(projectWorkspacePath, ExampleScriptFileName));
                     projectFiles.Add(exampleFile);
                     SaveProjectFile(exampleFile);
+                    if (currentFile == null)
+                    {
+                        currentFile = exampleFile;
+                    }
                 }
             }
             catch (Exception ex)
@@ -166,9 +179,6 @@ namespace ModTools.Scripting
         private void DrawHeader()
         {
             headerArea.Begin();
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("Scripts are stored in project workspace. To add a script create a new .py file in workspace and click 'Reload'", GUILayout.ExpandWidth(false));
-            GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
             GUILayout.Label("Project workspace:", GUILayout.ExpandWidth(false));
@@ -194,7 +204,24 @@ namespace ModTools.Scripting
             {
                 if (GUILayout.Button(Path.GetFileName(file.Path), GUILayout.ExpandWidth(false)))
                 {
+                    AbortActions();
                     currentFile = file;
+                }
+            }
+
+            if (GUILayout.Button("+ New File", GUILayout.ExpandWidth(false)))
+            {
+                for(int i = 0; ;i++)
+                {
+                    string path = Path.Combine(projectWorkspacePath, "NewFile" + (i == 0 ? "" : i.ToString()) + ".py");
+                    if(!File.Exists(path))
+                    {
+                        var newFile = new ScriptEditorFile("print(\"Hello world!\")", path);
+                        projectFiles.Add(newFile);
+                        SaveProjectFile(newFile);
+                        currentFile = newFile;
+                        break;
+                    }
                 }
             }
 
@@ -250,13 +277,16 @@ namespace ModTools.Scripting
 
             if (GUILayout.Button("Execute"))
             {
-                PythonConsole.PythonConsole.Instance.ScheduleExecution(currentFile.Source);
+                AbortActions();
+                PythonConsole.Instance.ScheduleExecution(currentFile.Source);
+                lastError = string.Empty;
             }
 
             GUI.enabled = true;
 
             if (GUILayout.Button("Clear output"))
             {
+                AbortActions();
                 lastError = string.Empty;
                 output = string.Empty;
             }
@@ -265,15 +295,53 @@ namespace ModTools.Scripting
 
             GUILayout.FlexibleSpace();
 
+            if(renamingFile)
+            {
+                try
+                {
+                    GUILayout.Label("New name:", GUILayout.ExpandWidth(false));
+                    newFileName = GUILayout.TextField(newFileName, GUILayout.Width(100));
+                    if (GUILayout.Button("OK"))
+                    {
+                        string newPath = Path.Combine(Path.GetDirectoryName(renamedFile.Path), newFileName + ".py");
+                        File.Move(renamedFile.Path, newPath);
+                        renamedFile.Rename(newPath);
+                        AbortActions();
+                    }
+                    if (GUILayout.Button("Cancel"))
+                    {
+                        AbortActions();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    lastError = ex.Message;
+                    return;
+                }
+            }
+            else
+            {
+                if (GUILayout.Button("Rename"))
+                {
+                    renamingFile = true;
+                    renamedFile = currentFile;
+                    newFileName = Path.GetFileNameWithoutExtension(renamedFile.Path);
+                }
+            }
+
+            GUILayout.Space(5);
+
             if (currentFile == null)
             {
                 GUI.enabled = false;
             }
 
+
             if (GUILayout.Button("Save"))
             {
                 try
                 {
+                    AbortActions();
                     SaveProjectFile(currentFile);
                 }
                 catch (Exception ex)
@@ -289,6 +357,7 @@ namespace ModTools.Scripting
 
             if (GUILayout.Button("Save all"))
             {
+                AbortActions();
                 SaveAllProjectFiles();
             }
 
@@ -310,6 +379,12 @@ namespace ModTools.Scripting
             GUILayout.EndScrollView();
 
             outputArea.End();
+        }
+
+        private void AbortActions()
+        {
+            renamingFile = false;
+            renamedFile = null;
         }
     }
 }

@@ -64,13 +64,13 @@
     <Compile Include="TcpClient.cs" />
     <Compile Include="Threading.cs" />
     <Compile Include="UI\GUIArea.cs" />
-    <Compile Include="UI\GUIComboBox.cs" />
     <Compile Include="UI\GUIWindow.cs" />
     <Compile Include="UI\ScriptEditor.cs" />
     <Compile Include="UI\ScriptEditorFile.cs" />
     <Compile Include="UnityPythonObject.cs" />
     <Compile Include="Util\FileUtil.cs" />
     <Compile Include="Util\ModPath.cs" />
+    <Compile Include="Util\NetUtil.cs" />
     <Compile Include="Util\Unzip.cs" />
   </ItemGroup>
   <ItemGroup />

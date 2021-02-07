@@ -42,10 +42,12 @@
     <Compile Include="Messages\CreateNodeMessage.cs" />
     <Compile Include="Messages\CreatePropMessage.cs" />
     <Compile Include="Messages\MessageHeader.cs" />
+    <Compile Include="Messages\NetNodeMessage.cs" />
+    <Compile Include="Messages\PropMessage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Messages\RunScriptMessage.cs" />
     <Compile Include="Protocol\TcpConversation.cs" />
-    <Compile Include="SharedStructures\Vector3.cs" />
+    <Compile Include="SharedStructures\Vector.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

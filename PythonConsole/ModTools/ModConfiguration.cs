@@ -3,7 +3,7 @@ using System.IO;
 using System.Xml.Serialization;
 using UnityEngine;
 
-namespace ModTools
+namespace PythonConsole
 {
     [XmlRoot("Configuration")]
     public sealed class ModConfiguration

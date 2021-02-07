@@ -14,7 +14,26 @@ namespace SkylinesRemotePython.API
             this.client = client;
         }
 
-        public int CreateProp(Vector3 position, string type, double angle = 0)
+        public Prop get_prop_from_id(int id)
+        {
+            client.SendMessage(id, "c_callfunc_GetPropFromId");
+            MessageHeader retMsg = client.GetMessage();
+            AssertMessage(retMsg, "s_ret_Prop");
+
+            return new Prop(retMsg.payload);
+        }
+
+        public NetNode get_node_from_id(int id)
+        {
+            client.SendMessage(id, "c_callfunc_GetNodeFromId");
+
+            MessageHeader retMsg = client.GetMessage();
+            AssertMessage(retMsg, "s_ret_NetNode");
+
+            return new NetNode(retMsg.payload);
+        }
+
+        public Prop create_prop(Vector position, string type, double angle = 0)
         {
             var msg = new CreatePropMessage()
             {
@@ -25,31 +44,46 @@ namespace SkylinesRemotePython.API
             client.SendMessage(msg, "c_callfunc_CreateProp");
 
             MessageHeader retMsg = client.GetMessage();
+            AssertMessage(retMsg, "s_ret_Prop");
 
-            if (retMsg.messageType != "s_ret_integer")
-            {
-                throw new Exception("Invalid return message");
-            }
-
-            return (int)retMsg.payload;
+            return new Prop(retMsg.payload);
         }
 
-        public int CreateNode(Vector3 position)
+        public NetNode create_node(Vector position, string type)
         {
             CreateNodeMessage msg = new CreateNodeMessage()
             {
-                Position = position
+                Position = position,
+                Type = type
             };
             client.SendMessage(msg, "c_callfunc_CreateNode");
 
             MessageHeader retMsg = client.GetMessage();
+            AssertMessage(retMsg, "s_ret_NetNode");
 
-            if(retMsg.messageType != "s_ret_integer")
+            return new NetNode(retMsg.payload);
+        }
+
+        public bool exists_prefab(string name)
+        {
+            client.SendMessage(name, "c_callfunc_ExistsPrefab");
+            MessageHeader retMsg = client.GetMessage();
+            AssertMessage(retMsg, "s_ret_bool");
+
+            return (bool)retMsg.payload;
+        }
+
+        public override string ToString()
+        {
+            return "Provides API to manipulate in-game objects, such as buildings or roads";
+        }
+
+        public static void AssertMessage(MessageHeader msg, string expected)
+        {
+            if(msg.messageType != expected)
             {
-                throw new Exception("Invalid return message");
+                throw new Exception("Invalid return message: expected '" + expected + "' but received '" + msg.messageType + "'");
             }
-
-            return (int)retMsg.payload;
         }
     }
 }

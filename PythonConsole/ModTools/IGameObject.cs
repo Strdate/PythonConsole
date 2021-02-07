@@ -1,4 +1,4 @@
-﻿namespace ModTools
+﻿namespace PythonConsole
 {
     public interface IGameObject
     {

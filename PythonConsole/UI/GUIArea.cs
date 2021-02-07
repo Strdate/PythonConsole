@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace ModTools.UI
+namespace PythonConsole
 {
     internal sealed class GUIArea
     {

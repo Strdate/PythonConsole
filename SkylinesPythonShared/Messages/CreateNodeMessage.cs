@@ -9,6 +9,8 @@ namespace SkylinesPythonShared
     [Serializable]
     public class CreateNodeMessage
     {
-        public Vector3 Position { get; set; }
+        public Vector Position { get; set; }
+
+        public string Type { get; set; }
     }
 }

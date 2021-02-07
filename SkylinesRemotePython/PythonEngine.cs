@@ -1,4 +1,5 @@
 ﻿using IronPython.Hosting;
+using IronPython.Runtime.Types;
 using Microsoft.Scripting;
 using Microsoft.Scripting.Hosting;
 using SkylinesPythonShared;
@@ -24,7 +25,8 @@ namespace SkylinesRemotePython
             _engine = Python.CreateEngine();
             _scope = _engine.CreateScope();
 
-            _scope.SetVariable("Vector3", typeof(Vector3));
+            _scope.SetVariable("Vector", DynamicHelpers.GetPythonTypeFromType(typeof(Vector)));
+            _scope.SetVariable("vector_xz", new Func<double,double, Vector>(Vector.vector_xz));
             _scope.SetVariable("game", new GameAPI(client));
 
             var outputStream = new MemoryStream();
