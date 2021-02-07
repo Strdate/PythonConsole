@@ -11,7 +11,7 @@ namespace PythonConsole
     public class PythonConsole
     {
         private static PythonConsole _instance;
-        public static PythonConsole Instsance
+        public static PythonConsole Instance
         {
             get
             {
@@ -70,16 +70,16 @@ namespace PythonConsole
                         MessageHeader header = _client.GetMessage();
                         switch (header.messageType)
                         {
-                            case "c_output_message": UIWindow.Instance.Log((string)header.payload); break;
+                            case "c_output_message": UnityPythonObject.Instance.Print((string)header.payload); break;
                             case "c_exception":
-                                UIWindow.Instance.Log("Exception: " + (string)header.payload + "\n");
+                                UnityPythonObject.Instance.PrintError((string)header.payload + "\n");
                                 _isRunning = false; break;
                             case "c_failed_to_compile":
-                                UIWindow.Instance.Log("Failed to compile:" + (string)header.payload + "\n");
+                                UnityPythonObject.Instance.Print("Failed to compile:" + (string)header.payload + "\n");
                                 _isRunning = false; break;
                             case "c_script_end":
                                 timer.Stop();
-                                UIWindow.Instance.Log("Execution took " + timer.ElapsedMilliseconds + " ms\n");
+                                UnityPythonObject.Instance.Print("Execution took " + timer.ElapsedMilliseconds + " ms\n");
                                 _isRunning = false; break;
                             default:
                                 if (header.messageType.StartsWith("c_callfunc_"))
