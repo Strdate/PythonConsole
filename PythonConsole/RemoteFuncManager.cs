@@ -1,0 +1,64 @@
+﻿using SkylinesPythonShared;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Text;
+
+namespace PythonConsole
+{
+    public class RemoteFuncManager
+    {
+        private TcpClient client;
+
+        private delegate object CallMethod(object msg);
+        private Dictionary<string,TargetInfo> funcDict = new Dictionary<string, TargetInfo>();
+
+        public RemoteFuncManager(TcpClient client)
+        {
+            this.client = client;
+            foreach (var field in typeof(Contracts).GetFields(BindingFlags.Static | BindingFlags.Public)) {
+                Contract contract = (Contract)field.GetValue(null);
+                CallMethod del = (CallMethod)Delegate.CreateDelegate(typeof(CallMethod), typeof(GameAPI), contract.FuncName);
+                funcDict.Add("c_callfunc_" + contract.FuncName, new TargetInfo(del, contract));
+            }
+        }
+
+        public void HandleAPICall(object msg, string type)
+        {
+            object retVal = null;
+            TargetInfo info = funcDict[type];
+            try
+            {
+                retVal = info.method(msg);
+            }
+            catch(Exception ex)
+            {
+                client.SendMessage(ex.Message, "s_exception");
+            }
+            client.SendMessage(retVal, "s_ret_" + info.contract.RetType);
+        }
+
+        public static UnityEngine.Vector3 ConvertVector(SkylinesPythonShared.API.Vector vect)
+        {
+            return new UnityEngine.Vector3((float)vect.x, (float)vect.y, (float)vect.z);
+        }
+
+        public static SkylinesPythonShared.API.Vector ConvertVectorBack(UnityEngine.Vector3 vect)
+        {
+            return new SkylinesPythonShared.API.Vector(vect.x, vect.y, vect.z);
+        }
+
+        private struct TargetInfo
+        {
+            internal TargetInfo(CallMethod method, Contract contract)
+            {
+                this.method = method;
+                this.contract = contract;
+            }
+
+            internal CallMethod method;
+            internal Contract contract;
+        }
+    }
+}

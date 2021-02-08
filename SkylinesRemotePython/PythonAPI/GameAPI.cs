@@ -8,7 +8,7 @@ namespace SkylinesRemotePython.API
 {
     public class GameAPI
     {
-        private ClientHandler client;
+        internal ClientHandler client;
         public GameAPI(ClientHandler client)
         {
             this.client = client;
@@ -16,21 +16,12 @@ namespace SkylinesRemotePython.API
 
         public Prop get_prop_from_id(int id)
         {
-            client.SendMessage(id, "c_callfunc_GetPropFromId");
-            MessageHeader retMsg = client.GetMessage();
-            AssertMessage(retMsg, "s_ret_Prop");
-
-            return new Prop(retMsg.payload);
+            return new Prop(client.RemoteCall<PropMessage>(Contracts.GetPropFromId, id), this);
         }
 
         public NetNode get_node_from_id(int id)
         {
-            client.SendMessage(id, "c_callfunc_GetNodeFromId");
-
-            MessageHeader retMsg = client.GetMessage();
-            AssertMessage(retMsg, "s_ret_NetNode");
-
-            return new NetNode(retMsg.payload);
+            return new NetNode(client.RemoteCall<NetNodeMessage>(Contracts.GetNodeFromId, id), this);
         }
 
         public Prop create_prop(Vector position, string type, double angle = 0)
@@ -41,12 +32,8 @@ namespace SkylinesRemotePython.API
                 Type = type,
                 Angle = angle
             };
-            client.SendMessage(msg, "c_callfunc_CreateProp");
 
-            MessageHeader retMsg = client.GetMessage();
-            AssertMessage(retMsg, "s_ret_Prop");
-
-            return new Prop(retMsg.payload);
+            return new Prop(client.RemoteCall<PropMessage>(Contracts.CreateProp, msg), this);
         }
 
         public NetNode create_node(Vector position, string type)
@@ -56,34 +43,18 @@ namespace SkylinesRemotePython.API
                 Position = position,
                 Type = type
             };
-            client.SendMessage(msg, "c_callfunc_CreateNode");
 
-            MessageHeader retMsg = client.GetMessage();
-            AssertMessage(retMsg, "s_ret_NetNode");
-
-            return new NetNode(retMsg.payload);
+            return new NetNode(client.RemoteCall<NetNodeMessage>(Contracts.CreateNode, msg), this);
         }
 
-        public bool exists_prefab(string name)
+        public bool is_prefab(string name)
         {
-            client.SendMessage(name, "c_callfunc_ExistsPrefab");
-            MessageHeader retMsg = client.GetMessage();
-            AssertMessage(retMsg, "s_ret_bool");
-
-            return (bool)retMsg.payload;
+            return client.RemoteCall<bool>(Contracts.ExistsPrefab, name);
         }
 
         public override string ToString()
         {
             return "Provides API to manipulate in-game objects, such as buildings or roads";
-        }
-
-        public static void AssertMessage(MessageHeader msg, string expected)
-        {
-            if(msg.messageType != expected)
-            {
-                throw new Exception("Invalid return message: expected '" + expected + "' but received '" + msg.messageType + "'");
-            }
         }
     }
 }

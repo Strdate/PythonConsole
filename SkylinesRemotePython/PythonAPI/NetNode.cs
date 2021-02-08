@@ -6,7 +6,7 @@ using System.Text;
 
 namespace SkylinesRemotePython.API
 {
-    public class NetNode
+    public class NetNode : ObjectAPI
     {
         public ushort id { get; private set; }
 
@@ -14,12 +14,21 @@ namespace SkylinesRemotePython.API
 
         public Vector position { get; private set; }
 
-        internal NetNode(object obj)
+        public void refresh()
         {
-            NetNodeMessage msg = (NetNodeMessage)obj;
+            AssignData(api.client.RemoteCall<NetNodeMessage>(Contracts.GetNodeFromId, id));
+        }
+
+        internal void AssignData(NetNodeMessage msg)
+        {
             id = msg.id;
             prefab_name = msg.prefab_name;
             position = msg.position;
+        }
+
+        internal NetNode(NetNodeMessage obj, GameAPI api) : base(api)
+        {
+            AssignData(obj);
         }
     }
 }

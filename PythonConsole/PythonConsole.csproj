@@ -58,7 +58,7 @@
     <Compile Include="ModTools\ModConfiguration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PythonAPI\GameAPI.cs" />
-    <Compile Include="PythonAPI\HandleCall.cs" />
+    <Compile Include="RemoteFuncManager.cs" />
     <Compile Include="PythonConsole.cs" />
     <Compile Include="PythonConsoleTool.cs" />
     <Compile Include="TcpClient.cs" />

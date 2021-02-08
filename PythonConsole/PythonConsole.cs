@@ -22,6 +22,7 @@ namespace PythonConsole
         }
 
         private TcpClient _client;
+        private RemoteFuncManager _remoteFuncManager;
         private string _scheduledScript;
         private bool _isRunning;
         private bool _isClientReady;
@@ -29,13 +30,6 @@ namespace PythonConsole
         public bool CanExecuteScript => !_isRunning && _isClientReady;
         public PythonConsole()
         {
-            /*try
-            {
-                _client = TcpClient.CreateClient();
-                _isClientReady = true;
-            } catch
-            {  }*/
-            
         }
 
         public void ScheduleExecution(string script)
@@ -55,6 +49,7 @@ namespace PythonConsole
                 if (!_isClientReady)
                 {
                     _client = TcpClient.CreateClient();
+                    _remoteFuncManager = new RemoteFuncManager(_client);
                     _isClientReady = true;
                 }
             } catch { }
@@ -89,7 +84,7 @@ namespace PythonConsole
                             default:
                                 if (header.messageType.StartsWith("c_callfunc_"))
                                 {
-                                    HandleCall.HandleAPICall(header.payload, header.messageType, _client);
+                                    _remoteFuncManager.HandleAPICall(header.payload, header.messageType);
                                 }
                                 break;
                         }

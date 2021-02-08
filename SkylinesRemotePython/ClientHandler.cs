@@ -33,7 +33,7 @@ namespace SkylinesRemotePython
             }
         }
 
-        public MessageHeader GetMessage()
+        public MessageHeader GetMessage(string assertedType = null)
         {
             MessageHeader msg = AwaitMessage();
             Console.WriteLine("In: " + msg.messageType);
@@ -45,7 +45,18 @@ namespace SkylinesRemotePython
                 throw new Exception(text);
             }
 
+            if (assertedType != null && assertedType != msg.messageType) {
+                throw new Exception("Invalid return message: expected '" + assertedType + "' but received '" + msg.messageType + "'");
+            }
+
             return msg;
+        }
+
+        public T RemoteCall<T>(Contract contract, object parameters)
+        {
+            SendMessage(parameters, "c_callfunc_" + contract.FuncName);
+            MessageHeader retMsg = GetMessage("s_ret_" + contract.RetType);
+            return (T)retMsg.payload;
         }
 
         public override void SendMessage(object obj, string type)

@@ -6,7 +6,7 @@ using System.Text;
 
 namespace SkylinesRemotePython.API
 {
-    public class Prop
+    public class Prop : ObjectAPI
     {
         public int id { get; private set; }
 
@@ -15,13 +15,22 @@ namespace SkylinesRemotePython.API
         public Vector position { get; private set; }
 
         public double angle { get; private set; }
-        internal Prop(object obj)
+
+        public void refresh()
         {
-            PropMessage msg = (PropMessage)obj;
+            AssignData(api.client.RemoteCall<PropMessage>(Contracts.GetPropFromId, id));
+        }
+
+        internal void AssignData(PropMessage msg)
+        {
             id = msg.id;
             prefab_name = msg.prefab_name;
             position = msg.position;
             angle = msg.angle;
+        }
+        internal Prop(PropMessage obj, GameAPI api) : base(api)
+        {
+            AssignData(obj);
         }
     }
 }

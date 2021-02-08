@@ -46,6 +46,7 @@
     <Compile Include="Messages\PropMessage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Messages\RunScriptMessage.cs" />
+    <Compile Include="Protocol\Contracts.cs" />
     <Compile Include="Protocol\TcpConversation.cs" />
     <Compile Include="SharedStructures\Vector.cs" />
   </ItemGroup>

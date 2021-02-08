@@ -10,42 +10,41 @@ namespace PythonConsole
 {
     public class GameAPI
     {
-        public static void GetPropFromId(object msg, TcpClient client)
+        public static object GetPropFromId(object msg)
         {
-            client.SendMessage(PrepareProp((ushort)((int)msg)), "s_ret_Prop");
+            return PrepareProp((ushort)((int)msg));
         }
-        public static void GetNodeFromId(object msg, TcpClient client)
+        public static object GetNodeFromId(object msg)
         {
-            client.SendMessage(PrepareNode((ushort)((int)msg)), "s_ret_NetNode");
+            return PrepareNode((ushort)((int)msg));
         }
-        public static void CreateProp(object msg, TcpClient client)
+        public static object CreateProp(object msg)
         {
             var data = (CreatePropMessage)msg;
 			ushort id;
             PropInfo info = PrefabCollection<PropInfo>.FindLoaded(data.Type);
             Assert(info, "Prefab '" + data.Type + "' not found");
-            Vector3 vect = HandleCall.ConvertVector(data.Position);
+            Vector3 vect = RemoteFuncManager.ConvertVector(data.Position);
             Vector3 pos = new Vector3(vect.x, data.Position.is_height_defined ? vect.y : NetUtil.TerrainHeight(vect), vect.z);
             if (Singleton<PropManager>.instance.CreateProp(out id, ref Singleton<SimulationManager>.instance.m_randomizer, info, pos, (float)data.Angle, true))
 			{
-                client.SendMessage(PrepareProp(id), "s_ret_Prop");
-                return;
+                return PrepareProp(id);
 			}
             throw new Exception("Internal error - failed to create prop");
         }
 
-        public static void CreateNode(object msg, TcpClient client)
+        public static object CreateNode(object msg)
         {
             var data = (CreateNodeMessage)msg;
             NetInfo info = PrefabCollection<NetInfo>.FindLoaded(data.Type);
             Assert(info, "Prefab '" + data.Type + "' not found");
-            Vector3 vect = HandleCall.ConvertVector(data.Position);
+            Vector3 vect = RemoteFuncManager.ConvertVector(data.Position);
             Vector3 pos = new Vector3(vect.x, data.Position.is_height_defined ? vect.y : NetUtil.TerrainHeight(vect), vect.z);
             ushort id = NetUtil.CreateNode(info, pos);
-            client.SendMessage(PrepareNode(id), "s_ret_NetNode");
+            return PrepareNode(id);
         }
 
-        public static void ExistsPrefab(object msg, TcpClient client)
+        public static object ExistsPrefab(object msg)
         {
             string name = (string)msg;
             bool ret = false;
@@ -56,7 +55,7 @@ namespace PythonConsole
             {
                 ret = true;
             }
-            client.SendMessage(ret, "s_ret_bool");
+            return ret;
         }
 
         private static SkylinesPythonShared.NetNodeMessage PrepareNode(ushort id)
@@ -65,7 +64,7 @@ namespace PythonConsole
             return new NetNodeMessage()
             {
                 id = id,
-                position = HandleCall.ConvertVectorBack(node.m_position),
+                position = RemoteFuncManager.ConvertVectorBack(node.m_position),
                 prefab_name = node.Info.name
             };
         }
@@ -76,7 +75,7 @@ namespace PythonConsole
             return new PropMessage()
             {
                 id = id,
-                position = HandleCall.ConvertVectorBack(prop.Position),
+                position = RemoteFuncManager.ConvertVectorBack(prop.Position),
                 prefab_name = prop.Info.name,
                 angle = prop.Angle
             };
