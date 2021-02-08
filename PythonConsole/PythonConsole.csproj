@@ -58,6 +58,7 @@
     <Compile Include="ModTools\ModConfiguration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PythonAPI\GameAPI.cs" />
+    <Compile Include="PythonAPI\Logic\NetLogic.cs" />
     <Compile Include="RemoteFuncManager.cs" />
     <Compile Include="PythonConsole.cs" />
     <Compile Include="PythonConsoleTool.cs" />
@@ -68,10 +69,13 @@
     <Compile Include="UI\ScriptEditor.cs" />
     <Compile Include="UI\ScriptEditorFile.cs" />
     <Compile Include="UnityPythonObject.cs" />
+    <Compile Include="Util\ExtensionMethods.cs" />
     <Compile Include="Util\FileUtil.cs" />
     <Compile Include="Util\ModPath.cs" />
     <Compile Include="Util\NetUtil.cs" />
     <Compile Include="Util\Unzip.cs" />
+    <Compile Include="Util\Util.cs" />
+    <Compile Include="Util\VectUtil.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

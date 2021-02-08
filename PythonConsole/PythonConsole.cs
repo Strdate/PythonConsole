@@ -27,6 +27,8 @@ namespace PythonConsole
         private bool _isRunning;
         private bool _isClientReady;
 
+        public bool IsReady { get => _isClientReady; }
+
         public bool CanExecuteScript => !_isRunning && _isClientReady;
         public PythonConsole()
         {
@@ -51,6 +53,7 @@ namespace PythonConsole
                     _client = TcpClient.CreateClient();
                     _remoteFuncManager = new RemoteFuncManager(_client);
                     _isClientReady = true;
+                    UnityPythonObject.Instance.Print("Python engine ready\n");
                 }
             } catch { }
             

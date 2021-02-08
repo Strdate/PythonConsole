@@ -25,7 +25,7 @@ namespace PythonConsole
 
         //private IModEntryPoint currentMod;
         private string lastError = string.Empty;
-        private string output = string.Empty;
+        private string output = "Starting remote python engine...\n";
 
         private Vector2 editorScrollPosition = Vector2.zero;
         private Vector2 outputScrollPosition = Vector2.zero;
@@ -271,10 +271,7 @@ namespace PythonConsole
 
             GUILayout.BeginHorizontal();
 
-            /*if (currentMod != null)
-            {
-                GUI.enabled = false;
-            }*/
+            GUI.enabled = PythonConsole.Instance.IsReady;
 
             if (GUILayout.Button("Execute"))
             {
