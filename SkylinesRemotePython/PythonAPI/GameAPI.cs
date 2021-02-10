@@ -14,17 +14,17 @@ namespace SkylinesRemotePython.API
             this.client = client;
         }
 
-        public Prop get_prop_from_id(int id)
+        public Prop get_prop(int id)
         {
             return new Prop(client.RemoteCall<PropMessage>(Contracts.GetPropFromId, id), this);
         }
 
-        public NetNode get_node_from_id(int id)
+        public NetNode get_node(int id)
         {
             return new NetNode(client.RemoteCall<NetNodeMessage>(Contracts.GetNodeFromId, id), this);
         }
 
-        public Segment get_segment_from_id(int id)
+        public Segment get_segment(int id)
         {
             return new Segment(client.RemoteCall<NetSegmentMessage>(Contracts.GetSegmentFromId, id), this);
         }

@@ -42,6 +42,9 @@ namespace PythonConsole
 
             if (Input.GetKeyDown(KeyCode.S))
             {
+                if(PythonConsole.Instance == null) {
+                    PythonConsole.CreateInstance();
+                }
                 scriptEditor.Visible = !scriptEditor.Visible;
             }
         }

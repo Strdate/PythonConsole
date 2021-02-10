@@ -47,11 +47,11 @@ namespace PythonConsole
                 .ChangeSizeRelative(height: 0)
                 .ChangeSizeBy(height: HeaderHeight);
 
-            editorArea = new GUIArea(this)
+            editorArea = new GUIArea(this, new Vector2(8,0))
                 .OffsetBy(vertical: 32.0f + HeaderHeight)
                 .ChangeSizeBy(height: -(32.0f + HeaderHeight + FooterHeight + OutputHeight));
 
-            footerArea = new GUIArea(this)
+            footerArea = new GUIArea(this, new Vector2(8, 0))
                 .OffsetRelative(vertical: 1f)
                 .OffsetBy(vertical: -FooterHeight-OutputHeight)
                 .ChangeSizeRelative(height: 0)
@@ -271,23 +271,30 @@ namespace PythonConsole
 
             GUILayout.BeginHorizontal();
 
-            GUI.enabled = PythonConsole.Instance.IsReady;
+            ConsoleState state = PythonConsole.Instance?.State ?? ConsoleState.Initializing;
 
-            if (GUILayout.Button("Execute"))
-            {
-                AbortActions();
-                PythonConsole.Instance.ScheduleExecution(currentFile.Source);
-                lastError = string.Empty;
+            if(state != ConsoleState.Dead) {
+                GUI.enabled = state == ConsoleState.Ready;
+
+                if (GUILayout.Button("Execute")) {
+                    AbortActions();
+                    PythonConsole.Instance.ScheduleExecution(currentFile.Source);
+                    lastError = string.Empty;
+                }
+
+                GUI.enabled = true;
+
+                if (GUILayout.Button("Clear output")) {
+                    AbortActions();
+                    lastError = string.Empty;
+                    output = string.Empty;
+                }
+            } else {
+                if (GUILayout.Button("Restart engine")) {
+                    PythonConsole.CreateInstance();
+                }
             }
-
-            GUI.enabled = true;
-
-            if (GUILayout.Button("Clear output"))
-            {
-                AbortActions();
-                lastError = string.Empty;
-                output = string.Empty;
-            }
+            
 
             GUILayout.Label(lastError != "" ? "Last error: " + lastError : "");
 

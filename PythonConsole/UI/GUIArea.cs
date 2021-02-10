@@ -4,7 +4,7 @@ namespace PythonConsole
 {
     internal sealed class GUIArea
     {
-        private readonly Vector2 margin = new Vector2(8f, 8f);
+        private Vector2 margin = new Vector2(8f, 8f);
         private readonly GUIWindow window;
 
         private Vector2 absoluteOffset;
@@ -19,6 +19,12 @@ namespace PythonConsole
         public GUIArea(GUIWindow window)
         {
             this.window = window;
+        }
+
+        public GUIArea(GUIWindow window, Vector2 margin)
+        {
+            this.window = window;
+            this.margin = margin;
         }
 
         public GUIArea OffsetBy(float? horizontal = null, float? vertical = null)

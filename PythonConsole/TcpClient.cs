@@ -16,16 +16,7 @@ namespace PythonConsole
         public static TcpClient CreateClient()
         {
             Socket s = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            try
-            {
-                s.Connect(IPAddress.Parse("127.0.0.1"), 6672);
-            }
-            catch
-            {
-                StartUpServer();
-                throw;
-            }
-            s.ReceiveTimeout = 5000;
+            s.Connect(IPAddress.Parse("127.0.0.1"), 6672);
             return new TcpClient(s);
         }
         protected TcpClient(Socket s) : base(s)
@@ -33,7 +24,7 @@ namespace PythonConsole
             
         }
 
-        private static void StartUpServer()
+        public static void StartUpServer()
         {
             string archivePath = Path.Combine(ModPath.Instsance.AssemblyPath,"SkylinesRemotePython.zip");
             string destPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SkylinesRemotePython");
@@ -58,7 +49,7 @@ namespace PythonConsole
             process.Start();
         }
 
-        public MessageHeader GetMessage()
+        public MessageHeader GetMessageSync()
         {
             MessageHeader msg = AwaitMessage();
             return msg;
