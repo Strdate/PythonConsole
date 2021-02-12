@@ -26,6 +26,7 @@ namespace SkylinesRemotePython
             _scope = _engine.CreateScope();
 
             _scope.SetVariable("Vector", DynamicHelpers.GetPythonTypeFromType(typeof(Vector)));
+            _scope.SetVariable("NetOptions", DynamicHelpers.GetPythonTypeFromType(typeof(NetOptions)));
             _scope.SetVariable("vector_xz", new Func<double,double, Vector>(Vector.vector_xz));
             _scope.SetVariable("game", new GameAPI(client));
 

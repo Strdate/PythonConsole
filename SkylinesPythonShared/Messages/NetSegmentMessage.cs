@@ -15,5 +15,7 @@ namespace SkylinesPythonShared
         public ushort start_node_id { get; set; }
 
         public ushort end_node_id { get; set; }
+
+        public float length { get; set; }
     }
 }

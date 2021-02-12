@@ -16,6 +16,8 @@ namespace SkylinesRemotePython.API
 
         public int end_node_id { get; private set; }
 
+        public float length { get; private set; }
+
         public NetNode start_node {
             get {
                 return new NetNode(api.client.RemoteCall<NetNodeMessage>(Contracts.GetNodeFromId, start_node_id), api);
@@ -39,6 +41,7 @@ namespace SkylinesRemotePython.API
             prefab_name = msg.prefab_name;
             start_node_id = msg.start_node_id;
             end_node_id = msg.end_node_id;
+            length = msg.length;
         }
 
         internal Segment(NetSegmentMessage obj, GameAPI api) : base(api)

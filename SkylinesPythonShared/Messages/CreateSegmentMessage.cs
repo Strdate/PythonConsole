@@ -9,7 +9,11 @@ namespace SkylinesPythonShared
     [Serializable]
     public class CreateSegmentMessage
     {
-        public string prefab_name { get; set; }
+        public NetOptions net_options { get; set; }
+
+        public Vector start_postition { get; set; }
+
+        public Vector end_postition { get; set; }
 
         public ushort start_node_id { get; set; }
 

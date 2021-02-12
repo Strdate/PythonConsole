@@ -52,59 +52,82 @@ namespace SkylinesRemotePython.API
             return new NetNode(client.RemoteCall<NetNodeMessage>(Contracts.CreateNode, msg), this);
         }
 
-        public Segment create_segment(NetNode startNode, NetNode endNode, string prefab)
+        public Segment create_segment(object startNode, object endNode, object type)
         {
-            return create_segment(startNode, endNode, prefab, null);
+            return CreateSegmentImpl(startNode, endNode, type, null, null, null);
         }
 
-        public Segment create_segment(NetNode startNode, NetNode endNode, string prefab, Vector middle_pos)
+        public Segment create_segment(object startNode, object endNode, object type, Vector middle_pos)
         {
+            return CreateSegmentImpl(startNode, endNode, type, null, null, middle_pos);
+        }
+
+        public Segment create_segment(object startNode, object endNode, object type, Vector start_dir, Vector end_dir)
+        {
+            return CreateSegmentImpl(startNode, endNode, type, start_dir, end_dir, null);
+        }
+
+        private Segment CreateSegmentImpl(object startNode, object endNode, object type, Vector start_dir, Vector end_dir, Vector middle_pos)
+        {
+            if(!(startNode is NetNode) && !(startNode is Vector)) {
+                throw new Exception("Segment startNode must be NetNode or Vector, not " + startNode.GetType().Name);
+            }
+            if (!(endNode is NetNode) && !(endNode is Vector)) {
+                throw new Exception("Segment endNode must be NetNode or Vector, not " + endNode.GetType().Name);
+            }
+            if (!(type is string) && !(type is NetOptions)) {
+                throw new Exception("Segment type must be prefab name or NetOptions object, not " + type.GetType().Name);
+            }
+            NetOptions options = type as NetOptions ?? new NetOptions((string) type);
             CreateSegmentMessage msg = new CreateSegmentMessage() {
-                start_node_id = startNode.id,
-                end_node_id = endNode.id,
-                prefab_name = prefab,
+                start_node_id = startNode is NetNode ? ((NetNode)startNode).id : (ushort)0,
+                end_node_id = endNode is NetNode ? ((NetNode)endNode).id : (ushort)0,
+                start_postition = startNode is Vector ? (Vector)startNode : null,
+                end_postition = endNode is Vector ? (Vector)endNode : null,
+                net_options = options,
+                start_dir = start_dir,
+                end_dir = end_dir,
                 middle_pos = middle_pos
             };
             return new Segment(client.RemoteCall<NetSegmentMessage>(Contracts.CreateSegment, msg), this);
         }
 
-        public Segment create_segment(NetNode startNode, NetNode endNode, string prefab, Vector start_dir, Vector end_dir)
+        public IList<Segment> create_segments(object startNode, object endNode, object type)
         {
-            CreateSegmentMessage msg = new CreateSegmentMessage() {
-                start_node_id = startNode.id,
-                end_node_id = endNode.id,
-                prefab_name = prefab,
-                start_dir = start_dir,
-                end_dir = end_dir
-            };
-            return new Segment(client.RemoteCall<NetSegmentMessage>(Contracts.CreateSegment, msg), this);
+            return CreateSegmentsImpl(startNode, endNode, type, null, null, null);
         }
 
-        public IList<Segment> create_segments(NetNode startNode, NetNode endNode, string prefab)
+        public IList<Segment> create_segments(object startNode, object endNode, object type, Vector middle_pos)
         {
-            return create_segments(startNode, endNode, prefab, null);
+            return CreateSegmentsImpl(startNode, endNode, type, null, null, middle_pos);
         }
 
-        public IList<Segment> create_segments(NetNode startNode, NetNode endNode, string prefab, Vector middle_pos)
+        public IList<Segment> create_segments(object startNode, object endNode, object type, Vector start_dir, Vector end_dir)
         {
-            CreateSegmentMessage msg = new CreateSegmentMessage() {
-                start_node_id = startNode.id,
-                end_node_id = endNode.id,
-                prefab_name = prefab,
-                middle_pos = middle_pos,
-                auto_split = true
-            };
-            return NetLogic.PrepareSegmentList(client.RemoteCall<NetSegmentListMessage>(Contracts.CreateSegments, msg).list, this);
+            return CreateSegmentsImpl(startNode, endNode, type, start_dir, end_dir, null);
         }
 
-        public IList<Segment> create_segments(NetNode startNode, NetNode endNode, string prefab, Vector start_dir, Vector end_dir)
+        private IList<Segment> CreateSegmentsImpl(object startNode, object endNode, object type, Vector start_dir, Vector end_dir, Vector middle_pos, bool autoSplit = false)
         {
+            if (!(startNode is NetNode) && !(startNode is Vector)) {
+                throw new Exception("Segment startNode must be NetNode or Vector, not " + startNode.GetType().Name);
+            }
+            if (!(endNode is NetNode) && !(endNode is Vector)) {
+                throw new Exception("Segment endNode must be NetNode or Vector, not " + endNode.GetType().Name);
+            }
+            if (!(type is string) && !(type is NetOptions)) {
+                throw new Exception("Segment type must be prefab name or NetOptions object, not " + type.GetType().Name);
+            }
+            NetOptions options = type as NetOptions ?? new NetOptions((string)type);
             CreateSegmentMessage msg = new CreateSegmentMessage() {
-                start_node_id = startNode.id,
-                end_node_id = endNode.id,
-                prefab_name = prefab,
+                start_node_id = startNode is NetNode ? ((NetNode)startNode).id : (ushort)0,
+                end_node_id = endNode is NetNode ? ((NetNode)endNode).id : (ushort)0,
+                start_postition = startNode is Vector ? (Vector)startNode : null,
+                end_postition = endNode is Vector ? (Vector)endNode : null,
+                net_options = options,
                 start_dir = start_dir,
                 end_dir = end_dir,
+                middle_pos = middle_pos,
                 auto_split = true
             };
             return NetLogic.PrepareSegmentList(client.RemoteCall<NetSegmentListMessage>(Contracts.CreateSegments, msg).list, this);

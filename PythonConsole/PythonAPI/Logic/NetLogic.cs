@@ -1,6 +1,7 @@
 ﻿using ColossalFramework;
 using ColossalFramework.Math;
 using SkylinesPythonShared;
+using SkylinesPythonShared.API;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,24 +14,26 @@ namespace PythonConsole
     {
         public static NetSegmentMessage CreateSegment(CreateSegmentMessage data)
         {
-            NetInfo info = PrefabCollection<NetInfo>.FindLoaded(data.prefab_name);
-            Util.Assert(info, "Prefab '" + data.prefab_name + "' not found");
+            ParseNetOptions(data.net_options, out NetInfo info, out bool invert);
 
-            ref NetNode startNode = ref NetUtil.Node(data.start_node_id);
-            ref NetNode endNode = ref NetUtil.Node(data.end_node_id);
+            ushort startNodeId = data.start_node_id;
+            ushort endNodeId = data.end_node_id;
+            ref NetNode startNode = ref EnsureNode(ref startNodeId, data.start_postition, info);
+            ref NetNode endNode = ref EnsureNode(ref endNodeId, data.end_postition, info);
 
             GetSegmentVectors(data, ref startNode, ref endNode, out Vector3 startDir, out Vector3 endDir);
 
-            return PrepareSegment( NetUtil.CreateSegment(data.start_node_id, data.end_node_id, startDir, endDir, info) );
+            return PrepareSegment( NetUtil.CreateSegment(startNodeId, endNodeId, startDir, endDir, info, invert) );
         }
 
         public static NetSegmentListMessage CreateSegments(CreateSegmentMessage data)
         {
-            NetInfo info = PrefabCollection<NetInfo>.FindLoaded(data.prefab_name);
-            Util.Assert(info, "Prefab '" + data.prefab_name + "' not found");
+            ParseNetOptions(data.net_options, out NetInfo info, out bool invert);
 
-            ref NetNode startNode = ref NetUtil.Node(data.start_node_id);
-            ref NetNode endNode = ref NetUtil.Node(data.end_node_id);
+            ushort startNodeId = data.start_node_id;
+            ushort endNodeId = data.end_node_id;
+            ref NetNode startNode = ref EnsureNode(ref startNodeId, data.start_postition, info);
+            ref NetNode endNode = ref EnsureNode(ref endNodeId, data.end_postition, info);
 
             GetSegmentVectors(data, ref startNode, ref endNode, out Vector3 firstStartDir, out Vector3 lastEndDir);
 
@@ -47,38 +50,45 @@ namespace PythonConsole
             Vector3 prevVector = firstStartDir;
             for (int i = 0; i < numOfSegments; i++) {
                 float t1 = (float)(i+1) / (float)numOfSegments;
-                //float height = Mathf.Lerp(startNode.m_position.y, endNode.m_position.y, t);
-                
-                //Vector3 startDir = VectorUtils.NormalizeXY(bezier.Tangent(t));
 
-                ushort endNodeId;
-                ushort startNodeId;
+                ushort curEndNodeId;
+                ushort curStartNodeId;
                 if(i == 0) {
-                    startNodeId = data.start_node_id;
+                    curStartNodeId = startNodeId;
                 } else {
-                    startNodeId = prevNodeId;
+                    curStartNodeId = prevNodeId;
                 }
                 Vector3 startDir = prevVector;
 
                 Vector3 endPos = bezier.Position(t1);
                 Vector3 endDir;
                 if (i + 1 < numOfSegments) {
-                    endNodeId = NetUtil.CreateNode(info, endPos);
+                    curEndNodeId = NetUtil.CreateNode(info, endPos);
                     endDir = -VectorUtils.NormalizeXZ(VectorUtils.NormalizeXY(bezier.Tangent(t1)));
                 } else {
-                    endNodeId = data.end_node_id;
+                    curEndNodeId = endNodeId;
                     endDir = lastEndDir;
                 }
 
-                segments.Add( PrepareSegment( NetUtil.CreateSegment(startNodeId, endNodeId, startDir, endDir, info) ));
+                segments.Add( PrepareSegment( NetUtil.CreateSegment(curStartNodeId, curEndNodeId, startDir, endDir, info, invert) ));
 
-                prevNodeId = endNodeId;
+                prevNodeId = curEndNodeId;
                 prevVector = -endDir;
             }
 
             return new NetSegmentListMessage() {
                 list = segments
             };
+        }
+
+        private static ref NetNode EnsureNode(ref ushort id, Vector position, NetInfo info)
+        {
+            if(id == 0) {
+                Vector3 vect = position.ToUnity();
+                Vector3 pos = new Vector3(vect.x, position.is_height_defined ? vect.y : NetUtil.TerrainHeight(vect), vect.z);
+                id = NetUtil.CreateNode(info, pos);
+            }
+            return ref NetUtil.Node(id);
         }
 
         public static SkylinesPythonShared.NetNodeMessage PrepareNode(ushort id)
@@ -98,7 +108,8 @@ namespace PythonConsole
                 id = id,
                 prefab_name = segment.Info.name,
                 start_node_id = segment.m_startNode,
-                end_node_id = segment.m_endNode
+                end_node_id = segment.m_endNode,
+                length = segment.m_averageLength
             };
         }
 
@@ -111,6 +122,38 @@ namespace PythonConsole
                 prefab_name = prop.Info.name,
                 angle = prop.Angle
             };
+        }
+
+        private static void ParseNetOptions(NetOptions options, out NetInfo info, out bool invert)
+        {
+            info = PrefabCollection<NetInfo>.FindLoaded(options.prefab_name);
+            Util.Assert(info, "Prefab '" + options.prefab_name + "' not found");
+
+            RoadAI roadAI = info.m_netAI as RoadAI;
+            string elevationMode = options.elevation_mode.ToLower();
+            switch (elevationMode) {
+                case "default":
+                    break;
+                case "ground":
+                    info = roadAI?.m_info ?? info;
+                    break;
+                case "elevated":
+                    info = roadAI?.m_elevatedInfo ?? info;
+                    break;
+                case "bridge":
+                    info = roadAI?.m_bridgeInfo ?? info;
+                    break;
+                case "tunnel":
+                    info = roadAI?.m_tunnelInfo ?? info;
+                    break;
+                case "slope":
+                    info = roadAI?.m_tunnelInfo ?? info;
+                    break;
+                default:
+                    throw new Exception("'" + elevationMode + "' is not valid elevation mode");
+            }
+
+            invert = options.invert;
         }
 
         private static void GetSegmentVectors(CreateSegmentMessage data, ref NetNode startNode, ref NetNode endNode, out Vector3 startDir, out Vector3 endDir)
