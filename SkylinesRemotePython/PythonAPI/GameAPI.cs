@@ -80,6 +80,36 @@ namespace SkylinesRemotePython.API
             return new Segment(client.RemoteCall<NetSegmentMessage>(Contracts.CreateSegment, msg), this);
         }
 
+        public IList<Segment> create_segments(NetNode startNode, NetNode endNode, string prefab)
+        {
+            return create_segments(startNode, endNode, prefab, null);
+        }
+
+        public IList<Segment> create_segments(NetNode startNode, NetNode endNode, string prefab, Vector middle_pos)
+        {
+            CreateSegmentMessage msg = new CreateSegmentMessage() {
+                start_node_id = startNode.id,
+                end_node_id = endNode.id,
+                prefab_name = prefab,
+                middle_pos = middle_pos,
+                auto_split = true
+            };
+            return NetLogic.PrepareSegmentList(client.RemoteCall<NetSegmentListMessage>(Contracts.CreateSegments, msg).list, this);
+        }
+
+        public IList<Segment> create_segments(NetNode startNode, NetNode endNode, string prefab, Vector start_dir, Vector end_dir)
+        {
+            CreateSegmentMessage msg = new CreateSegmentMessage() {
+                start_node_id = startNode.id,
+                end_node_id = endNode.id,
+                prefab_name = prefab,
+                start_dir = start_dir,
+                end_dir = end_dir,
+                auto_split = true
+            };
+            return NetLogic.PrepareSegmentList(client.RemoteCall<NetSegmentListMessage>(Contracts.CreateSegments, msg).list, this);
+        }
+
         public bool is_prefab(string name)
         {
             return client.RemoteCall<bool>(Contracts.ExistsPrefab, name);

@@ -20,5 +20,7 @@ namespace SkylinesPythonShared
         public Vector end_dir { get; set; }
 
         public Vector middle_pos { get; set; }
+
+        public bool auto_split { get; set; }
     }
 }

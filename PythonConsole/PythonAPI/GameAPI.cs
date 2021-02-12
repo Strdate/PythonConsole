@@ -54,6 +54,11 @@ namespace PythonConsole
             return NetLogic.CreateSegment((CreateSegmentMessage)msg);
         }
 
+        public static object CreateSegments(object msg)
+        {
+            return NetLogic.CreateSegments((CreateSegmentMessage)msg);
+        }
+
         public static object ExistsPrefab(object msg)
         {
             string name = (string)msg;

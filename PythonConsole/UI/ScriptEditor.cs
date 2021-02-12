@@ -13,7 +13,7 @@ namespace PythonConsole
         private const string ExampleScriptFileName = "Script.py";
 
         private const float HeaderHeight = 90.0f;
-        private const float FooterHeight = 60.0f;
+        private const float FooterHeight = 40.0f;
         private const float OutputHeight = 180.0f;
 
         private readonly List<ScriptEditorFile> projectFiles = new List<ScriptEditorFile>();
@@ -51,7 +51,7 @@ namespace PythonConsole
                 .OffsetBy(vertical: 32.0f + HeaderHeight)
                 .ChangeSizeBy(height: -(32.0f + HeaderHeight + FooterHeight + OutputHeight));
 
-            footerArea = new GUIArea(this, new Vector2(8, 0))
+            footerArea = new GUIArea(this, new Vector2(8, 4))
                 .OffsetRelative(vertical: 1f)
                 .OffsetBy(vertical: -FooterHeight-OutputHeight)
                 .ChangeSizeRelative(height: 0)

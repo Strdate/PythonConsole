@@ -44,6 +44,7 @@
     <Compile Include="Messages\CreateSegmentMessage.cs" />
     <Compile Include="Messages\MessageHeader.cs" />
     <Compile Include="Messages\NetNodeMessage.cs" />
+    <Compile Include="Messages\NetSegmentListMessage.cs" />
     <Compile Include="Messages\NetSegmentMessage.cs" />
     <Compile Include="Messages\PropMessage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

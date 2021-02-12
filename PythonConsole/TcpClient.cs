@@ -42,7 +42,7 @@ namespace PythonConsole
                     UseShellExecute = true,
                     RedirectStandardOutput = false,
                     RedirectStandardError = false,
-                    CreateNoWindow = false
+                    CreateNoWindow = true
                 }
 
             };

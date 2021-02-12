@@ -13,6 +13,7 @@ namespace SkylinesPythonShared
         public static Contract CreateProp = new Contract() { FuncName = "CreateProp", RetType = "Prop"};
         public static Contract CreateNode = new Contract() { FuncName = "CreateNode", RetType = "NetNode"};
         public static Contract CreateSegment = new Contract() { FuncName = "CreateSegment", RetType = "Segment" };
+        public static Contract CreateSegments = new Contract() { FuncName = "CreateSegments", RetType = "SegmentList" };
         public static Contract ExistsPrefab = new Contract() { FuncName = "ExistsPrefab", RetType = "bool" };
     }
 
