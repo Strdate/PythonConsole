@@ -76,11 +76,11 @@ namespace PythonConsole
                             break;
                         case "c_exception":
                             State = ConsoleState.Ready;
-                            PrintErrortAsync((string)header.payload);
+                            PrintErrorAsync((string)header.payload);
                             break;
                         case "c_failed_to_compile":
                             State = ConsoleState.Ready;
-                            PrintErrortAsync("Failed to compile: " + (string)header.payload);
+                            PrintErrorAsync("Failed to compile: " + (string)header.payload);
                             break;
                         case "c_script_end":
                             _stopWatch.Stop();
@@ -107,7 +107,7 @@ namespace PythonConsole
             });
         }
 
-        private void PrintErrortAsync(string message)
+        private void PrintErrorAsync(string message)
         {
             ThreadHelper.dispatcher.Dispatch(() => {
                 UnityPythonObject.Instance.PrintError(message);

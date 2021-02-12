@@ -71,6 +71,7 @@
     <Compile Include="UnityPythonObject.cs" />
     <Compile Include="Util\ExtensionMethods.cs" />
     <Compile Include="Util\FileUtil.cs" />
+    <Compile Include="Util\ManagersUtil.cs" />
     <Compile Include="Util\ModPath.cs" />
     <Compile Include="Util\NetUtil.cs" />
     <Compile Include="Util\Unzip.cs" />

@@ -124,6 +124,16 @@ namespace PythonConsole
             };
         }
 
+        public static TreeMessage PrepareTree(uint id)
+        {
+            TreeInstance tree = ManagersUtil.Tree(id);
+            return new TreeMessage() {
+                id = id,
+                position = tree.Position.FromUnity(),
+                prefab_name = tree.Info.name
+            };
+        }
+
         private static void ParseNetOptions(NetOptions options, out NetInfo info, out bool invert)
         {
             info = PrefabCollection<NetInfo>.FindLoaded(options.prefab_name);

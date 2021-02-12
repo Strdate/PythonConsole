@@ -19,6 +19,11 @@ namespace SkylinesRemotePython.API
             return new Prop(client.RemoteCall<PropMessage>(Contracts.GetPropFromId, id), this);
         }
 
+        public Tree get_tree(long id)
+        {
+            return new Tree(client.RemoteCall<TreeMessage>(Contracts.GetTreeFromId, id), this);
+        }
+
         public NetNode get_node(int id)
         {
             return new NetNode(client.RemoteCall<NetNodeMessage>(Contracts.GetNodeFromId, id), this);
@@ -39,6 +44,16 @@ namespace SkylinesRemotePython.API
             };
 
             return new Prop(client.RemoteCall<PropMessage>(Contracts.CreateProp, msg), this);
+        }
+
+        public Tree create_tree(Vector position, string prefab_name)
+        {
+            var msg = new CreateTreeMessage() {
+                Position = position,
+                prefab_name = prefab_name
+            };
+
+            return new Tree(client.RemoteCall<TreeMessage>(Contracts.CreateTree, msg), this);
         }
 
         public NetNode create_node(Vector position, string prefab)
