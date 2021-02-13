@@ -35,6 +35,7 @@ namespace PythonConsole
 
         public void Update()
         {
+            scriptEditor.OnUpdate();
             if (!Input.GetKey(KeyCode.LeftAlt))
             {
                 return;

@@ -24,6 +24,11 @@ namespace SkylinesRemotePython.API
             return new Tree(client.RemoteCall<TreeMessage>(Contracts.GetTreeFromId, id), this);
         }
 
+        public Building get_building(int id)
+        {
+            return new Building(client.RemoteCall<BuildingMessage>(Contracts.GetBuildingFromId, id), this);
+        }
+
         public NetNode get_node(int id)
         {
             return new NetNode(client.RemoteCall<NetNodeMessage>(Contracts.GetNodeFromId, id), this);
@@ -54,6 +59,17 @@ namespace SkylinesRemotePython.API
             };
 
             return new Tree(client.RemoteCall<TreeMessage>(Contracts.CreateTree, msg), this);
+        }
+
+        public Building create_building(Vector position, string type, double angle = 0)
+        {
+            var msg = new CreateBuildingMessage() {
+                Position = position,
+                Type = type,
+                Angle = angle
+            };
+
+            return new Building(client.RemoteCall<BuildingMessage>(Contracts.CreateBuilding, msg), this);
         }
 
         public NetNode create_node(Vector position, string prefab)
@@ -151,6 +167,11 @@ namespace SkylinesRemotePython.API
         public bool is_prefab(string name)
         {
             return client.RemoteCall<bool>(Contracts.ExistsPrefab, name);
+        }
+
+        public float terrain_height(Vector pos)
+        {
+            return client.RemoteCall<float>(Contracts.GetTerrainHeight, pos);
         }
 
         public override string ToString()

@@ -1,5 +1,6 @@
 ﻿using ColossalFramework;
 using SkylinesPythonShared;
+using SkylinesPythonShared.API;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,12 +13,17 @@ namespace PythonConsole
     {
         public static object GetPropFromId(object msg)
         {
-            return NetLogic.PrepareProp((ushort)((int)msg));
+            return ManagersLogic.PrepareProp((ushort)((int)msg));
         }
 
         public static object GetTreeFromId(object msg)
         {
-            return NetLogic.PrepareTree((uint)((long)msg));
+            return ManagersLogic.PrepareTree((uint)((long)msg));
+        }
+
+        public static object GetBuildingFromId(object msg)
+        {
+            return ManagersLogic.PrepareBuilding((ushort)((int)msg));
         }
         public static object GetNodeFromId(object msg)
         {
@@ -36,11 +42,7 @@ namespace PythonConsole
             Util.Assert(info, "Prefab '" + data.Type + "' not found");
             Vector3 vect = data.Position.ToUnity();
             Vector3 pos = new Vector3(vect.x, data.Position.is_height_defined ? vect.y : NetUtil.TerrainHeight(vect), vect.z);
-            if (Singleton<PropManager>.instance.CreateProp(out id, ref Singleton<SimulationManager>.instance.m_randomizer, info, pos, (float)data.Angle, true))
-			{
-                return NetLogic.PrepareProp(id);
-			}
-            throw new Exception("Internal error - failed to create prop");
+            return ManagersLogic.PrepareProp( ManagersUtil.CreateProp(pos, (float)data.Angle, info, true) );
         }
 
         public static object CreateTree(object msg)
@@ -52,7 +54,18 @@ namespace PythonConsole
             Vector3 vect = data.Position.ToUnity();
             Vector3 pos = new Vector3(vect.x, data.Position.is_height_defined ? vect.y : NetUtil.TerrainHeight(vect), vect.z);
             uint id = ManagersUtil.CreateTree(pos, info, true);
-            return NetLogic.PrepareTree(id);
+            return ManagersLogic.PrepareTree(id);
+        }
+
+        public static object CreateBuilding(object msg)
+        {
+            var data = (CreateBuildingMessage)msg;
+            ushort id;
+            BuildingInfo info = PrefabCollection<BuildingInfo>.FindLoaded(data.Type);
+            Util.Assert(info, "Prefab '" + data.Type + "' not found");
+            Vector3 vect = data.Position.ToUnity();
+            Vector3 pos = new Vector3(vect.x, data.Position.is_height_defined ? vect.y : NetUtil.TerrainHeight(vect), vect.z);
+            return ManagersLogic.PrepareBuilding(ManagersUtil.CreateBuilding(pos, (float)data.Angle, info));
         }
 
         public static object CreateNode(object msg)
@@ -88,6 +101,11 @@ namespace PythonConsole
                 ret = true;
             }
             return ret;
+        }
+
+        public static object GetTerrainHeight(object msg)
+        {
+            return NetUtil.TerrainHeight(((Vector)msg).ToUnity());
         }
     }
 }

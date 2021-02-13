@@ -39,6 +39,8 @@ namespace PythonConsole
 
         private ScriptEditorFile currentFile;
 
+        private readonly ModalUI modalUI = new ModalUI();
+
         public ScriptEditor()
             : base("Python Console", new Rect(16.0f, 16.0f, 640.0f, 480.0f))
         {
@@ -174,6 +176,20 @@ namespace PythonConsole
             }
 
             lastError = string.Empty;
+        }
+
+        public void OnUpdate()
+        {
+            var middleButtonState = MouseButtonState.None;
+            if (Input.GetMouseButtonDown(2)) {
+                middleButtonState = MouseButtonState.Pressed;
+            } else if (Input.GetMouseButtonUp(2)) {
+                middleButtonState = MouseButtonState.Released;
+            } else if (Input.GetMouseButton(2)) {
+                middleButtonState = MouseButtonState.Held;
+            }
+
+            modalUI.Update(IsMouseOverWindow(), middleButtonState);
         }
 
         private void DrawHeader()

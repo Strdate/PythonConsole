@@ -39,6 +39,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Messages\BuildingMessage.cs" />
+    <Compile Include="Messages\CreateBuildingMessage.cs" />
     <Compile Include="Messages\CreateNodeMessage.cs" />
     <Compile Include="Messages\CreatePropMessage.cs" />
     <Compile Include="Messages\CreateSegmentMessage.cs" />
