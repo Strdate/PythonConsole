@@ -15,6 +15,8 @@ namespace PythonConsole
 
         internal ScriptEditor scriptEditor;
 
+        private bool _keyPressProcessed;
+
         public ModConfiguration Config { get; set; } = new ModConfiguration();
 
         public void Start()
@@ -36,17 +38,16 @@ namespace PythonConsole
         public void Update()
         {
             scriptEditor.OnUpdate();
-            if (!Input.GetKey(KeyCode.LeftAlt))
-            {
-                return;
-            }
-
-            if (Input.GetKeyDown(KeyCode.S))
-            {
-                if(PythonConsole.Instance == null) {
-                    PythonConsole.CreateInstance();
+            if (ModInfo.ScriptEditorShortcut.IsPressed()) {
+                if (!_keyPressProcessed) {
+                    _keyPressProcessed = true;
+                    if (PythonConsole.Instance == null) {
+                        PythonConsole.CreateInstance();
+                    }
+                    scriptEditor.Visible = !scriptEditor.Visible;
                 }
-                scriptEditor.Visible = !scriptEditor.Visible;
+            } else {
+                _keyPressProcessed = false;
             }
         }
 

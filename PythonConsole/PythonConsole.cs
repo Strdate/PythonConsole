@@ -70,13 +70,23 @@ namespace PythonConsole
             try {
                 while (State != ConsoleState.Dead) {
                     MessageHeader header = _client.GetMessageSync();
+
+                    if(header.messageType == "c_exception") {
+                        State = ConsoleState.Ready;
+                        if(State != ConsoleState.ScriptAborting) {
+                            PrintErrorAsync((string)header.payload);
+                        }
+                        continue;
+                    }
+
+                    if(State == ConsoleState.ScriptAborting) {
+                        _client.SendMessage(null, "s_script_abort");
+                        continue;
+                    }
+
                     switch (header.messageType) {
                         case "c_output_message":
                             PrintAsync((string)header.payload);
-                            break;
-                        case "c_exception":
-                            State = ConsoleState.Ready;
-                            PrintErrorAsync((string)header.payload);
                             break;
                         case "c_failed_to_compile":
                             State = ConsoleState.Ready;
@@ -98,6 +108,7 @@ namespace PythonConsole
                 try { PrintAsync("Python engine crashed. Message: " + ex.Message + "\n"); } catch { }
             }
             State = ConsoleState.Dead;
+            try { _client.CloseSocket(); } catch { }
         }
 
         private void PrintAsync(string message)
@@ -134,19 +145,15 @@ namespace PythonConsole
             }
         }
 
+        public void AbortScript()
+        {
+            State = ConsoleState.ScriptAborting;
+            _client.SendMessage(null, "s_script_abort");
+        }
+
         private InstanceMessage[] GetClipboardObjects()
         {
             return SelectionTool.Instance.Clipboard.Where((obj) => obj.Exists).Select((obj) => obj.ToMessage()).ToArray();
-        }
-
-        public void OnUpdate()
-        {
-            if (!(UnityPythonObject.Instance?.scriptEditor?.Visible ?? false)) {
-                return;
-            }
-
-
-            
         }
 
         public void SimulationStep()
@@ -157,6 +164,14 @@ namespace PythonConsole
                     _remoteFuncManager.HandleAPICall(header.payload, header.messageType);
                 }
             }
+        }
+
+        public void KillInstance()
+        {
+            this.State = ConsoleState.Dead;
+            try {
+                TcpClient.process.Kill();
+            } catch { }
         }
 
         public static void CreateInstance()
@@ -173,6 +188,7 @@ namespace PythonConsole
         Initializing,
         Ready,
         ScriptRunning,
+        ScriptAborting,
         Dead
     }
 }

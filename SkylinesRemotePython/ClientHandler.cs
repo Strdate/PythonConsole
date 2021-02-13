@@ -29,7 +29,13 @@ namespace SkylinesRemotePython
             engine = new PythonEngine(this);
             while (true)
             {
-                HandleGeneralMessage( GetMessage() );
+                try {
+                    HandleGeneralMessage(GetMessage());
+                } catch(Exception ex) {
+                    if (ex.Message != "Abort script")
+                        throw;
+                }
+                
             }
         }
 
@@ -37,6 +43,11 @@ namespace SkylinesRemotePython
         {
             MessageHeader msg = AwaitMessage();
             Console.WriteLine("In: " + msg.messageType);
+
+            if (msg.messageType == "s_script_abort") {
+                Console.WriteLine("Abort script");
+                throw new Exception("Abort script");
+            }
 
             if (msg.messageType == "s_exception")
             {

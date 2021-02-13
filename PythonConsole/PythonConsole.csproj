@@ -80,6 +80,8 @@
     <Compile Include="Util\ManagersUtil.cs" />
     <Compile Include="Util\ModPath.cs" />
     <Compile Include="Util\NetUtil.cs" />
+    <Compile Include="Util\OptionsKeyMapping.cs" />
+    <Compile Include="Util\SettingsBool.cs" />
     <Compile Include="Util\ToolControllerUtil.cs" />
     <Compile Include="Util\Unzip.cs" />
     <Compile Include="Util\Util.cs" />

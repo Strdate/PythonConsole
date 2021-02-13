@@ -13,6 +13,7 @@ namespace PythonConsole
 {
     public class TcpClient : TcpConversation
     {
+        public static Process process;
         public static TcpClient CreateClient()
         {
             Socket s = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
@@ -33,7 +34,7 @@ namespace PythonConsole
             {
                 unzip.ExtractToDirectory(destPath);
             }
-            var process = new Process
+            process = new Process
             {
                 StartInfo = new ProcessStartInfo
                 {
@@ -47,6 +48,11 @@ namespace PythonConsole
 
             };
             process.Start();
+        }
+
+        public void CloseSocket()
+        {
+            _client.Close();
         }
 
         public MessageHeader GetMessageSync()

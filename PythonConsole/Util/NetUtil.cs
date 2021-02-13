@@ -271,6 +271,12 @@ namespace PythonConsole
             }
         }
 
+        public static UnityEngine.Vector3 ToUnityTerrain(this SkylinesPythonShared.API.Vector vect)
+        {
+            Vector3 unity = vect.ToUnity();
+            return new UnityEngine.Vector3(unity.x, vect.is_height_defined ? unity.y : NetUtil.TerrainHeight(unity), unity.z);
+        }
+
         /* As always */
 
         public static NetManager Manager

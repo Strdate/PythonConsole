@@ -13,6 +13,8 @@ namespace PythonConsole
         private UITiledSprite bar;
         private UIComponent fullscreenContainer;
 
+        private bool _keyPressProcessed;
+
         public void Awake()
         {
             var toolController = FindObjectOfType<ToolManager>().m_properties;
@@ -93,24 +95,14 @@ namespace PythonConsole
                 bar.Hide();
             }
 
-            /*if (MainWindow.Instance.Config.SelectionTool) {
-                if (!button.isVisible) {
-                    button.Show();
+            if (ModInfo.ClipboardToolShortcut.IsPressed()) {
+                if(!_keyPressProcessed) {
+                    _keyPressProcessed = true;
+                    ToggleTool();
                 }
             } else {
-                if (button.isVisible) {
-                    button.Hide();
-                }
-
-                return;
-            }*/
-
-            if (!Input.GetKey(KeyCode.RightAlt) && !Input.GetKey(KeyCode.LeftAlt) ||
-                !Input.GetKeyDown(KeyCode.M)) {
-                return;
+                _keyPressProcessed = false;
             }
-
-            ToggleTool();
         }
 
         private static Texture2D GetTextureByName(string name, UITextureAtlas atlas)

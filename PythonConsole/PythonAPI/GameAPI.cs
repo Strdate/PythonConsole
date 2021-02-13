@@ -39,9 +39,7 @@ namespace PythonConsole
             var data = (CreatePropMessage)msg;
             PropInfo info = PrefabCollection<PropInfo>.FindLoaded(data.Type);
             Util.Assert(info, "Prefab '" + data.Type + "' not found");
-            Vector3 vect = data.Position.ToUnity();
-            Vector3 pos = new Vector3(vect.x, data.Position.is_height_defined ? vect.y : NetUtil.TerrainHeight(vect), vect.z);
-            return ManagersLogic.PrepareProp( ManagersUtil.CreateProp(pos, (float)data.Angle, info, true) );
+            return ManagersLogic.PrepareProp( ManagersUtil.CreateProp(data.Position.ToUnityTerrain(), (float)data.Angle, info, true) );
         }
 
         public static object CreateTree(object msg)
@@ -50,9 +48,7 @@ namespace PythonConsole
             
             TreeInfo info = PrefabCollection<TreeInfo>.FindLoaded(data.prefab_name);
             Util.Assert(info, "Prefab '" + data.prefab_name + "' not found");
-            Vector3 vect = data.Position.ToUnity();
-            Vector3 pos = new Vector3(vect.x, data.Position.is_height_defined ? vect.y : NetUtil.TerrainHeight(vect), vect.z);
-            uint id = ManagersUtil.CreateTree(pos, info, true);
+            uint id = ManagersUtil.CreateTree(data.Position.ToUnityTerrain(), info, true);
             return ManagersLogic.PrepareTree(id);
         }
 
@@ -61,9 +57,7 @@ namespace PythonConsole
             var data = (CreateBuildingMessage)msg;
             BuildingInfo info = PrefabCollection<BuildingInfo>.FindLoaded(data.Type);
             Util.Assert(info, "Prefab '" + data.Type + "' not found");
-            Vector3 vect = data.Position.ToUnity();
-            Vector3 pos = new Vector3(vect.x, data.Position.is_height_defined ? vect.y : NetUtil.TerrainHeight(vect), vect.z);
-            return ManagersLogic.PrepareBuilding(ManagersUtil.CreateBuilding(pos, (float)data.Angle, info));
+            return ManagersLogic.PrepareBuilding(ManagersUtil.CreateBuilding(data.Position.ToUnityTerrain(), (float)data.Angle, info));
         }
 
         public static object CreateNode(object msg)
@@ -71,9 +65,7 @@ namespace PythonConsole
             var data = (CreateNodeMessage)msg;
             NetInfo info = PrefabCollection<NetInfo>.FindLoaded(data.Type);
             Util.Assert(info, "Prefab '" + data.Type + "' not found");
-            Vector3 vect = data.Position.ToUnity();
-            Vector3 pos = new Vector3(vect.x, data.Position.is_height_defined ? vect.y : NetUtil.TerrainHeight(vect), vect.z);
-            ushort id = NetUtil.CreateNode(info, pos);
+            ushort id = NetUtil.CreateNode(info, data.Position.ToUnityTerrain());
             return NetLogic.PrepareNode(id);
         }
 

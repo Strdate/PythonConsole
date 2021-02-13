@@ -68,7 +68,7 @@ namespace PythonConsole
 
         public void ReloadProjectWorkspace()
         {
-            AbortActions();
+            AbortFileActions();
             string configPath = UnityPythonObject.Instance.Config.ScriptWorkspacePath;
             projectWorkspacePath = configPath == null || configPath == "" ? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),"SkylinesPython") : configPath;
             if (projectWorkspacePath.Length == 0)
@@ -221,7 +221,7 @@ namespace PythonConsole
                 string caption = Path.GetFileName(file.Path);
                 if (GUILayout.Button(currentFile == file ? "= " + caption + " =" : caption, GUILayout.ExpandWidth(false)))
                 {
-                    AbortActions();
+                    AbortFileActions();
                     currentFile = file;
                 }
             }
@@ -293,15 +293,22 @@ namespace PythonConsole
                 GUI.enabled = state == ConsoleState.Ready;
 
                 if (GUILayout.Button("Execute")) {
-                    AbortActions();
+                    AbortFileActions();
                     PythonConsole.Instance.ScheduleExecution(currentFile.Source);
                     lastError = string.Empty;
+                }
+
+                GUI.enabled = state == ConsoleState.ScriptRunning;
+
+                if (GUILayout.Button("Abort")) {
+                    AbortFileActions();
+                    PythonConsole.Instance.AbortScript();
                 }
 
                 GUI.enabled = true;
 
                 if (GUILayout.Button("Clear output")) {
-                    AbortActions();
+                    AbortFileActions();
                     lastError = string.Empty;
                     output = string.Empty;
                 }
@@ -312,7 +319,7 @@ namespace PythonConsole
             }
             
 
-            GUILayout.Label(lastError != "" ? "Last error: " + lastError : "");
+            GUILayout.Label(state == ConsoleState.ScriptRunning ? "Executing..." : (state == ConsoleState.ScriptAborting ? "Aborting..." : (lastError != "" ? "Last error: " + lastError : "")));
 
             GUILayout.FlexibleSpace();
 
@@ -327,11 +334,11 @@ namespace PythonConsole
                         string newPath = Path.Combine(Path.GetDirectoryName(currentFile.Path), newFileName + ".py");
                         File.Move(currentFile.Path, newPath);
                         currentFile.Rename(newPath);
-                        AbortActions();
+                        AbortFileActions();
                     }
                     if (GUILayout.Button("Cancel"))
                     {
-                        AbortActions();
+                        AbortFileActions();
                     }
                 }
                 catch (Exception ex)
@@ -357,7 +364,7 @@ namespace PythonConsole
                 }
                 if (GUILayout.Button("No"))
                 {
-                    AbortActions();
+                    AbortFileActions();
                 }
             }
             else
@@ -379,7 +386,7 @@ namespace PythonConsole
                 {
                     try
                     {
-                        AbortActions();
+                        AbortFileActions();
                         SaveProjectFile(currentFile);
                     }
                     catch (Exception ex)
@@ -395,7 +402,7 @@ namespace PythonConsole
 
                 if (GUILayout.Button("Save all"))
                 {
-                    AbortActions();
+                    AbortFileActions();
                     SaveAllProjectFiles();
                 }
             }
@@ -420,7 +427,7 @@ namespace PythonConsole
             outputArea.End();
         }
 
-        private void AbortActions()
+        private void AbortFileActions()
         {
             renamingFile = false;
             deletingFile = false;
