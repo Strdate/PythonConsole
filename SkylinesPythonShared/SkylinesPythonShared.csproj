@@ -45,6 +45,7 @@
     <Compile Include="Messages\CreatePropMessage.cs" />
     <Compile Include="Messages\CreateSegmentMessage.cs" />
     <Compile Include="Messages\CreateTreeMessage.cs" />
+    <Compile Include="Messages\InstanceMessage.cs" />
     <Compile Include="Messages\MessageHeader.cs" />
     <Compile Include="Messages\NetNodeMessage.cs" />
     <Compile Include="Messages\NetSegmentListMessage.cs" />

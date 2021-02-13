@@ -6,10 +6,7 @@ using System.Text;
 namespace SkylinesPythonShared
 {
     [Serializable]
-    public class RunScriptMessage
+    public abstract class InstanceMessage
     {
-        public string script { get; set; }
-
-        public InstanceMessage[] clipboard { get; set; }
     }
 }

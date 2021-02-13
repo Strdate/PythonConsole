@@ -20,11 +20,17 @@ namespace PythonConsole
             {
                 UnityPythonObject.Instance = new GameObject("UnityPythonObject").AddComponent<UnityPythonObject>();
             }
+            var selectionToolGo = new GameObject("SelectionToolControl");
+            selectionToolGo.transform.parent = UnityPythonObject.Instance.transform;
+            selectionToolGo.AddComponent<SelectionToolControl>();
         }
 
         public void OnLevelUnloading()
         {
-
+            var go = UnityEngine.Object.FindObjectOfType<SelectionToolControl>();
+            if (go != null) {
+                UnityEngine.Object.Destroy(go);
+            }
         }
 
         public void OnReleased()

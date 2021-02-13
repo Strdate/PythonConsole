@@ -7,7 +7,7 @@ using System.Text;
 namespace SkylinesPythonShared
 {
     [Serializable]
-    public class TreeMessage
+    public class TreeMessage : InstanceMessage
     {
         public uint id { get; set; }
 

@@ -118,8 +118,10 @@ namespace PythonConsole
         {
             try {
                 if (State == ConsoleState.Ready) {
-                    RunScriptMessage msg = new RunScriptMessage();
-                    msg.script = script;
+                    RunScriptMessage msg = new RunScriptMessage() {
+                        script = script,
+                        clipboard = GetClipboardObjects()
+                    };
                     _stopWatch = new Stopwatch();
                     _stopWatch.Start();
                     _client.SendMessage(msg, "s_script_run");
@@ -130,6 +132,11 @@ namespace PythonConsole
                 State = ConsoleState.Dead;
                 throw;
             }
+        }
+
+        private InstanceMessage[] GetClipboardObjects()
+        {
+            return SelectionTool.Instance.Clipboard.Where((obj) => obj.Exists).Select((obj) => obj.ToMessage()).ToArray();
         }
 
         public void OnUpdate()

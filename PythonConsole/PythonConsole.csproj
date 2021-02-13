@@ -56,13 +56,15 @@
     <Compile Include="ModInfo.cs" />
     <Compile Include="ModTools\IGameObject.cs" />
     <Compile Include="ModTools\ModConfiguration.cs" />
+    <Compile Include="ObjectInstance.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PythonAPI\GameAPI.cs" />
     <Compile Include="PythonAPI\Logic\ManagersLogic.cs" />
     <Compile Include="PythonAPI\Logic\NetLogic.cs" />
     <Compile Include="RemoteFuncManager.cs" />
     <Compile Include="PythonConsole.cs" />
-    <Compile Include="PythonConsoleTool.cs" />
+    <Compile Include="SelectionTool.cs" />
+    <Compile Include="SelectionToolControl.cs" />
     <Compile Include="TcpClient.cs" />
     <Compile Include="Threading.cs" />
     <Compile Include="UI\GUIArea.cs" />
@@ -71,16 +73,21 @@
     <Compile Include="UI\ScriptEditor.cs" />
     <Compile Include="UI\ScriptEditorFile.cs" />
     <Compile Include="UnityPythonObject.cs" />
+    <Compile Include="Util\AtlasUtil.cs" />
     <Compile Include="Util\ExtensionMethods.cs" />
     <Compile Include="Util\FileUtil.cs" />
+    <Compile Include="Util\InstanceUtil.cs" />
     <Compile Include="Util\ManagersUtil.cs" />
     <Compile Include="Util\ModPath.cs" />
     <Compile Include="Util\NetUtil.cs" />
+    <Compile Include="Util\ToolControllerUtil.cs" />
     <Compile Include="Util\Unzip.cs" />
     <Compile Include="Util\Util.cs" />
     <Compile Include="Util\VectUtil.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="SelectionToolBar.png" />
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SkylinesPythonShared\SkylinesPythonShared.csproj">
       <Project>{a33a999c-50c0-462e-830b-14d809b74fc3}</Project>

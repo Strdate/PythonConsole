@@ -50,6 +50,11 @@ namespace PythonConsole
             }
         }
 
+        public void OnGUI()
+        {
+            SelectionTool.Instance.DrawVarLabels();
+        }
+
         public void SaveConfig()
         {
             if (Config == null)

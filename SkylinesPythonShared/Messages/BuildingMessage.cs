@@ -7,7 +7,7 @@ using System.Text;
 namespace SkylinesPythonShared
 {
     [Serializable]
-    public class BuildingMessage
+    public class BuildingMessage : InstanceMessage
     {
         public ushort id { get; set; }
 

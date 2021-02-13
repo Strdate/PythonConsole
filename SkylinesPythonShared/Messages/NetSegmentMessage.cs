@@ -6,7 +6,7 @@ using System.Text;
 namespace SkylinesPythonShared
 {
     [Serializable]
-    public class NetSegmentMessage
+    public class NetSegmentMessage : InstanceMessage
     {
         public ushort id { get; set; }
 

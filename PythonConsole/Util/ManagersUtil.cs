@@ -90,6 +90,18 @@ namespace PythonConsole
             return id != 0 && data.m_flags != Building.Flags.None && (data.m_flags & Building.Flags.Deleted) == Building.Flags.None;
         }
 
+        public static bool ExistsProp(ushort id)
+        {
+            ref PropInstance data = ref Prop(id);
+            return id != 0 && (data.m_flags != (ushort)PropInstance.Flags.None) && (data.m_flags & (ushort)PropInstance.Flags.Deleted) == (ushort)Building.Flags.None;
+        }
+
+        public static bool ExistsTree(uint id)
+        {
+            ref TreeInstance data = ref Tree(id);
+            return id != 0 && data.m_flags != (ushort)TreeInstance.Flags.None && (data.m_flags & (ushort)TreeInstance.Flags.Deleted) == (ushort)Building.Flags.None;
+        }
+
         public static ref Building BuildingS(ushort id)
         {
             return ref BuildingManager.m_buildings.m_buffer[id];

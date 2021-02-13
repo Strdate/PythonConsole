@@ -37,7 +37,6 @@ namespace PythonConsole
         public static object CreateProp(object msg)
         {
             var data = (CreatePropMessage)msg;
-			ushort id;
             PropInfo info = PrefabCollection<PropInfo>.FindLoaded(data.Type);
             Util.Assert(info, "Prefab '" + data.Type + "' not found");
             Vector3 vect = data.Position.ToUnity();
@@ -60,7 +59,6 @@ namespace PythonConsole
         public static object CreateBuilding(object msg)
         {
             var data = (CreateBuildingMessage)msg;
-            ushort id;
             BuildingInfo info = PrefabCollection<BuildingInfo>.FindLoaded(data.Type);
             Util.Assert(info, "Prefab '" + data.Type + "' not found");
             Vector3 vect = data.Position.ToUnity();

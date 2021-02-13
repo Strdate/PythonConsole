@@ -7,7 +7,7 @@ using System.Text;
 namespace SkylinesPythonShared
 {
     [Serializable]
-    public class NetNodeMessage
+    public class NetNodeMessage : InstanceMessage
     {
         public ushort id { get; set; }
 

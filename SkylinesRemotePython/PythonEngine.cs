@@ -18,17 +18,19 @@ namespace SkylinesRemotePython
 
         private ScriptEngine _engine;
         private ScriptScope _scope;
+        private GameAPI _gameAPI;
 
         public PythonEngine(ClientHandler client)
         {
             this.client = client;
             _engine = Python.CreateEngine();
             _scope = _engine.CreateScope();
+            _gameAPI = new GameAPI(client);
 
             _scope.SetVariable("Vector", DynamicHelpers.GetPythonTypeFromType(typeof(Vector)));
             _scope.SetVariable("NetOptions", DynamicHelpers.GetPythonTypeFromType(typeof(NetOptions)));
             _scope.SetVariable("vector_xz", new Func<double,double, Vector>(Vector.vector_xz));
-            _scope.SetVariable("game", new GameAPI(client));
+            _scope.SetVariable("game", _gameAPI);
 
             var outputStream = new MemoryStream();
             var outputStreamWriter = new TcpStreamWriter(outputStream, client);
@@ -38,7 +40,7 @@ namespace SkylinesRemotePython
         public void RunScript(object obj)
         {
             RunScriptMessage msg = (RunScriptMessage)obj;
-
+            PrepareLocals(msg.clipboard);
             try
             {
                 var source = _engine.CreateScriptSourceFromString(msg.script, SourceCodeKind.Statements);
@@ -56,6 +58,31 @@ namespace SkylinesRemotePython
             catch(Exception ex)
             {
                 client.SendMessage(ex.Message, "c_failed_to_compile");
+            }
+        }
+
+        private void PrepareLocals(InstanceMessage[] arr)
+        {
+            List<ObjectAPI> res = new List<ObjectAPI>();
+            ObjectAPI obj;
+            for(int i = 0; i < arr.Length; i++) {
+                if(arr[i] is NetNodeMessage) {
+                    obj = new NetNode((NetNodeMessage)arr[i], _gameAPI);
+                } else if (arr[i] is NetSegmentMessage) {
+                    obj = new Segment((NetSegmentMessage)arr[i], _gameAPI);
+                } else if (arr[i] is BuildingMessage) {
+                    obj = new Building((BuildingMessage)arr[i], _gameAPI);
+                } else if (arr[i] is PropMessage) {
+                    obj = new Prop((PropMessage)arr[i], _gameAPI);
+                } else /*if (arr[i] is TreeMessage*/ {
+                    obj = new Tree((TreeMessage)arr[i], _gameAPI);
+                }
+                res.Add(obj);
+            }
+
+            _scope.SetVariable("cba", res);
+            if (res.Count > 0) {
+                _scope.SetVariable("cb", res[0]);
             }
         }
     }
