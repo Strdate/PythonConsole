@@ -79,6 +79,32 @@ namespace PythonConsole
             return NetLogic.CreateSegments((CreateSegmentMessage)msg);
         }
 
+        public static object DeleteObject(object msg)
+        {
+            DeleteObjectMessage data = (DeleteObjectMessage)msg;
+            bool ret;
+            switch(data.type) {
+                case "node":
+                    ret = NetUtil.ReleaseNode((ushort)data.id);
+                    break;
+                case "segment":
+                    ret = NetUtil.ReleaseSegment((ushort)data.id, data.param);
+                    break;
+                case "building":
+                    ret = ManagersUtil.ReleaseBuilding((ushort)data.id);
+                    break;
+                case "prop":
+                    ret = ManagersUtil.ReleaseProp((ushort)data.id);
+                    break;
+                case "tree":
+                    ret = ManagersUtil.ReleaseTree(data.id);
+                    break;
+                default:
+                    throw new Exception("Unknown type '" + data.type + "'");
+            }
+            return ret;
+        }
+
         public static object ExistsPrefab(object msg)
         {
             string name = (string)msg;

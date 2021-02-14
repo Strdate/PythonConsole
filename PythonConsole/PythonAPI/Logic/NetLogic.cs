@@ -42,7 +42,7 @@ namespace PythonConsole
             Vector3 halfWay = bezier.Position(0.5f);
             float length = (new Vector2(halfWay.x, halfWay.z) - new Vector2(startNode.m_position.x, startNode.m_position.z)).magnitude
                 + (new Vector2(halfWay.x, halfWay.z) - new Vector2(endNode.m_position.x, endNode.m_position.z)).magnitude;
-            int numOfSegments = Mathf.Min(1000, Mathf.FloorToInt(length / 100f) + 1);
+            int numOfSegments = Mathf.Min(1000, Mathf.FloorToInt(length / (float)data.net_options.node_spacing) + 1);
 
             List<NetSegmentMessage> segments = new List<NetSegmentMessage>();
 
@@ -109,7 +109,8 @@ namespace PythonConsole
                 prefab_name = segment.Info.name,
                 start_node_id = segment.m_startNode,
                 end_node_id = segment.m_endNode,
-                length = segment.m_averageLength
+                length = segment.m_averageLength,
+                middle_pos = segment.m_middlePosition.FromUnity()
             };
         }
 
@@ -147,11 +148,11 @@ namespace PythonConsole
 
         private static void GetSegmentVectors(CreateSegmentMessage data, ref NetNode startNode, ref NetNode endNode, out Vector3 startDir, out Vector3 endDir)
         {
-            if (data.middle_pos == null && (data.start_dir == null || data.end_dir == null)) {
+            if (data.control_point == null && (data.start_dir == null || data.end_dir == null)) {
                 startDir = (endNode.m_position - startNode.m_position).normalized;
                 endDir = (startNode.m_position - endNode.m_position).normalized;
-            } else if (data.middle_pos != null) {
-                VectUtil.DirectionVectorsFromMiddlePos(startNode.m_position, endNode.m_position, data.middle_pos.ToUnity(), out startDir, out endDir);
+            } else if (data.control_point != null) {
+                VectUtil.DirectionVectorsFromMiddlePos(startNode.m_position, endNode.m_position, data.control_point.ToUnity(), out startDir, out endDir);
             } else if (data.start_dir != null && data.end_dir != null) {
                 startDir = data.start_dir.ToUnity().normalized;
                 endDir = data.end_dir.ToUnity().normalized;

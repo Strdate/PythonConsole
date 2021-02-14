@@ -21,6 +21,7 @@ namespace PythonConsole
 
         public static readonly SavedInputKey ScriptEditorShortcut = new SavedInputKey("ScriptEditorShortcut", settingsFileName, SavedInputKey.Encode(KeyCode.S, false, false, true), true);
         public static readonly SavedInputKey ClipboardToolShortcut = new SavedInputKey("ClipboardToolShortcut", settingsFileName, SavedInputKey.Encode(KeyCode.C, false, false, true), true);
+        public static readonly SettingsBool SyncExecution = new SettingsBool("Execute scripts synchronously (needs engine restart)", "Script execution will freeze simulation, but it may take less time", "SyncExecution", false);
 
         public ModInfo()
         {
@@ -47,8 +48,14 @@ namespace PythonConsole
 
                 group.AddSpace(10);
 
+                SyncExecution.Draw(group, (b) => {
+                    PythonConsole.Instance?.KillInstance();
+                });
+
+                group.AddSpace(10);
+
                 group.AddButton("Kill python engine", () => {
-                    PythonConsole.Instance.KillInstance();
+                    PythonConsole.Instance?.KillInstance();
                 });
 
             }

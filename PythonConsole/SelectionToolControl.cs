@@ -9,7 +9,7 @@ namespace PythonConsole
 {
     public class SelectionToolControl : MonoBehaviour
     {
-        private UIButton button;
+        //private UIButton button;
         private UITiledSprite bar;
         private UIComponent fullscreenContainer;
 

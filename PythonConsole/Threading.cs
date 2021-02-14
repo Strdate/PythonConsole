@@ -11,9 +11,9 @@ namespace PythonConsole
 
         public override void OnUpdate(float realTimeDelta, float simulationTimeDelta)
         {
-            if(PythonConsole.Instance != null) {
+            /*if(PythonConsole.Instance != null) {
                 PythonConsole.Instance.SimulationStep();
-            }
+            }*/
         }
 
         public override void OnBeforeSimulationTick()

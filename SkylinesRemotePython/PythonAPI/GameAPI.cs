@@ -111,14 +111,14 @@ namespace SkylinesRemotePython.API
             }
             NetOptions options = type as NetOptions ?? new NetOptions((string) type);
             CreateSegmentMessage msg = new CreateSegmentMessage() {
-                start_node_id = startNode is NetNode ? ((NetNode)startNode).id : (ushort)0,
-                end_node_id = endNode is NetNode ? ((NetNode)endNode).id : (ushort)0,
+                start_node_id = startNode is NetNode ? (ushort)((NetNode)startNode).id : (ushort)0,
+                end_node_id = endNode is NetNode ? (ushort)((NetNode)endNode).id : (ushort)0,
                 start_postition = startNode is Vector ? (Vector)startNode : null,
                 end_postition = endNode is Vector ? (Vector)endNode : null,
                 net_options = options,
                 start_dir = start_dir,
                 end_dir = end_dir,
-                middle_pos = middle_pos
+                control_point = middle_pos
             };
             return new Segment(client.RemoteCall<NetSegmentMessage>(Contracts.CreateSegment, msg), this);
         }
@@ -151,14 +151,14 @@ namespace SkylinesRemotePython.API
             }
             NetOptions options = type as NetOptions ?? new NetOptions((string)type);
             CreateSegmentMessage msg = new CreateSegmentMessage() {
-                start_node_id = startNode is NetNode ? ((NetNode)startNode).id : (ushort)0,
-                end_node_id = endNode is NetNode ? ((NetNode)endNode).id : (ushort)0,
+                start_node_id = startNode is NetNode ? (ushort)((NetNode)startNode).id : (ushort)0,
+                end_node_id = endNode is NetNode ? (ushort)((NetNode)endNode).id : (ushort)0,
                 start_postition = startNode is Vector ? (Vector)startNode : null,
                 end_postition = endNode is Vector ? (Vector)endNode : null,
                 net_options = options,
                 start_dir = start_dir,
                 end_dir = end_dir,
-                middle_pos = middle_pos,
+                control_point = middle_pos,
                 auto_split = true
             };
             return NetLogic.PrepareSegmentList(client.RemoteCall<NetSegmentListMessage>(Contracts.CreateSegments, msg).list, this);

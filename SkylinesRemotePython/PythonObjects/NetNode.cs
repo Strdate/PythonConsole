@@ -8,7 +8,7 @@ namespace SkylinesRemotePython.API
 {
     public class NetNode : ObjectAPI
     {
-        public ushort id { get; private set; }
+        public override string type => "node";
 
         public string prefab_name { get; private set; }
 

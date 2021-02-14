@@ -8,7 +8,7 @@ namespace SkylinesRemotePython.API
 {
     public class Tree : ObjectAPI
     {
-        public long id { get; private set; }
+        public override string type => "tree";
 
         public string prefab_name { get; private set; }
 

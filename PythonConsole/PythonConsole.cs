@@ -27,12 +27,14 @@ namespace PythonConsole
             get => _state;
             private set => _state = value;
         }
+        public bool ExecuteSynchronously { get; private set; }
         private Thread _thread;
         private Stopwatch _stopWatch;
 
-        public PythonConsole()
+        public PythonConsole(bool executeSynchronously)
         {
             Queue q = new Queue();
+            ExecuteSynchronously = executeSynchronously;
             _simulationQueue = Queue.Synchronized(q);
             _thread = new Thread(new ThreadStart(RemotePythonThread));
             _thread.Name = "RemotePython";
@@ -76,6 +78,11 @@ namespace PythonConsole
                         if(State != ConsoleState.ScriptAborting) {
                             PrintErrorAsync((string)header.payload);
                         }
+                        continue;
+                    }
+
+                    if(header.messageType == "c_ready") {
+                        State = ConsoleState.Ready;
                         continue;
                     }
 
@@ -158,12 +165,17 @@ namespace PythonConsole
 
         public void SimulationStep()
         {
-            if (State == ConsoleState.ScriptRunning) {
-                while(_simulationQueue.Count > 0) {
-                    MessageHeader header = (MessageHeader) _simulationQueue.Dequeue();
-                    _remoteFuncManager.HandleAPICall(header.payload, header.messageType);
+            do {
+                if (State == ConsoleState.ScriptRunning) {
+                    while (_simulationQueue.Count > 0) {
+                        MessageHeader header = (MessageHeader)_simulationQueue.Dequeue();
+                        _remoteFuncManager.HandleAPICall(header.payload, header.messageType);
+                    }
+                    if(ExecuteSynchronously) {
+                        Thread.Sleep(1);
+                    }
                 }
-            }
+            } while (State == ConsoleState.ScriptRunning && ExecuteSynchronously);
         }
 
         public void KillInstance()
@@ -179,7 +191,7 @@ namespace PythonConsole
             if(_instance != null) {
                 _instance.State = ConsoleState.Dead;
             }
-            _instance = new PythonConsole();
+            _instance = new PythonConsole(ModInfo.SyncExecution.value);
         }
     }
 

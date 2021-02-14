@@ -32,8 +32,12 @@ namespace SkylinesRemotePython
                 try {
                     HandleGeneralMessage(GetMessage());
                 } catch(Exception ex) {
-                    if (ex.Message != "Abort script")
+                    Console.WriteLine(ex.Message);
+                    if (ex.Message == "Abort script") {
+                        SendMessage(null, "c_ready");
+                    } else {
                         throw;
+                    }
                 }
                 
             }

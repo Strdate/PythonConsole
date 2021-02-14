@@ -263,11 +263,11 @@ namespace PythonConsole
             {
                 if (text.Length > editor.cursorIndex)
                 {
-                    text = text.Insert(editor.cursorIndex, "\t");
-                    editor.cursorIndex++;
+                    text = text.Insert(editor.cursorIndex, "    ");
+                    editor.cursorIndex += 4;
                     editor.selectIndex = editor.cursorIndex;
                 }
-
+                GUI.FocusControl(TextAreaControlName);
                 Event.current.Use();
             }
 

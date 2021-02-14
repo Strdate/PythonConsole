@@ -8,13 +8,15 @@ namespace SkylinesRemotePython.API
 {
     public class Segment : ObjectAPI
     {
-        public ushort id { get; private set; }
+        public override string type => "segment";
 
         public string prefab_name { get; private set; }
 
         public int start_node_id { get; private set; }
 
         public int end_node_id { get; private set; }
+
+        public Vector middle_pos { get; private set; }
 
         public float length { get; private set; }
 
@@ -42,6 +44,7 @@ namespace SkylinesRemotePython.API
             start_node_id = msg.start_node_id;
             end_node_id = msg.end_node_id;
             length = msg.length;
+            middle_pos = msg.middle_pos;
         }
 
         internal Segment(NetSegmentMessage obj, GameAPI api) : base(api)

@@ -14,11 +14,14 @@ namespace SkylinesPythonShared.API
 
         public bool invert { get; private set; }
 
-        public NetOptions(string prefab_name, string elevation_mode = "default", bool invert = false)
+        public int node_spacing { get; private set; }
+
+        public NetOptions(string prefab_name, string elevation_mode = "default", bool invert = false, int node_spacing = 100)
         {
             this.prefab_name = prefab_name;
             this.elevation_mode = elevation_mode;
             this.invert = invert;
+            this.node_spacing = node_spacing;
         }
     }
 }

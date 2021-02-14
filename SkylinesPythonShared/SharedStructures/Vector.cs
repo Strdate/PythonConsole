@@ -27,6 +27,14 @@ namespace SkylinesPythonShared.API
             this.is_height_defined = true;
         }
 
+        private Vector(double X, double Y, double Z, bool is_height_defined)
+        {
+            this.x = X;
+            this.y = Y;
+            this.z = Z;
+            this.is_height_defined = is_height_defined;
+        }
+
         public static Vector vector_xz(double X, double Z)
         {
             return new Vector()
@@ -56,6 +64,7 @@ namespace SkylinesPythonShared.API
             return hashCode;
         }
 
+        public double plain_angle => Math.Atan(x / z);
         public double magnitude => Math.Sqrt(x * x + y * y + z * z);
 
         public Vector normalized => new Vector(x / magnitude, y / magnitude, z / magnitude);
@@ -68,7 +77,36 @@ namespace SkylinesPythonShared.API
 
         public override string ToString()
         {
-            return "[" + x + ", " + (is_height_defined ? y.ToString() : "undefined") + ", " + z + "]";
+            return "[" + x.ToString("N3") + ", " + (is_height_defined ? y.ToString("N3") : "undefined") + ", " + z.ToString("N3") + "]";
+        }
+        public static Vector operator +(Vector a, Vector b)
+        {
+            return new Vector(a.x + b.x, a.y + b.y, a.z + b.z, a.is_height_defined && b.is_height_defined);
+        }
+
+        public static Vector operator -(Vector a, Vector b)
+        {
+            return new Vector(a.x - b.x, a.y - b.y, a.z - b.z, a.is_height_defined && b.is_height_defined);
+        }
+
+        public static Vector operator -(Vector a)
+        {
+            return new Vector(-a.x, -a.y, -a.z, a.is_height_defined);
+        }
+
+        public static Vector operator *(Vector a, double d)
+        {
+            return new Vector(a.x * d, a.y * d, a.z * d);
+        }
+
+        public static Vector operator *(double d, Vector a)
+        {
+            return new Vector(a.x * d, a.y * d, a.z * d);
+        }
+
+        public static Vector operator /(Vector a, float d)
+        {
+            return new Vector(a.x / d, a.y / d, a.z / d);
         }
 
     }
