@@ -29,10 +29,7 @@ namespace SkylinesRemotePython.API
             return new Building(client.RemoteCall<BuildingMessage>(Contracts.GetBuildingFromId, id), this);
         }
 
-        public NetNode get_node(int id)
-        {
-            return new NetNode(client.RemoteCall<NetNodeMessage>(Contracts.GetNodeFromId, id), this);
-        }
+        public NetNode get_node(int id) => NetNode.GetNetNode(id, this);
 
         public Segment get_segment(int id)
         {

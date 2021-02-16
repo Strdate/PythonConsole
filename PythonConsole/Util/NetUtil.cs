@@ -227,6 +227,19 @@ namespace PythonConsole
             return GetNonzeroSegment(Node(nodeId), index);
         }
 
+        public static List<ushort> GetSegmentsFromNode(ushort nodeId)
+        {
+            ref NetNode node = ref Node(nodeId);
+            List<ushort> list = new List<ushort>();
+            for (int i = 0; i < 8; i++) {
+                ushort segment = node.GetSegment(i);
+                if (segment != 0) {
+                    list.Add(segment);
+                }
+            }
+            return list;
+        }
+
         public static ushort GetNonzeroSegment(NetNode node, int index)
         {
             for (int i = 0; i < 8; i++)

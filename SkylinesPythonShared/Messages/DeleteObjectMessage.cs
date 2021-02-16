@@ -11,7 +11,7 @@ namespace SkylinesPythonShared
     {
         public uint id { get; set; }
 
-        public bool param { get; set; }
+        public bool keep_nodes { get; set; }
 
         public string type { get; set; }
     }

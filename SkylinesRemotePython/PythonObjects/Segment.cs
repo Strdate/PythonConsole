@@ -21,24 +21,38 @@ namespace SkylinesRemotePython.API
         public float length { get; private set; }
 
         public NetNode start_node {
-            get {
-                return new NetNode(api.client.RemoteCall<NetNodeMessage>(Contracts.GetNodeFromId, start_node_id), api);
-            }
+            get => NetNode.GetNetNode(start_node_id, api);
         }
 
         public NetNode end_node {
-            get {
-                return new NetNode(api.client.RemoteCall<NetNodeMessage>(Contracts.GetNodeFromId, end_node_id), api);
-            }
+            get => NetNode.GetNetNode(end_node_id, api);
         }
 
-        public void refresh()
+        public bool delete(bool keep_nodes)
+        {
+            if (is_deleted) {
+                return true;
+            }
+            api.client.RemoteCall<bool>(Contracts.DeleteObject, new DeleteObjectMessage() {
+                id = id,
+                type = type,
+                keep_nodes = keep_nodes
+            });
+            refresh();
+            return is_deleted;
+        }
+
+        public override void refresh()
         {
             AssignData(api.client.RemoteCall<NetSegmentMessage>(Contracts.GetSegmentFromId, id));
         }
 
         internal void AssignData(NetSegmentMessage msg)
         {
+            if(msg == null) {
+                is_deleted = true;
+                return;
+            }
             id = msg.id;
             prefab_name = msg.prefab_name;
             start_node_id = msg.start_node_id;

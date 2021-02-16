@@ -93,6 +93,9 @@ namespace PythonConsole
 
         public static SkylinesPythonShared.NetNodeMessage PrepareNode(ushort id)
         {
+            if (!NetUtil.ExistsNode(id)) {
+                return null;
+            }
             ref NetNode node = ref NetUtil.Node(id);
             return new NetNodeMessage() {
                 id = id,
@@ -103,6 +106,9 @@ namespace PythonConsole
 
         public static SkylinesPythonShared.NetSegmentMessage PrepareSegment(ushort id)
         {
+            if (!NetUtil.ExistsSegment(id)) {
+                return null;
+            }
             ref NetSegment segment = ref NetUtil.Segment(id);
             return new NetSegmentMessage() {
                 id = id,

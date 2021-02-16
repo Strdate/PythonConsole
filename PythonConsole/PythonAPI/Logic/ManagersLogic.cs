@@ -10,6 +10,9 @@ namespace PythonConsole
     {
         public static PropMessage PrepareProp(ushort id)
         {
+            if (!ManagersUtil.ExistsProp(id)) {
+                return null;
+            }
             PropInstance prop = ManagersUtil.Prop(id);
             return new PropMessage() {
                 id = id,
@@ -21,6 +24,9 @@ namespace PythonConsole
 
         public static TreeMessage PrepareTree(uint id)
         {
+            if (!ManagersUtil.ExistsTree(id)) {
+                return null;
+            }
             TreeInstance tree = ManagersUtil.Tree(id);
             return new TreeMessage() {
                 id = id,
@@ -31,6 +37,9 @@ namespace PythonConsole
 
         public static BuildingMessage PrepareBuilding(ushort id)
         {
+            if (!ManagersUtil.ExistsBuilding(id)) {
+                return null;
+            }
             Building building = ManagersUtil.BuildingS(id);
             return new BuildingMessage() {
                 id = id,

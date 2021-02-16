@@ -16,7 +16,7 @@ namespace SkylinesPythonShared.API
 
         private Vector()
         {
-
+            
         }
 
         public Vector(double X, double Y, double Z)
@@ -64,7 +64,16 @@ namespace SkylinesPythonShared.API
             return hashCode;
         }
 
-        public double plain_angle => Math.Atan(x / z);
+        public double plain_angle(Vector other = null)
+        {
+            if(other == null) {
+                other = Vector.vector_xz(1, 0);
+            }
+            double sin = x * other.z - other.x * z;
+            double cos = x * other.x + z * other.z;
+
+            return Math.Atan2(sin, cos);
+        }
         public double magnitude => Math.Sqrt(x * x + y * y + z * z);
 
         public Vector normalized => new Vector(x / magnitude, y / magnitude, z / magnitude);

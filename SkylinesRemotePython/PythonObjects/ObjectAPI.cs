@@ -4,11 +4,15 @@ using System.Collections.Generic;
 using System.Text;
 
 namespace SkylinesRemotePython.API {
-    public class ObjectAPI
+    public abstract class ObjectAPI
     {
         protected GameAPI api;
 
         public uint id { get; protected set; }
+
+        public bool is_deleted { get; protected set; }
+
+        public abstract void refresh();
 
         public virtual string type => "";
 
@@ -17,12 +21,17 @@ namespace SkylinesRemotePython.API {
             this.api = api;
         }
 
-        public virtual bool delete(bool param = false)
+        public virtual bool delete()
         {
-            return api.client.RemoteCall<bool>(Contracts.DeleteObject, new DeleteObjectMessage() {
+            if(is_deleted) {
+                return true;
+            }
+            api.client.RemoteCall<bool>(Contracts.DeleteObject, new DeleteObjectMessage() {
                 id = id,
                 type = type
             });
+            refresh();
+            return is_deleted;
         }
     }
 }

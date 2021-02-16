@@ -12,17 +12,23 @@ namespace SkylinesRemotePython.API
 
         public string prefab_name { get; private set; }
 
+        public Vector pos => position;
+
         public Vector position { get; private set; }
 
         public double angle { get; private set; }
 
-        public void refresh()
+        public override void refresh()
         {
             AssignData(api.client.RemoteCall<BuildingMessage>(Contracts.GetBuildingFromId, id));
         }
 
         internal void AssignData(BuildingMessage msg)
         {
+            if (msg == null) {
+                is_deleted = true;
+                return;
+            }
             id = msg.id;
             prefab_name = msg.prefab_name;
             position = msg.position;

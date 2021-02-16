@@ -13,26 +13,26 @@ namespace PythonConsole
     {
         public static object GetPropFromId(object msg)
         {
-            return ManagersLogic.PrepareProp((ushort)((int)msg));
+            return ManagersLogic.PrepareProp((ushort)((uint)msg));
         }
 
         public static object GetTreeFromId(object msg)
         {
-            return ManagersLogic.PrepareTree((uint)((long)msg));
+            return ManagersLogic.PrepareTree((uint)((uint)msg));
         }
 
         public static object GetBuildingFromId(object msg)
         {
-            return ManagersLogic.PrepareBuilding((ushort)((int)msg));
+            return ManagersLogic.PrepareBuilding((ushort)((uint)msg));
         }
         public static object GetNodeFromId(object msg)
         {
-            return NetLogic.PrepareNode((ushort)((int)msg));
+            return NetLogic.PrepareNode((ushort)((uint)msg));
         }
 
         public static object GetSegmentFromId(object msg)
         {
-            return NetLogic.PrepareSegment((ushort)((int)msg));
+            return NetLogic.PrepareSegment((ushort)((uint)msg));
         }
         public static object CreateProp(object msg)
         {
@@ -40,6 +40,11 @@ namespace PythonConsole
             PropInfo info = PrefabCollection<PropInfo>.FindLoaded(data.Type);
             Util.Assert(info, "Prefab '" + data.Type + "' not found");
             return ManagersLogic.PrepareProp( ManagersUtil.CreateProp(data.Position.ToUnityTerrain(), (float)data.Angle, info, true) );
+        }
+
+        public static object GetSegmentsForNodeId(object msg)
+        {
+            return NetUtil.GetSegmentsFromNode((ushort)(uint)msg).Select((seg) => NetLogic.PrepareSegment(seg)).ToList();
         }
 
         public static object CreateTree(object msg)
@@ -88,7 +93,7 @@ namespace PythonConsole
                     ret = NetUtil.ReleaseNode((ushort)data.id);
                     break;
                 case "segment":
-                    ret = NetUtil.ReleaseSegment((ushort)data.id, data.param);
+                    ret = NetUtil.ReleaseSegment((ushort)data.id, !data.keep_nodes);
                     break;
                 case "building":
                     ret = ManagersUtil.ReleaseBuilding((ushort)data.id);
