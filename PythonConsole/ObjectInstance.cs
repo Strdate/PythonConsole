@@ -1,8 +1,5 @@
 ﻿using SkylinesPythonShared;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using UnityEngine;
 
 namespace PythonConsole
@@ -13,9 +10,13 @@ namespace PythonConsole
 
         public Type ObjectType { get; private set; }
 
+        private SelectedPoint _point;
+
         public bool Exists {
             get {
-                if (ObjectType == Type.Node) {
+                if(ObjectType == Type.Point) {
+                    return true;
+                } else if (ObjectType == Type.Node) {
                     return NetUtil.ExistsNode((ushort)Id);
                 } else if (ObjectType == Type.Segment) {
                     return NetUtil.ExistsSegment((ushort)Id);
@@ -30,7 +31,9 @@ namespace PythonConsole
         }
         public Vector3 Position {
             get {
-                if (ObjectType == Type.Node) {
+                if (ObjectType == Type.Point) {
+                    return _point.position;
+                } else if (ObjectType == Type.Node) {
                     return NetUtil.Node((ushort)Id).m_position;
                 } else if (ObjectType == Type.Segment) {
                     return NetUtil.Segment((ushort)Id).m_middlePosition;
@@ -62,7 +65,9 @@ namespace PythonConsole
 
         public InstanceMessage ToMessage()
         {
-            if (ObjectType == Type.Node) {
+            if (ObjectType == Type.Point) {
+                return _point.position.FromUnity();
+            } else if (ObjectType == Type.Node) {
                 return NetLogic.PrepareNode((ushort)Id);
             } else if (ObjectType == Type.Segment) {
                 return NetLogic.PrepareSegment((ushort)Id);
@@ -78,8 +83,9 @@ namespace PythonConsole
         public override bool Equals(object obj)
         {
             return obj is ObjectInstance instance &&
-                   Id == instance.Id &&
-                   ObjectType == instance.ObjectType;
+                   Id == instance.Id
+                   && ObjectType == instance.ObjectType
+                   && Id != 0;
         }
 
         public override int GetHashCode()
@@ -104,7 +110,7 @@ namespace PythonConsole
                 return false;
             }
 
-            return (Id == other.Id) && (ObjectType == other.ObjectType);
+            return (Id == other.Id) && (ObjectType == other.ObjectType) && Id != 0;
         }
 
         public static bool operator ==(ObjectInstance lhs, ObjectInstance rhs)
@@ -130,13 +136,20 @@ namespace PythonConsole
             ObjectType = type;
         }
 
+        public ObjectInstance(SelectedPoint point)
+        {
+            _point = point;
+            ObjectType = Type.Point;
+        }
+
         public enum Type
         {
             Node,
             Segment,
             Prop,
             Tree,
-            Building
+            Building,
+            Point
         }
     }
 }

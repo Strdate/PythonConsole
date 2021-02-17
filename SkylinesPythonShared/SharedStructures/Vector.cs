@@ -6,7 +6,7 @@ using System.Text;
 namespace SkylinesPythonShared.API
 {
     [Serializable]
-    public class Vector
+    public class Vector : InstanceMessage
     {
         public double x { get; private set; }
         public double y { get; private set; }
@@ -86,7 +86,7 @@ namespace SkylinesPythonShared.API
 
         public override string ToString()
         {
-            return "[" + x.ToString("N3") + ", " + (is_height_defined ? y.ToString("N3") : "undefined") + ", " + z.ToString("N3") + "]";
+            return "[" + x.ToString("V3") + ", " + (is_height_defined ? y.ToString("V3") : "undefined") + ", " + z.ToString("V3") + "]";
         }
         public static Vector operator +(Vector a, Vector b)
         {

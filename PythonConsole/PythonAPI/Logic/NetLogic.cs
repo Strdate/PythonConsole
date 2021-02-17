@@ -100,7 +100,8 @@ namespace PythonConsole
             return new NetNodeMessage() {
                 id = id,
                 position = node.m_position.FromUnity(),
-                prefab_name = node.Info.name
+                prefab_name = node.Info.name,
+                elevation = node.Info.m_netAI.IsUnderground() ? -node.m_elevation : node.m_elevation
             };
         }
 

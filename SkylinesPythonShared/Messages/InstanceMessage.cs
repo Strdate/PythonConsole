@@ -5,8 +5,7 @@ using System.Text;
 
 namespace SkylinesPythonShared
 {
-    [Serializable]
-    public abstract class InstanceMessage
+    public interface InstanceMessage
     {
     }
 }

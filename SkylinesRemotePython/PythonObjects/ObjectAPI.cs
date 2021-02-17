@@ -33,5 +33,34 @@ namespace SkylinesRemotePython.API {
             refresh();
             return is_deleted;
         }
+
+        public override bool Equals(object obj)
+        {
+            ObjectAPI other = (ObjectAPI)obj;
+            return this.type == other.type &&
+                   id == other.id;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(id, type);
+        }
+
+        public static bool operator ==(ObjectAPI lhs, ObjectAPI rhs)
+        {
+            if (System.Object.ReferenceEquals(lhs, null)) {
+                if (System.Object.ReferenceEquals(rhs, null)) {
+                    return true;
+                }
+
+                return false;
+            }
+            return lhs.id == rhs.id && lhs.type == rhs.type;
+        }
+
+        public static bool operator !=(ObjectAPI lhs, ObjectAPI rhs)
+        {
+            return !(lhs == rhs);
+        }
     }
 }

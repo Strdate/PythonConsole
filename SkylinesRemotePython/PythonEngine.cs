@@ -63,10 +63,12 @@ namespace SkylinesRemotePython
 
         private void PrepareLocals(InstanceMessage[] arr)
         {
-            List<ObjectAPI> res = new List<ObjectAPI>();
-            ObjectAPI obj;
+            List<object> res = new List<object>();
+            object obj;
             for(int i = 0; i < arr.Length; i++) {
-                if(arr[i] is NetNodeMessage) {
+                if(arr[i] is Vector) {
+                    obj = new Point((Vector)arr[i]);
+                } else if(arr[i] is NetNodeMessage) {
                     obj = new NetNode((NetNodeMessage)arr[i], _gameAPI);
                 } else if (arr[i] is NetSegmentMessage) {
                     obj = new Segment((NetSegmentMessage)arr[i], _gameAPI);

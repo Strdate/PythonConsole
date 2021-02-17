@@ -9,6 +9,8 @@ namespace PythonConsole
         private ushort hoveredSegment;
         private ushort hoveredBuilding;
 
+        private bool isShiftPressed;
+
         public static SelectionTool Instance;
 
         public List<ObjectInstance> Clipboard = new List<ObjectInstance>();
@@ -49,6 +51,18 @@ namespace PythonConsole
         public override void RenderOverlay(RenderManager.CameraInfo cameraInfo)
         {
             base.RenderOverlay(cameraInfo);
+
+            if (isShiftPressed) {
+                RenderManager.instance.OverlayEffect.DrawCircle(cameraInfo, Color.red, m_accuratePosition, 3f, m_accuratePosition.y - 1f, m_accuratePosition.y + 1f, true, true);
+            }
+
+            for (int i = 0; i < Clipboard.Count; i++) {
+                if (Clipboard[i].ObjectType == ObjectInstance.Type.Point) {
+                    Vector3 pos = Clipboard[i].Position;
+                    RenderManager.instance.OverlayEffect.DrawCircle(cameraInfo, Color.black, pos, 3f, pos.y - 1f, pos.y + 1f, true, true);
+                }
+            }
+
             if (m_hoverInstance.NetNode == 0) {
                 return;
             }
@@ -62,8 +76,12 @@ namespace PythonConsole
                 NetManager.instance.m_nodes.m_buffer[m_hoverInstance.NetNode].m_position.y + 1f,
                 true,
                 true);
+        }
 
-
+        protected override void OnToolUpdate()
+        {
+            base.OnToolUpdate();
+            isShiftPressed = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
         }
 
         public override void SimulationStep()
@@ -137,52 +155,17 @@ namespace PythonConsole
                 return;
             }
 
-            if (m_hoverInstance.IsEmpty) {
-                return;
-            }
-
             if(e.button == 0) {
-                ToggleInstanceSelection(ObjectInstance.FromInstance(m_hoverInstance), e);
-            } else if (e.button == 1) {
+                if(e.shift) {
+                    ToggleInstanceSelection(new ObjectInstance(new SelectedPoint(m_accuratePosition)), e);
+                } else if(!m_hoverInstance.IsEmpty) {
+                    ToggleInstanceSelection(ObjectInstance.FromInstance(m_hoverInstance), e);
+                }
+            } else if (e.button == 1 && !m_hoverInstance.IsEmpty) {
                 if (m_hoverInstance.NetNode > 0) {
                     ToggleInstanceSelection(new ObjectInstance(hoveredSegment, ObjectInstance.Type.Segment), e);
                 }
             }
-
-            /*var sceneExplorer = FindObjectOfType<SceneExplorer>();
-            if (e.button == 0) {
-                if (m_hoverInstance.NetNode > 0) {
-                    sceneExplorer.Show(ReferenceChainBuilder.ForNode(m_hoverInstance.NetNode));
-                } else if (m_hoverInstance.NetSegment > 0) {
-                    sceneExplorer.Show(ReferenceChainBuilder.ForSegment(m_hoverInstance.NetSegment));
-                } else if (m_hoverInstance.Tree > 0) {
-                    sceneExplorer.Show(ReferenceChainBuilder.ForTree(m_hoverInstance.Tree));
-                } else if (m_hoverInstance.Prop > 0) {
-                    sceneExplorer.Show(ReferenceChainBuilder.ForProp(m_hoverInstance.Prop));
-                } else if (m_hoverInstance.CitizenInstance > 0) {
-                    sceneExplorer.Show(ReferenceChainBuilder.ForCitizenInstance(m_hoverInstance.CitizenInstance));
-                } else if (m_hoverInstance.Building > 0) {
-                    sceneExplorer.Show(ReferenceChainBuilder.ForBuilding(m_hoverInstance.Building));
-                } else if (m_hoverInstance.Vehicle > 0) {
-                    sceneExplorer.Show(ReferenceChainBuilder.ForVehicle(m_hoverInstance.Vehicle));
-                } else if (m_hoverInstance.ParkedVehicle > 0) {
-                    sceneExplorer.Show(ReferenceChainBuilder.ForParkedVehicle(m_hoverInstance.ParkedVehicle));
-                } else if (m_hoverInstance.District > 0) {
-                    sceneExplorer.Show(ReferenceChainBuilder.ForDistrict(m_hoverInstance.District));
-                } else if (m_hoverInstance.Park > 0) {
-                    sceneExplorer.Show(ReferenceChainBuilder.ForPark(m_hoverInstance.Park));
-                } else if (m_hoverInstance.TransportLine > 0) {
-                    sceneExplorer.Show(ReferenceChainBuilder.ForTransportLine(m_hoverInstance.TransportLine));
-                }
-            } else if (e.button == 1) {
-                if (m_hoverInstance.CitizenInstance > 0) {
-                    sceneExplorer.Show(ReferenceChainBuilder.ForCitizen(m_hoverInstance.GetCitizenId()));
-                } else if (m_hoverInstance.NetNode > 0) {
-                    sceneExplorer.Show(ReferenceChainBuilder.ForSegment(hoveredSegment));
-                } else if (m_hoverInstance.NetSegment > 0) {
-                    sceneExplorer.Show(ReferenceChainBuilder.ForBuilding(hoveredBuilding));
-                }
-            }*/
         }
 
         private void ToggleInstanceSelection(ObjectInstance inst, Event e)
@@ -306,11 +289,13 @@ namespace PythonConsole
             var inst = ObjectInstance.FromInstance(hoverInstance1);
             int index = Clipboard.IndexOf(inst);
 
-            if (index > -1) {
+            if (index > -1 && !isShiftPressed) {
                 varInfo = Clipboard.Count == 1 ? "Var: cb\n" : "Var: cba[" + index + "]\n";
             }
 
-            if (hoverInstance1.NetNode != 0) {
+            if(isShiftPressed) {
+                text = $"[{m_accuratePosition.x.ToString("N2")}, {m_accuratePosition.y.ToString("N2")}, {m_accuratePosition.z.ToString("N2")}]";
+            } else if (hoverInstance1.NetNode != 0) {
                 text = $"Node ID: {hoverInstance1.NetNode}\nSegment ID: {hoveredSegment}\nAsset: {hoverInstance1.GetNetworkAssetName()}";
             } else if (hoverInstance1.NetSegment != 0) {
                 text = $"Segment ID: {hoverInstance1.NetSegment}\nBuilding ID: {hoveredBuilding}\nAsset: {hoverInstance1.GetNetworkAssetName()}";
@@ -353,7 +338,7 @@ namespace PythonConsole
             }
 
             for (int i = 0; i < Clipboard.Count; i++) {
-                if (Clipboard[i] != ObjectInstance.FromInstance(m_hoverInstance) && Clipboard[i].Exists) {
+                if ((Clipboard[i] != ObjectInstance.FromInstance(m_hoverInstance) || isShiftPressed) && Clipboard[i].Exists) {
                     Vector3 pos = Clipboard[i].Position;
 
                     string label = Clipboard.Count == 1 ? "Var: cb" : "Var: cba[" + i + "]";

@@ -17,6 +17,8 @@ namespace SkylinesRemotePython.API
 
         public Vector position { get; private set; }
 
+        public int elevation { get; private set; }
+
         private CachedObj<List<Segment>> _cachedSegments;
         public List<Segment> segments => _cachedSegments.Get;
 
@@ -34,6 +36,7 @@ namespace SkylinesRemotePython.API
             id = msg.id;
             prefab_name = msg.prefab_name;
             position = msg.position;
+            elevation = msg.elevation;
             _cachedSegments = new CachedObj<List<Segment>>(() => api.client.RemoteCall<List<NetSegmentMessage>>(Contracts.GetSegmentsForNodeId, id).Select((obj) => new Segment(obj, api)).ToList()); ;
         }
 

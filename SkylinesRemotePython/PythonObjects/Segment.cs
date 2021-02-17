@@ -28,6 +28,22 @@ namespace SkylinesRemotePython.API
             get => NetNode.GetNetNode(end_node_id, api);
         }
 
+        public NetNode get_other_node(object node)
+        {
+            uint? nodeId = node as uint?;
+            if(nodeId == null) {
+                NetNode netNode = (NetNode)node;
+                nodeId = netNode.id;
+            }
+            if(start_node_id == nodeId) {
+                return end_node;
+            }
+            if (end_node_id == nodeId) {
+                return start_node;
+            }
+            return null;
+        }
+
         public bool delete(bool keep_nodes)
         {
             if (is_deleted) {

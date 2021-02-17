@@ -63,6 +63,7 @@
     <Compile Include="PythonAPI\Logic\NetLogic.cs" />
     <Compile Include="RemoteFuncManager.cs" />
     <Compile Include="PythonConsole.cs" />
+    <Compile Include="SelectedPoint.cs" />
     <Compile Include="SelectionTool.cs" />
     <Compile Include="SelectionToolControl.cs" />
     <Compile Include="TcpClient.cs" />

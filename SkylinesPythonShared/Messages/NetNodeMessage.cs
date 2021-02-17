@@ -13,6 +13,8 @@ namespace SkylinesPythonShared
 
         public string prefab_name { get; set; }
 
+        public int elevation { get; set; }
+
         public Vector position { get; set; }
     }
 }

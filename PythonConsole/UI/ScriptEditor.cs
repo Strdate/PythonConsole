@@ -37,6 +37,8 @@ namespace PythonConsole
         private bool deletingFile;
         private string newFileName;
 
+        private bool _capsProcessed;
+
         private ScriptEditorFile currentFile;
 
         private readonly ModalUI modalUI = new ModalUI();
@@ -259,16 +261,19 @@ namespace PythonConsole
             var text = GUILayout.TextArea(currentFile != null ? currentFile.Source : "No file loaded..", GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
             var editor = (TextEditor)GUIUtility.GetStateObject(typeof(TextEditor), GUIUtility.keyboardControl);
 
-            if (GUIUtility.keyboardControl == editor.controlID && Event.current.Equals(Event.KeyboardEvent("tab")))
+            if (GUIUtility.keyboardControl == editor.controlID && Event.current.capsLock)
             {
-                if (text.Length > editor.cursorIndex)
-                {
-                    text = text.Insert(editor.cursorIndex, "    ");
-                    editor.cursorIndex += 4;
-                    editor.selectIndex = editor.cursorIndex;
+                if(!_capsProcessed) {
+                    _capsProcessed = true;
+                    if (text.Length > editor.cursorIndex) {
+                        text = text.Insert(editor.cursorIndex, "  ");
+                        editor.cursorIndex += 2;
+                        editor.selectIndex = editor.cursorIndex;
+                    }
+                    GUI.FocusControl(TextAreaControlName);
                 }
-                GUI.FocusControl(TextAreaControlName);
-                Event.current.Use();
+            } else {
+                _capsProcessed = false;
             }
 
             if (currentFile != null)
