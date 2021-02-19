@@ -12,10 +12,6 @@ namespace SkylinesRemotePython.API
 
         public string prefab_name { get; private set; }
 
-        public Vector pos => position;
-
-        //public override Vector position { get; protected set; }
-
         public double angle => _angle;
 
         public override void refresh()

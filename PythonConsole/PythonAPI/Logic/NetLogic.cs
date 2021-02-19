@@ -1,5 +1,6 @@
 ﻿using ColossalFramework;
 using ColossalFramework.Math;
+using MoveIt;
 using SkylinesPythonShared;
 using SkylinesPythonShared.API;
 using System;
@@ -136,11 +137,14 @@ namespace PythonConsole
         {
             switch(msg.type) {
                 case "node":
-                    Moveable.MoveNode((ushort)msg.id, msg.position.ToUnity(), 0);
+                    MoveableNode mnode = new MoveableNode(new InstanceID() {
+                        NetNode = (ushort)msg.id
+                    });
+                    mnode.MoveCall(msg.position.ToUnity());
                     return PrepareNode((ushort)msg.id);
-                case "segment":
+                /*case "segment":
                     Moveable.MoveSegment((ushort)msg.id, msg.position.ToUnity(), 0);
-                    return PrepareSegment((ushort)msg.id);
+                    return PrepareSegment((ushort)msg.id);*/
                 default:
                     throw new Exception($"Cannot move {msg.type}");
             }

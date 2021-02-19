@@ -15,8 +15,6 @@ namespace SkylinesRemotePython.API
 
         public NetPrefab prefab => NetPrefab.GetNetPrefab(prefab_name, api);
 
-        public Vector pos => position;
-
         public override Vector position {
             get => _position;
             set => MoveImpl(value, null);

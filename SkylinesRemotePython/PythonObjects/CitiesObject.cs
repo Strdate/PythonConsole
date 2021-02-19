@@ -16,6 +16,11 @@ namespace SkylinesRemotePython.API {
             get => _position;
             set => throw new Exception($"Position of {type} cannot be changed");
         }
+
+        public Vector pos {
+            get => position;
+            set => position = value;
+        }
         
         internal double _angle;
 

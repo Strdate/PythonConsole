@@ -1,4 +1,5 @@
 ﻿using ICities;
+using MoveIt;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,6 +15,11 @@ namespace PythonConsole
             /*if(PythonConsole.Instance != null) {
                 PythonConsole.Instance.SimulationStep();
             }*/
+        }
+
+        public override void OnAfterSimulationFrame()
+        {
+            MoveItTool.instance.SimulationStep();
         }
 
         public override void OnBeforeSimulationTick()
