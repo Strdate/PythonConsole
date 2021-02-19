@@ -26,7 +26,7 @@ namespace SkylinesRemotePython.API
         internal void AssignData(BuildingMessage msg)
         {
             if (msg == null) {
-                is_deleted = true;
+                deleted = true;
                 return;
             }
             id = msg.id;

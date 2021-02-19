@@ -24,7 +24,7 @@ namespace SkylinesRemotePython.API
         internal void AssignData(TreeMessage msg)
         {
             if (msg == null) {
-                is_deleted = true;
+                deleted = true;
                 return;
             }
             id = msg.id;

@@ -30,7 +30,7 @@ namespace SkylinesRemotePython.API
         internal void AssignData(NetNodeMessage msg)
         {
             if (msg == null) {
-                is_deleted = true;
+                deleted = true;
                 return;
             }
             id = msg.id;
@@ -45,7 +45,7 @@ namespace SkylinesRemotePython.API
             AssignData(obj);
         }
 
-        internal static NetNode GetNetNode(int id, GameAPI api)
+        internal static NetNode GetNetNode(uint id, GameAPI api)
         {
             return new NetNode(api.client.RemoteCall<NetNodeMessage>(Contracts.GetNodeFromId, id), api);
         }

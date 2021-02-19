@@ -10,7 +10,7 @@ namespace SkylinesRemotePython.API {
 
         public uint id { get; protected set; }
 
-        public bool is_deleted { get; protected set; }
+        public bool deleted { get; protected set; }
 
         public abstract void refresh();
 
@@ -23,7 +23,7 @@ namespace SkylinesRemotePython.API {
 
         public virtual bool delete()
         {
-            if(is_deleted) {
+            if(deleted) {
                 return true;
             }
             api.client.RemoteCall<bool>(Contracts.DeleteObject, new DeleteObjectMessage() {
@@ -31,7 +31,7 @@ namespace SkylinesRemotePython.API {
                 type = type
             });
             refresh();
-            return is_deleted;
+            return deleted;
         }
 
         public override bool Equals(object obj)

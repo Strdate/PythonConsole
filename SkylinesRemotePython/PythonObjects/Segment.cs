@@ -21,11 +21,11 @@ namespace SkylinesRemotePython.API
         public float length { get; private set; }
 
         public NetNode start_node {
-            get => NetNode.GetNetNode(start_node_id, api);
+            get => NetNode.GetNetNode((uint)start_node_id, api);
         }
 
         public NetNode end_node {
-            get => NetNode.GetNetNode(end_node_id, api);
+            get => NetNode.GetNetNode((uint)end_node_id, api);
         }
 
         public NetNode get_other_node(object node)
@@ -46,7 +46,7 @@ namespace SkylinesRemotePython.API
 
         public bool delete(bool keep_nodes)
         {
-            if (is_deleted) {
+            if (deleted) {
                 return true;
             }
             api.client.RemoteCall<bool>(Contracts.DeleteObject, new DeleteObjectMessage() {
@@ -55,7 +55,7 @@ namespace SkylinesRemotePython.API
                 keep_nodes = keep_nodes
             });
             refresh();
-            return is_deleted;
+            return deleted;
         }
 
         public override void refresh()
@@ -66,7 +66,7 @@ namespace SkylinesRemotePython.API
         internal void AssignData(NetSegmentMessage msg)
         {
             if(msg == null) {
-                is_deleted = true;
+                deleted = true;
                 return;
             }
             id = msg.id;

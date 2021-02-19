@@ -9,9 +9,11 @@ namespace SkylinesRemotePython.API
     public class GameAPI
     {
         internal ClientHandler client;
+        internal NetLogic _netLogic;
         public GameAPI(ClientHandler client)
         {
             this.client = client;
+            _netLogic = new NetLogic(this);
         }
 
         public Prop get_prop(int id)
@@ -29,7 +31,7 @@ namespace SkylinesRemotePython.API
             return new Building(client.RemoteCall<BuildingMessage>(Contracts.GetBuildingFromId, id), this);
         }
 
-        public NetNode get_node(int id) => NetNode.GetNetNode(id, this);
+        public NetNode get_node(int id) => NetNode.GetNetNode((uint)id, this);
 
         public Segment get_segment(int id)
         {
@@ -82,83 +84,37 @@ namespace SkylinesRemotePython.API
 
         public Segment create_segment(object startNode, object endNode, object type)
         {
-            return CreateSegmentImpl(startNode, endNode, type, null, null, null);
+            return _netLogic.CreateSegmentImpl(startNode, endNode, type, null, null, null);
         }
 
         public Segment create_segment(object startNode, object endNode, object type, Vector middle_pos)
         {
-            return CreateSegmentImpl(startNode, endNode, type, null, null, middle_pos);
+            return _netLogic.CreateSegmentImpl(startNode, endNode, type, null, null, middle_pos);
         }
 
         public Segment create_segment(object startNode, object endNode, object type, Vector start_dir, Vector end_dir)
         {
-            return CreateSegmentImpl(startNode, endNode, type, start_dir, end_dir, null);
+            return _netLogic.CreateSegmentImpl(startNode, endNode, type, start_dir, end_dir, null);
         }
 
-        private Segment CreateSegmentImpl(object startNode, object endNode, object type, Vector start_dir, Vector end_dir, Vector middle_pos)
+        public PathBuilder begin_path(object startNode, object options = null)
         {
-            if(!(startNode is NetNode) && !(startNode is Vector)) {
-                throw new Exception("Segment startNode must be NetNode or Vector, not " + startNode.GetType().Name);
-            }
-            if (!(endNode is NetNode) && !(endNode is Vector)) {
-                throw new Exception("Segment endNode must be NetNode or Vector, not " + endNode.GetType().Name);
-            }
-            if (!(type is string) && !(type is NetOptions)) {
-                throw new Exception("Segment type must be prefab name or NetOptions object, not " + type.GetType().Name);
-            }
-            NetOptions options = type as NetOptions ?? new NetOptions((string) type);
-            CreateSegmentMessage msg = new CreateSegmentMessage() {
-                start_node_id = startNode is NetNode ? (ushort)((NetNode)startNode).id : (ushort)0,
-                end_node_id = endNode is NetNode ? (ushort)((NetNode)endNode).id : (ushort)0,
-                start_postition = startNode is Vector ? (Vector)startNode : null,
-                end_postition = endNode is Vector ? (Vector)endNode : null,
-                net_options = options,
-                start_dir = start_dir,
-                end_dir = end_dir,
-                control_point = middle_pos
-            };
-            return new Segment(client.RemoteCall<NetSegmentMessage>(Contracts.CreateSegment, msg), this);
+            return PathBuilder.BeginPath(this, startNode, options);
         }
 
         public IList<Segment> create_segments(object startNode, object endNode, object type)
         {
-            return CreateSegmentsImpl(startNode, endNode, type, null, null, null);
+            return _netLogic.CreateSegmentsImpl(startNode, endNode, type, null, null, null);
         }
 
         public IList<Segment> create_segments(object startNode, object endNode, object type, Vector middle_pos)
         {
-            return CreateSegmentsImpl(startNode, endNode, type, null, null, middle_pos);
+            return _netLogic.CreateSegmentsImpl(startNode, endNode, type, null, null, middle_pos);
         }
 
         public IList<Segment> create_segments(object startNode, object endNode, object type, Vector start_dir, Vector end_dir)
         {
-            return CreateSegmentsImpl(startNode, endNode, type, start_dir, end_dir, null);
-        }
-
-        private IList<Segment> CreateSegmentsImpl(object startNode, object endNode, object type, Vector start_dir, Vector end_dir, Vector middle_pos, bool autoSplit = false)
-        {
-            if (!(startNode is NetNode) && !(startNode is Vector)) {
-                throw new Exception("Segment startNode must be NetNode or Vector, not " + startNode.GetType().Name);
-            }
-            if (!(endNode is NetNode) && !(endNode is Vector)) {
-                throw new Exception("Segment endNode must be NetNode or Vector, not " + endNode.GetType().Name);
-            }
-            if (!(type is string) && !(type is NetOptions)) {
-                throw new Exception("Segment type must be prefab name or NetOptions object, not " + type.GetType().Name);
-            }
-            NetOptions options = type as NetOptions ?? new NetOptions((string)type);
-            CreateSegmentMessage msg = new CreateSegmentMessage() {
-                start_node_id = startNode is NetNode ? (ushort)((NetNode)startNode).id : (ushort)0,
-                end_node_id = endNode is NetNode ? (ushort)((NetNode)endNode).id : (ushort)0,
-                start_postition = startNode is Vector ? (Vector)startNode : null,
-                end_postition = endNode is Vector ? (Vector)endNode : null,
-                net_options = options,
-                start_dir = start_dir,
-                end_dir = end_dir,
-                control_point = middle_pos,
-                auto_split = true
-            };
-            return NetLogic.PrepareSegmentList(client.RemoteCall<NetSegmentListMessage>(Contracts.CreateSegments, msg).list, this);
+            return _netLogic.CreateSegmentsImpl(startNode, endNode, type, start_dir, end_dir, null);
         }
 
         public bool is_prefab(string name)

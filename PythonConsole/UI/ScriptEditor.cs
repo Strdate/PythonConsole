@@ -265,12 +265,11 @@ namespace PythonConsole
             {
                 if(!_capsProcessed) {
                     _capsProcessed = true;
-                    if (text.Length > editor.cursorIndex) {
+                    if (text.Length >= editor.cursorIndex) {
                         text = text.Insert(editor.cursorIndex, "  ");
                         editor.cursorIndex += 2;
                         editor.selectIndex = editor.cursorIndex;
                     }
-                    GUI.FocusControl(TextAreaControlName);
                 }
             } else {
                 _capsProcessed = false;

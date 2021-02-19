@@ -124,6 +124,7 @@ namespace PythonConsole
             return ret;
         }
 
+
         public static object GetTerrainHeight(object msg)
         {
             return NetUtil.TerrainHeight(((Vector)msg).ToUnity());

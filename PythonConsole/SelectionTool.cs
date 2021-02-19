@@ -52,7 +52,7 @@ namespace PythonConsole
         {
             base.RenderOverlay(cameraInfo);
 
-            if (isShiftPressed) {
+            if (isShiftPressed && !m_toolController.IsInsideUI) {
                 RenderManager.instance.OverlayEffect.DrawCircle(cameraInfo, Color.red, m_accuratePosition, 3f, m_accuratePosition.y - 1f, m_accuratePosition.y + 1f, true, true);
             }
 
@@ -159,7 +159,10 @@ namespace PythonConsole
                 if(e.shift) {
                     ToggleInstanceSelection(new ObjectInstance(new SelectedPoint(m_accuratePosition)), e);
                 } else if(!m_hoverInstance.IsEmpty) {
-                    ToggleInstanceSelection(ObjectInstance.FromInstance(m_hoverInstance), e);
+                    ObjectInstance inst = ObjectInstance.FromInstance(m_hoverInstance);
+                    if(inst != null) {
+                        ToggleInstanceSelection(inst, e);
+                    }
                 }
             } else if (e.button == 1 && !m_hoverInstance.IsEmpty) {
                 if (m_hoverInstance.NetNode > 0) {
@@ -293,24 +296,29 @@ namespace PythonConsole
                 varInfo = Clipboard.Count == 1 ? "Var: cb\n" : "Var: cba[" + index + "]\n";
             }
 
+            string position = "";
+            if(inst != null) {
+                position = FormatVector(inst.Position) + "\n";
+            }
+
             if(isShiftPressed) {
-                text = $"[{m_accuratePosition.x.ToString("N2")}, {m_accuratePosition.y.ToString("N2")}, {m_accuratePosition.z.ToString("N2")}]";
+                text = FormatVector(m_accuratePosition);
             } else if (hoverInstance1.NetNode != 0) {
-                text = $"Node ID: {hoverInstance1.NetNode}\nSegment ID: {hoveredSegment}\nAsset: {hoverInstance1.GetNetworkAssetName()}";
+                text = $"Node ID: {hoverInstance1.NetNode}\nSegment ID: {hoveredSegment}\n{position}Asset: {hoverInstance1.GetNetworkAssetName()}";
             } else if (hoverInstance1.NetSegment != 0) {
-                text = $"Segment ID: {hoverInstance1.NetSegment}\nBuilding ID: {hoveredBuilding}\nAsset: {hoverInstance1.GetNetworkAssetName()}";
+                text = $"Segment ID: {hoverInstance1.NetSegment}\nBuilding ID: {hoveredBuilding}\n{position}Asset: {hoverInstance1.GetNetworkAssetName()}";
             } else if (hoverInstance1.Building != 0) {
-                text = $"Building ID: {hoverInstance1.Building}\nAsset: {hoverInstance1.GetBuildingAssetName()}";
+                text = $"Building ID: {hoverInstance1.Building}\n{position}Asset: {hoverInstance1.GetBuildingAssetName()}";
             } else if (hoverInstance1.Vehicle != 0) {
-                text = $"Vehicle ID: {hoverInstance1.Vehicle}\nAsset: {hoverInstance1.GetVehicleAssetName()}";
+                text = $"Vehicle ID: {hoverInstance1.Vehicle}\n{position}Asset: {hoverInstance1.GetVehicleAssetName()}";
             } else if (hoverInstance1.ParkedVehicle != 0) {
                 text = $"Parked Vehicle ID: {hoverInstance1.ParkedVehicle}\nAsset: {hoverInstance1.GetVehicleAssetName()}";
             } else if (hoverInstance1.CitizenInstance != 0) {
                 text = $"Citizen instance ID: {hoverInstance1.CitizenInstance}\nCitizen ID: {hoverInstance1.GetCitizenId()}\nAsset: {hoverInstance1.GetCitizenAssetName()}";
             } else if (hoverInstance1.Prop != 0) {
-                text = $"Prop ID: {hoverInstance1.Prop}\nAsset: {hoverInstance1.GetPropAssetName()}";
+                text = $"Prop ID: {hoverInstance1.Prop}\n{position}Asset: {hoverInstance1.GetPropAssetName()}";
             } else if (hoverInstance1.Tree != 0) {
-                text = $"Tree ID: {hoverInstance1.Tree}\nAsset: {hoverInstance1.GetTreeAssetName()}";
+                text = $"Tree ID: {hoverInstance1.Tree}\n{position}Asset: {hoverInstance1.GetTreeAssetName()}";
             } else if (hoverInstance1.Park != 0) {
                 text = $"Park ID: {hoverInstance1.Park}\nName: {hoverInstance1.GetParkName()}";
             } else if (hoverInstance1.District != 0) {
@@ -330,6 +338,11 @@ namespace PythonConsole
                 GUI.color = color;
             }
         }
+
+        private static string FormatVector(Vector3 vect)
+        {
+            return $"[{vect.x.ToString("N2")}, {vect.y.ToString("N2")}, {vect.z.ToString("N2")}]";
+        } 
 
         public void DrawVarLabels()
         {
