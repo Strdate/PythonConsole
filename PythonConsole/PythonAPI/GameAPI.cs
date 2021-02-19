@@ -47,6 +47,11 @@ namespace PythonConsole
             return NetUtil.GetSegmentsFromNode((ushort)(uint)msg).Select((seg) => NetLogic.PrepareSegment(seg)).ToList();
         }
 
+        public static object GetNetPrefabFromName(object msg)
+        {
+            return NetLogic.PrepareNetInfo((string)msg);
+        }
+
         public static object CreateTree(object msg)
         {
             var data = (CreateTreeMessage)msg;

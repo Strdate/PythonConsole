@@ -6,7 +6,7 @@ using System.Text;
 
 namespace SkylinesRemotePython.API
 {
-    public class Tree : ObjectAPI
+    public class Tree : CitiesObject
     {
         public override string type => "tree";
 

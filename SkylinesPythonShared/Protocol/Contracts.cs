@@ -13,6 +13,7 @@ namespace SkylinesPythonShared
         public static Contract GetNodeFromId = new Contract() { FuncName = "GetNodeFromId", RetType = "NetNode"};
         public static Contract GetSegmentFromId = new Contract() { FuncName = "GetSegmentFromId", RetType = "NetSegment" };
         public static Contract GetSegmentsForNodeId = new Contract() { FuncName = "GetSegmentsForNodeId", RetType = "NetSegments" };
+        public static Contract GetNetPrefabFromName = new Contract() { FuncName = "GetNetPrefabFromName", RetType = "NetPrefab" };
         public static Contract CreateProp = new Contract() { FuncName = "CreateProp", RetType = "Prop"};
         public static Contract CreateTree = new Contract() { FuncName = "CreateTree", RetType = "Tree" };
         public static Contract CreateBuilding = new Contract() { FuncName = "CreateBuilding", RetType = "Building" };

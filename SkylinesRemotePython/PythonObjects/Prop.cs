@@ -6,7 +6,7 @@ using System.Text;
 
 namespace SkylinesRemotePython.API
 {
-    public class Prop : ObjectAPI
+    public class Prop : CitiesObject
     {
         public override string type => "prop";
 

@@ -4,10 +4,8 @@ using System.Collections.Generic;
 using System.Text;
 
 namespace SkylinesRemotePython.API {
-    public abstract class ObjectAPI
+    public abstract class CitiesObject : ApiRefObject
     {
-        protected GameAPI api;
-
         public uint id { get; protected set; }
 
         public bool deleted { get; protected set; }
@@ -16,9 +14,9 @@ namespace SkylinesRemotePython.API {
 
         public virtual string type => "";
 
-        internal ObjectAPI(GameAPI api)
+        internal CitiesObject(GameAPI api) : base(api)
         {
-            this.api = api;
+
         }
 
         public virtual bool delete()
@@ -36,7 +34,7 @@ namespace SkylinesRemotePython.API {
 
         public override bool Equals(object obj)
         {
-            ObjectAPI other = (ObjectAPI)obj;
+            CitiesObject other = (CitiesObject)obj;
             return this.type == other.type &&
                    id == other.id;
         }
@@ -46,7 +44,7 @@ namespace SkylinesRemotePython.API {
             return HashCode.Combine(id, type);
         }
 
-        public static bool operator ==(ObjectAPI lhs, ObjectAPI rhs)
+        public static bool operator ==(CitiesObject lhs, CitiesObject rhs)
         {
             if (System.Object.ReferenceEquals(lhs, null)) {
                 if (System.Object.ReferenceEquals(rhs, null)) {
@@ -58,7 +56,7 @@ namespace SkylinesRemotePython.API {
             return lhs.id == rhs.id && lhs.type == rhs.type;
         }
 
-        public static bool operator !=(ObjectAPI lhs, ObjectAPI rhs)
+        public static bool operator !=(CitiesObject lhs, CitiesObject rhs)
         {
             return !(lhs == rhs);
         }

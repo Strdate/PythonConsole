@@ -7,11 +7,13 @@ using System.Text;
 
 namespace SkylinesRemotePython.API
 {
-    public class NetNode : ObjectAPI
+    public class Node : CitiesObject
     {
         public override string type => "node";
 
         public string prefab_name { get; private set; }
+
+        public NetPrefab prefab => NetPrefab.GetNetPrefab(prefab_name, api);
 
         public Vector pos => position;
 
@@ -40,14 +42,14 @@ namespace SkylinesRemotePython.API
             _cachedSegments = new CachedObj<List<Segment>>(() => api.client.RemoteCall<List<NetSegmentMessage>>(Contracts.GetSegmentsForNodeId, id).Select((obj) => new Segment(obj, api)).ToList()); ;
         }
 
-        internal NetNode(NetNodeMessage obj, GameAPI api) : base(api)
+        internal Node(NetNodeMessage obj, GameAPI api) : base(api)
         {
             AssignData(obj);
         }
 
-        internal static NetNode GetNetNode(uint id, GameAPI api)
+        internal static Node GetNetNode(uint id, GameAPI api)
         {
-            return new NetNode(api.client.RemoteCall<NetNodeMessage>(Contracts.GetNodeFromId, id), api);
+            return new Node(api.client.RemoteCall<NetNodeMessage>(Contracts.GetNodeFromId, id), api);
         }
     }
 }

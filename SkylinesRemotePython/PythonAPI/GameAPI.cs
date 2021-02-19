@@ -31,7 +31,7 @@ namespace SkylinesRemotePython.API
             return new Building(client.RemoteCall<BuildingMessage>(Contracts.GetBuildingFromId, id), this);
         }
 
-        public NetNode get_node(int id) => NetNode.GetNetNode((uint)id, this);
+        public Node get_node(int id) => Node.GetNetNode((uint)id, this);
 
         public Segment get_segment(int id)
         {
@@ -71,15 +71,17 @@ namespace SkylinesRemotePython.API
             return new Building(client.RemoteCall<BuildingMessage>(Contracts.CreateBuilding, msg), this);
         }
 
-        public NetNode create_node(Vector position, string prefab)
+        public Node create_node(Vector position, object prefab)
         {
-            CreateNodeMessage msg = new CreateNodeMessage()
-            {
+            if(!(prefab is string) && !(prefab is NetPrefab)) {
+                throw new Exception("Prefab must be string or NetPrefab");
+            }
+            CreateNodeMessage msg = new CreateNodeMessage() {
                 Position = position,
-                Type = prefab
+                Type = prefab is NetPrefab ? ((NetPrefab)prefab).name : (string)prefab
             };
 
-            return new NetNode(client.RemoteCall<NetNodeMessage>(Contracts.CreateNode, msg), this);
+            return new Node(client.RemoteCall<NetNodeMessage>(Contracts.CreateNode, msg), this);
         }
 
         public Segment create_segment(object startNode, object endNode, object type)
@@ -115,6 +117,11 @@ namespace SkylinesRemotePython.API
         public IList<Segment> create_segments(object startNode, object endNode, object type, Vector start_dir, Vector end_dir)
         {
             return _netLogic.CreateSegmentsImpl(startNode, endNode, type, start_dir, end_dir, null);
+        }
+
+        public NetPrefab get_net_prefab(string name)
+        {
+            return NetPrefab.GetNetPrefab(name, this);
         }
 
         public bool is_prefab(string name)

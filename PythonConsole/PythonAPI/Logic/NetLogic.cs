@@ -121,6 +121,17 @@ namespace PythonConsole
             };
         }
 
+        public static NetPrefabMessage PrepareNetInfo(string name)
+        {
+            NetInfo info = PrefabCollection<NetInfo>.FindLoaded(name);
+            return new NetPrefabMessage() {
+                name = info.name,
+                width = info.m_halfWidth * 2,
+                is_overground = info.m_netAI.IsOverground(),
+                is_underground = info.m_netAI.IsUnderground()
+            };
+        }
+
         private static void ParseNetOptions(NetOptions options, out NetInfo info, out bool invert)
         {
             info = PrefabCollection<NetInfo>.FindLoaded(options.prefab_name);

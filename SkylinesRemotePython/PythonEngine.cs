@@ -69,7 +69,7 @@ namespace SkylinesRemotePython
                 if(arr[i] is Vector) {
                     obj = new Point((Vector)arr[i]);
                 } else if(arr[i] is NetNodeMessage) {
-                    obj = new NetNode((NetNodeMessage)arr[i], _gameAPI);
+                    obj = new Node((NetNodeMessage)arr[i], _gameAPI);
                 } else if (arr[i] is NetSegmentMessage) {
                     obj = new Segment((NetSegmentMessage)arr[i], _gameAPI);
                 } else if (arr[i] is BuildingMessage) {

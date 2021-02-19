@@ -6,11 +6,13 @@ using System.Text;
 
 namespace SkylinesRemotePython.API
 {
-    public class Segment : ObjectAPI
+    public class Segment : CitiesObject
     {
         public override string type => "segment";
 
         public string prefab_name { get; private set; }
+
+        public NetPrefab prefab => NetPrefab.GetNetPrefab(prefab_name, api);
 
         public int start_node_id { get; private set; }
 
@@ -20,19 +22,19 @@ namespace SkylinesRemotePython.API
 
         public float length { get; private set; }
 
-        public NetNode start_node {
-            get => NetNode.GetNetNode((uint)start_node_id, api);
+        public Node start_node {
+            get => Node.GetNetNode((uint)start_node_id, api);
         }
 
-        public NetNode end_node {
-            get => NetNode.GetNetNode((uint)end_node_id, api);
+        public Node end_node {
+            get => Node.GetNetNode((uint)end_node_id, api);
         }
 
-        public NetNode get_other_node(object node)
+        public Node get_other_node(object node)
         {
             uint? nodeId = node as uint?;
             if(nodeId == null) {
-                NetNode netNode = (NetNode)node;
+                Node netNode = (Node)node;
                 nodeId = netNode.id;
             }
             if(start_node_id == nodeId) {

@@ -11,9 +11,9 @@ namespace SkylinesRemotePython.API
     {
         private object last_position;
 
-        public NetNode last_node { get; private set; }
+        public Node last_node { get; private set; }
 
-        public object options { get; set; }
+        public NetOptions options { get; set; }
 
         private GameAPI api;
 
@@ -24,20 +24,18 @@ namespace SkylinesRemotePython.API
 
         private PathBuilder(GameAPI api, object startNode, object options = null)
         {
-            if (!(startNode is NetNode) && !(startNode is Vector) && !(startNode is Point)) {
+            if (!(startNode is Node) && !(startNode is Vector) && !(startNode is Point)) {
                 throw new Exception("Segment startNode must be NetNode, Vector or Point - not " + startNode.GetType().Name);
             }
-            if (options != null && !(options is string) && !(options is NetOptions)) {
-                throw new Exception("Segment type must be prefab name or NetOptions object, not " + options.GetType().Name);
-            }
-            if(options == null && startNode is NetNode) {
-                options = ((NetNode)startNode).prefab_name;
+            if(options == null && startNode is Node) {
+                options = ((Node)startNode).prefab_name;
             } else if (options == null) {
                 throw new Exception("You must provide prefab name or NetOptions as the second param, if that connot be inferred from first param");
             }
+            NetOptions parsedOptions = NetOptionsUtil.Ensure(options);
             this.api = api;
             last_position = startNode;
-            this.options = options;
+            this.options = parsedOptions;
         }
 
         public PathBuilder path_to(object endNode)
