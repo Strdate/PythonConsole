@@ -9,7 +9,7 @@ namespace SkylinesRemotePython.API
 {
     public class PathBuilder
     {
-        private object last_position;
+        private IPositionable last_position;
 
         public Node last_node { get; private set; }
 
@@ -17,16 +17,13 @@ namespace SkylinesRemotePython.API
 
         private GameAPI api;
 
-        internal static PathBuilder BeginPath(GameAPI api, object obj, object options = null)
+        internal static PathBuilder BeginPath(GameAPI api, IPositionable obj, object options = null)
         {
             return new PathBuilder(api, obj, options);
         }
 
-        private PathBuilder(GameAPI api, object startNode, object options = null)
+        private PathBuilder(GameAPI api, IPositionable startNode, object options = null)
         {
-            if (!(startNode is Node) && !(startNode is Vector) && !(startNode is Point)) {
-                throw new Exception("Segment startNode must be NetNode, Vector or Point - not " + startNode.GetType().Name);
-            }
             if(options == null && startNode is Node) {
                 options = ((Node)startNode).prefab_name;
             } else if (options == null) {
@@ -38,25 +35,25 @@ namespace SkylinesRemotePython.API
             this.options = parsedOptions;
         }
 
-        public PathBuilder path_to(object endNode)
+        public PathBuilder path_to(IPositionable endNode)
         {
             PathToImpl(last_position, endNode, options, null, null, null);
             return this;
         }
 
-        public PathBuilder path_to(object endNode, Vector middle_pos)
+        public PathBuilder path_to(IPositionable endNode, Vector middle_pos)
         {
             PathToImpl(last_position, endNode, options, null, null, middle_pos);
             return this;
         }
 
-        public PathBuilder path_to(object endNode, Vector start_dir, Vector end_dir)
+        public PathBuilder path_to(IPositionable endNode, Vector start_dir, Vector end_dir)
         {
             PathToImpl(last_position, endNode, options, start_dir, end_dir, null);
             return this;
         }
 
-        private void PathToImpl(object last_position, object endNode, object options, Vector start_dir, Vector end_dir, Vector middle_pos)
+        private void PathToImpl(IPositionable last_position, IPositionable endNode, object options, Vector start_dir, Vector end_dir, Vector middle_pos)
         {
             last_node = api._netLogic.CreateSegmentsImpl(last_position, endNode, options, start_dir, end_dir, middle_pos).Last().end_node;
             this.last_position = last_node;

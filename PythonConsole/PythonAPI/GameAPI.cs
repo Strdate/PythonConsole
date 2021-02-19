@@ -88,6 +88,11 @@ namespace PythonConsole
         {
             return NetLogic.CreateSegments((CreateSegmentMessage)msg);
         }
+        
+        public static object MoveObject(object msg)
+        {
+            return NetLogic.Move((MoveMessage)msg);
+        }
 
         public static object DeleteObject(object msg)
         {

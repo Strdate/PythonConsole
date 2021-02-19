@@ -17,7 +17,10 @@ namespace SkylinesRemotePython.API
 
         public Vector pos => position;
 
-        public Vector position { get; private set; }
+        public override Vector position {
+            get => _position;
+            set => MoveImpl(value, null);
+        }
 
         public int elevation { get; private set; }
 
@@ -29,15 +32,16 @@ namespace SkylinesRemotePython.API
             AssignData(api.client.RemoteCall<NetNodeMessage>(Contracts.GetNodeFromId, id));
         }
 
-        internal void AssignData(NetNodeMessage msg)
+        internal override void AssignData(InstanceMessage data)
         {
+            NetNodeMessage msg = data as NetNodeMessage;
             if (msg == null) {
                 deleted = true;
                 return;
             }
             id = msg.id;
             prefab_name = msg.prefab_name;
-            position = msg.position;
+            _position = msg.position;
             elevation = msg.elevation;
             _cachedSegments = new CachedObj<List<Segment>>(() => api.client.RemoteCall<List<NetSegmentMessage>>(Contracts.GetSegmentsForNodeId, id).Select((obj) => new Segment(obj, api)).ToList()); ;
         }

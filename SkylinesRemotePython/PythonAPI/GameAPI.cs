@@ -84,37 +84,37 @@ namespace SkylinesRemotePython.API
             return new Node(client.RemoteCall<NetNodeMessage>(Contracts.CreateNode, msg), this);
         }
 
-        public Segment create_segment(object startNode, object endNode, object type)
+        public Segment create_segment(IPositionable startNode, IPositionable endNode, object type)
         {
             return _netLogic.CreateSegmentImpl(startNode, endNode, type, null, null, null);
         }
 
-        public Segment create_segment(object startNode, object endNode, object type, Vector middle_pos)
+        public Segment create_segment(IPositionable startNode, IPositionable endNode, object type, Vector middle_pos)
         {
             return _netLogic.CreateSegmentImpl(startNode, endNode, type, null, null, middle_pos);
         }
 
-        public Segment create_segment(object startNode, object endNode, object type, Vector start_dir, Vector end_dir)
+        public Segment create_segment(IPositionable startNode, IPositionable endNode, object type, Vector start_dir, Vector end_dir)
         {
             return _netLogic.CreateSegmentImpl(startNode, endNode, type, start_dir, end_dir, null);
         }
 
-        public PathBuilder begin_path(object startNode, object options = null)
+        public PathBuilder begin_path(IPositionable startNode, object options = null)
         {
             return PathBuilder.BeginPath(this, startNode, options);
         }
 
-        public IList<Segment> create_segments(object startNode, object endNode, object type)
+        public IList<Segment> create_segments(IPositionable startNode, IPositionable endNode, object type)
         {
             return _netLogic.CreateSegmentsImpl(startNode, endNode, type, null, null, null);
         }
 
-        public IList<Segment> create_segments(object startNode, object endNode, object type, Vector middle_pos)
+        public IList<Segment> create_segments(IPositionable startNode, IPositionable endNode, object type, Vector middle_pos)
         {
             return _netLogic.CreateSegmentsImpl(startNode, endNode, type, null, null, middle_pos);
         }
 
-        public IList<Segment> create_segments(object startNode, object endNode, object type, Vector start_dir, Vector end_dir)
+        public IList<Segment> create_segments(IPositionable startNode, IPositionable endNode, object type, Vector start_dir, Vector end_dir)
         {
             return _netLogic.CreateSegmentsImpl(startNode, endNode, type, start_dir, end_dir, null);
         }

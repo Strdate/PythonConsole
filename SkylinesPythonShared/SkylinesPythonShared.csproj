@@ -48,6 +48,7 @@
     <Compile Include="Messages\DeleteObjectMessage.cs" />
     <Compile Include="Messages\InstanceMessage.cs" />
     <Compile Include="Messages\MessageHeader.cs" />
+    <Compile Include="Messages\MoveMessage.cs" />
     <Compile Include="Messages\NetNodeMessage.cs" />
     <Compile Include="Messages\NetPrefabMessage.cs" />
     <Compile Include="Messages\NetSegmentListMessage.cs" />
@@ -59,6 +60,7 @@
     <Compile Include="Protocol\Contracts.cs" />
     <Compile Include="Protocol\TcpConversation.cs" />
     <Compile Include="SharedStructures\NetOptions.cs" />
+    <Compile Include="SharedStructures\IPositionable.cs" />
     <Compile Include="SharedStructures\Vector.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

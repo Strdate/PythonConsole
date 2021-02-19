@@ -56,6 +56,7 @@
     <Compile Include="ModInfo.cs" />
     <Compile Include="ModTools\IGameObject.cs" />
     <Compile Include="ModTools\ModConfiguration.cs" />
+    <Compile Include="PythonAPI\Logic\MoveableNode.cs" />
     <Compile Include="ObjectInstance.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PythonAPI\GameAPI.cs" />

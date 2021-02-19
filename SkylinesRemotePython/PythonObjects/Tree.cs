@@ -14,22 +14,23 @@ namespace SkylinesRemotePython.API
 
         public Vector pos => position;
 
-        public Vector position { get; private set; }
+        //public override Vector position { get; protected set; }
 
         public override void refresh()
         {
             AssignData(api.client.RemoteCall<TreeMessage>(Contracts.GetTreeFromId, id));
         }
 
-        internal void AssignData(TreeMessage msg)
+        internal override void AssignData(InstanceMessage data)
         {
+            TreeMessage msg = data as TreeMessage;
             if (msg == null) {
                 deleted = true;
                 return;
             }
             id = msg.id;
             prefab_name = msg.prefab_name;
-            position = msg.position;
+            _position = msg.position;
         }
         internal Tree(TreeMessage obj, GameAPI api) : base(api)
         {

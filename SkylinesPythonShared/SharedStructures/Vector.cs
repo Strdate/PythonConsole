@@ -6,13 +6,15 @@ using System.Text;
 namespace SkylinesPythonShared.API
 {
     [Serializable]
-    public class Vector : InstanceMessage
+    public class Vector : InstanceMessage, IPositionable
     {
         public double x { get; private set; }
         public double y { get; private set; }
         public double z { get; private set; }
 
         public bool is_height_defined { get; private set; }
+
+        public Vector position => this;
 
         private Vector()
         {

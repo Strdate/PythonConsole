@@ -18,8 +18,15 @@ namespace SkylinesRemotePython.API
 
         public int end_node_id { get; private set; }
 
-        public Vector middle_pos { get; private set; }
+        public Vector middle_pos {
+            get => position;
+            set => position = value;
+        }
 
+        public override Vector position {
+            get => _position;
+            set => MoveImpl(value, null);
+        }
         public float length { get; private set; }
 
         public Node start_node {
@@ -65,8 +72,9 @@ namespace SkylinesRemotePython.API
             AssignData(api.client.RemoteCall<NetSegmentMessage>(Contracts.GetSegmentFromId, id));
         }
 
-        internal void AssignData(NetSegmentMessage msg)
+        internal override void AssignData(InstanceMessage data)
         {
+            NetSegmentMessage msg = data as NetSegmentMessage;
             if(msg == null) {
                 deleted = true;
                 return;
@@ -76,7 +84,7 @@ namespace SkylinesRemotePython.API
             start_node_id = msg.start_node_id;
             end_node_id = msg.end_node_id;
             length = msg.length;
-            middle_pos = msg.middle_pos;
+            _position = msg.middle_pos;
         }
 
         internal Segment(NetSegmentMessage obj, GameAPI api) : base(api)

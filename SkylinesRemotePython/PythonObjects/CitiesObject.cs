@@ -1,22 +1,43 @@
 ﻿using SkylinesPythonShared;
+using SkylinesPythonShared.API;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace SkylinesRemotePython.API {
-    public abstract class CitiesObject : ApiRefObject
+    public abstract class CitiesObject : ApiRefObject, IPositionable
     {
         public uint id { get; protected set; }
 
         public bool deleted { get; protected set; }
 
+        protected Vector _position;
+        public virtual Vector position { 
+            get => _position;
+            set => throw new Exception($"Position of {type} cannot be changed");
+        }
+        
+        internal double _angle;
+
         public abstract void refresh();
+
+        internal abstract void AssignData(InstanceMessage msg);
 
         public virtual string type => "";
 
         internal CitiesObject(GameAPI api) : base(api)
         {
 
+        }
+
+        protected void MoveImpl(Vector position, float? angle)
+        {
+            AssignData(api.client.RemoteCall<InstanceMessage>(Contracts.MoveObject, new MoveMessage() {
+                id = id,
+                type = type,
+                position = position,
+                angle = angle
+            }));
         }
 
         public virtual bool delete()

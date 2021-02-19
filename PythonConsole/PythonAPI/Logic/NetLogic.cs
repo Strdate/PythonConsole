@@ -132,6 +132,20 @@ namespace PythonConsole
             };
         }
 
+        public static InstanceMessage Move(MoveMessage msg)
+        {
+            switch(msg.type) {
+                case "node":
+                    Moveable.MoveNode((ushort)msg.id, msg.position.ToUnity(), 0);
+                    return PrepareNode((ushort)msg.id);
+                case "segment":
+                    Moveable.MoveSegment((ushort)msg.id, msg.position.ToUnity(), 0);
+                    return PrepareSegment((ushort)msg.id);
+                default:
+                    throw new Exception($"Cannot move {msg.type}");
+            }
+        }
+
         private static void ParseNetOptions(NetOptions options, out NetInfo info, out bool invert)
         {
             info = PrefabCollection<NetInfo>.FindLoaded(options.prefab_name);

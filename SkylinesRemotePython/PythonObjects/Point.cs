@@ -5,7 +5,7 @@ using System.Text;
 
 namespace SkylinesRemotePython.API
 {
-    public class Point
+    public class Point : IPositionable
     {
         public Vector pos => position;
 
