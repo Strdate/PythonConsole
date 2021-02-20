@@ -75,7 +75,7 @@ namespace PythonConsole
             try {
                 while (State != ConsoleState.Dead) {
                     MessageHeader header = _client.GetMessageSync();
-
+                    //UnityEngine.Debug.Log("In: " + header.messageType);
                     if(header.messageType == "c_exception") {
                         State = ConsoleState.Ready;
                         if(State != ConsoleState.ScriptAborting) {
@@ -169,7 +169,7 @@ namespace PythonConsole
         public void SimulationStep()
         {
             do {
-                if (State == ConsoleState.ScriptRunning) {
+                if (State == ConsoleState.ScriptRunning || State == ConsoleState.Ready) {
                     while (_simulationQueue.Count > 0) {
                         MessageHeader header = (MessageHeader)_simulationQueue.Dequeue();
                         _remoteFuncManager.HandleAPICall(header.payload, header.messageType);
