@@ -49,13 +49,13 @@ namespace PythonConsole
                 group.AddSpace(10);
 
                 SyncExecution.Draw(group, (b) => {
-                    PythonConsole.Instance?.KillInstance();
+                    PythonConsole.CreateInstance();
                 });
 
                 group.AddSpace(10);
 
                 group.AddButton("Kill python engine", () => {
-                    PythonConsole.Instance?.KillInstance();
+                    PythonConsole.CreateInstance();
                 });
 
             }

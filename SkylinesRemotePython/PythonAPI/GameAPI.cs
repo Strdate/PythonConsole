@@ -134,6 +134,22 @@ namespace SkylinesRemotePython.API
             return client.RemoteCall<float>(Contracts.GetTerrainHeight, pos);
         }
 
+        public RenderableObjectHandle render_line(IPositionable vector, IPositionable origin, string color = "red", double length = 20, double size = 0.1)
+        {
+            return new RenderableObjectHandle(client.RemoteCall<int>(Contracts.RenderVector, new RenderVectorMessage() {
+                vector = vector.position,
+                origin = origin.position,
+                color = color,
+                length = (float)length,
+                size = (float)size
+            }), this);
+        }
+
+        public void clear()
+        {
+            client.RemoteVoidCall(Contracts.RemoveRenderedObject, 0);
+        }
+
         public override string ToString()
         {
             return "Provides API to manipulate in-game objects, such as buildings or roads";

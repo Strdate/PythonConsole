@@ -25,7 +25,7 @@ namespace PythonConsole
             toolController.AddExtraToolToController<SelectionTool>();
             /*var textureButton = AtlasUtil.LoadTextureFromAssembly("ModTools.SelectionToolButton.png");
             textureButton.name = "SelectionToolButton";*/
-            var textureBar = AtlasUtil.LoadTextureFromAssembly("PythonConsole.SelectionToolBar.png");
+            var textureBar = AtlasUtil.LoadTextureFromAssembly("PythonConsole.ClipboardTool.SelectionToolBar.png");
             textureBar.name = "SelectionToolBar";
 
             var escButton = (UIButton)UIView.Find("Esc");

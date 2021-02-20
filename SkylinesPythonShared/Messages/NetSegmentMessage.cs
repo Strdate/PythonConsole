@@ -17,7 +17,13 @@ namespace SkylinesPythonShared
 
         public ushort end_node_id { get; set; }
 
+        public Vector start_dir { get; set; }
+
+        public Vector end_dir { get; set; }
+
         public Vector middle_pos { get; set; }
+
+        public Bezier bezier { get; set; }
 
         public float length { get; set; }
     }

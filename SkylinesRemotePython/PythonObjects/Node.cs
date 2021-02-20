@@ -15,12 +15,9 @@ namespace SkylinesRemotePython.API
 
         public NetPrefab prefab => NetPrefab.GetNetPrefab(prefab_name, api);
 
-        public override Vector position {
-            get => _position;
-            set => MoveImpl(value, null);
-        }
-
         public int elevation { get; private set; }
+
+        public void move(IPositionable pos) => MoveImpl(pos.position, null);
 
         private CachedObj<List<Segment>> _cachedSegments;
         public List<Segment> segments => _cachedSegments.Get;

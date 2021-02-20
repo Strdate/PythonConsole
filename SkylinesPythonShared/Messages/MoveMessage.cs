@@ -15,6 +15,8 @@ namespace SkylinesPythonShared
 
         public Vector position { get; set; }
 
-        public float? angle { get; set; }
+        public float angle { get; set; }
+
+        public bool is_angle_defined { get; set; }
     }
 }

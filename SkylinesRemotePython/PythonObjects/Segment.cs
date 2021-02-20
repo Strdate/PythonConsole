@@ -18,15 +18,18 @@ namespace SkylinesRemotePython.API
 
         public int end_node_id { get; private set; }
 
+        public Vector start_dir { get; private set; }
+
+        public Vector end_dir { get; private set; }
+
+        public Bezier bezier { get; private set; }
+
         public Vector middle_pos {
             get => position;
             set => position = value;
         }
 
-        public override Vector position {
-            get => _position;
-            set => MoveImpl(value, null);
-        }
+        public void move(IPositionable pos) => MoveImpl(pos.position, null);
         public float length { get; private set; }
 
         public Node start_node {
@@ -83,8 +86,11 @@ namespace SkylinesRemotePython.API
             prefab_name = msg.prefab_name;
             start_node_id = msg.start_node_id;
             end_node_id = msg.end_node_id;
+            start_dir = msg.start_dir;
+            end_dir = msg.end_dir;
             length = msg.length;
             _position = msg.middle_pos;
+            bezier = msg.bezier;
         }
 
         internal Segment(NetSegmentMessage obj, GameAPI api) : base(api)

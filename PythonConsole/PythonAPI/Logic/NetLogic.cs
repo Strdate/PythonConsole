@@ -112,13 +112,24 @@ namespace PythonConsole
                 return null;
             }
             ref NetSegment segment = ref NetUtil.Segment(id);
+            ref NetNode startNode = ref NetUtil.Node(segment.m_startNode);
+            ref NetNode endNode = ref NetUtil.Node(segment.m_endNode);
+
+            bool smoothStart = (startNode.m_flags & NetNode.Flags.Middle) != NetNode.Flags.None;
+            bool smoothEnd = (endNode.m_flags & NetNode.Flags.Middle) != NetNode.Flags.None;
+
+            NetSegment.CalculateMiddlePoints(startNode.m_position, segment.m_startDirection, endNode.m_position, segment.m_endDirection, smoothStart, smoothEnd, out Vector3 b, out Vector3 c);
+            Bezier bezier = new Bezier3(startNode.m_position, b, c, endNode.m_position).FromUnity();
             return new NetSegmentMessage() {
                 id = id,
                 prefab_name = segment.Info.name,
                 start_node_id = segment.m_startNode,
                 end_node_id = segment.m_endNode,
+                start_dir = segment.m_startDirection.FromUnity(),
+                end_dir = segment.m_endDirection.FromUnity(),
                 length = segment.m_averageLength,
-                middle_pos = segment.m_middlePosition.FromUnity()
+                middle_pos = segment.m_middlePosition.FromUnity(),
+                bezier = bezier
             };
         }
 
@@ -131,23 +142,6 @@ namespace PythonConsole
                 is_overground = info.m_netAI.IsOverground(),
                 is_underground = info.m_netAI.IsUnderground()
             };
-        }
-
-        public static InstanceMessage Move(MoveMessage msg)
-        {
-            switch(msg.type) {
-                case "node":
-                    MoveableNode mnode = new MoveableNode(new InstanceID() {
-                        NetNode = (ushort)msg.id
-                    });
-                    mnode.MoveCall(msg.position.ToUnity());
-                    return PrepareNode((ushort)msg.id);
-                /*case "segment":
-                    Moveable.MoveSegment((ushort)msg.id, msg.position.ToUnity(), 0);
-                    return PrepareSegment((ushort)msg.id);*/
-                default:
-                    throw new Exception($"Cannot move {msg.type}");
-            }
         }
 
         private static void ParseNetOptions(NetOptions options, out NetInfo info, out bool invert)

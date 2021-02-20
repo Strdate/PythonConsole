@@ -12,6 +12,8 @@ namespace SkylinesRemotePython.API
 
         public string prefab_name { get; private set; }
 
+        public void move(IPositionable pos) => MoveImpl(pos.position, null);
+
         public override void refresh()
         {
             AssignData(api.client.RemoteCall<TreeMessage>(Contracts.GetTreeFromId, id));

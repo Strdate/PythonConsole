@@ -12,7 +12,12 @@ namespace SkylinesRemotePython.API
 
         public string prefab_name { get; private set; }
 
-        public double angle => _angle;
+        public double angle {
+            get => _angle;
+            set => MoveImpl(null, (float?)value);
+        }
+
+        public void move(IPositionable pos, double? angle = null) => MoveImpl(pos.position, (float?)angle);
 
         public override void refresh()
         {

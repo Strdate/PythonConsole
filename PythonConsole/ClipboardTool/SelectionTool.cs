@@ -52,6 +52,13 @@ namespace PythonConsole
         {
             base.RenderOverlay(cameraInfo);
 
+            try {
+                foreach (var item in PythonConsole.Instance.RenderManager) {
+                    item.Value.Render(cameraInfo);
+                }
+            } catch { }
+            
+
             if (isShiftPressed && !m_toolController.IsInsideUI) {
                 RenderManager.instance.OverlayEffect.DrawCircle(cameraInfo, Color.red, m_accuratePosition, 3f, m_accuratePosition.y - 1f, m_accuratePosition.y + 1f, true, true);
             }

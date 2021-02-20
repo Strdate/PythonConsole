@@ -36,7 +36,9 @@ namespace PythonConsole
             {
                 client.SendMessage(ex.Message, "s_exception");
             }
-            client.SendMessage(retVal, "s_ret_" + info.contract.RetType);
+            if(info.contract.RetType != null) {
+                client.SendMessage(retVal, "s_ret_" + info.contract.RetType);
+            }
         }
 
         private struct TargetInfo

@@ -232,6 +232,15 @@ namespace MoveIt
             return (segmentBuffer[segmentId].m_flags & NetSegment.Flags.Created) != NetSegment.Flags.None;
         }
 
+        public void MoveCall(Vector3 newPosition)
+        {
+            Bounds originalBounds = GetBounds(false);
+            Move(newPosition, 0);
+            Bounds fullbounds = GetBounds(false);
+            MoveItTool.UpdateArea(originalBounds, true);
+            MoveItTool.UpdateArea(fullbounds, true);
+        }
+
         public override void Transform(InstanceState state, ref Matrix4x4 matrix4x, float deltaHeight, float deltaAngle, Vector3 center, bool followTerrain)
         {
             Vector3 newPosition = matrix4x.MultiplyPoint(state.position - center);

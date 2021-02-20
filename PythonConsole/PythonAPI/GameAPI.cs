@@ -91,7 +91,7 @@ namespace PythonConsole
         
         public static object MoveObject(object msg)
         {
-            return NetLogic.Move((MoveMessage)msg);
+            return ManagersLogic.Move((MoveMessage)msg);
         }
 
         public static object DeleteObject(object msg)
@@ -134,10 +134,20 @@ namespace PythonConsole
             return ret;
         }
 
-
         public static object GetTerrainHeight(object msg)
         {
             return NetUtil.TerrainHeight(((Vector)msg).ToUnity());
+        }
+
+        public static object RenderVector(object msg)
+        {
+            return PythonConsole.Instance.RenderManager.AddObj(new RenderableVector((RenderVectorMessage)msg));
+        }
+
+        public static object RemoveRenderedObject(object msg)
+        {
+            PythonConsole.Instance.RenderManager.RemoveObj((int)msg);
+            return null;
         }
     }
 }

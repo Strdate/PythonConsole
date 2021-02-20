@@ -66,15 +66,29 @@ namespace SkylinesPythonShared.API
             return hashCode;
         }
 
-        public double plain_angle(Vector other = null)
+        public double flat_angle(Vector other = null)
         {
             if(other == null) {
                 other = Vector.vector_xz(1, 0);
             }
+
             double sin = x * other.z - other.x * z;
             double cos = x * other.x + z * other.z;
+            double angle = pi - Math.Atan2(sin, cos);
+            return angle > 0 ? angle : angle + 2*pi;
+        }
 
-            return Math.Atan2(sin, cos);
+        public Vector flat_rotate(double angle, Vector pivot = null)
+        {
+            pivot = pivot ?? zero;
+            Vector difference = this - pivot;
+
+            double sin = Math.Sin(angle);
+            double cos = Math.Cos(angle);
+
+            Vector newPoint = new Vector((float)(difference.x * cos - difference.z * sin + pivot.x), pivot.y, (float)(difference.x * sin + difference.z * cos + pivot.z));
+
+            return newPoint;
         }
         public double magnitude => Math.Sqrt(x * x + y * y + z * z);
 
@@ -88,8 +102,13 @@ namespace SkylinesPythonShared.API
 
         public override string ToString()
         {
-            return "[" + x.ToString("V3") + ", " + (is_height_defined ? y.ToString("V3") : "undefined") + ", " + z.ToString("V3") + "]";
+            return "[" + x.ToString("F3") + ", " + (is_height_defined ? y.ToString("F3") : "undefined") + ", " + z.ToString("F3") + "]";
         }
+
+        public static Vector zero => new Vector(0, 0, 0);
+
+        public static double pi => 3.141592653;
+
         public static Vector operator +(Vector a, Vector b)
         {
             return new Vector(a.x + b.x, a.y + b.y, a.z + b.z, a.is_height_defined && b.is_height_defined);

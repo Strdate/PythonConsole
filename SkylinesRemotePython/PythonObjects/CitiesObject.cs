@@ -14,7 +14,7 @@ namespace SkylinesRemotePython.API {
         protected Vector _position;
         public virtual Vector position { 
             get => _position;
-            set => throw new Exception($"Position of {type} cannot be changed");
+            set => MoveImpl(value, null);//throw new Exception($"Position of {type} cannot be changed");
         }
 
         public Vector pos {
@@ -41,7 +41,8 @@ namespace SkylinesRemotePython.API {
                 id = id,
                 type = type,
                 position = position,
-                angle = angle
+                angle = angle.HasValue ? angle.Value : 0f,
+                is_angle_defined = angle.HasValue
             }));
         }
 

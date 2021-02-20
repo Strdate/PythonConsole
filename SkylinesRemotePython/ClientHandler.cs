@@ -74,6 +74,11 @@ namespace SkylinesRemotePython
             return (T)retMsg.payload;
         }
 
+        public void RemoteVoidCall(Contract contract, object parameters)
+        {
+            SendMessage(parameters, "c_callfunc_" + contract.FuncName);
+        }
+
         public override void SendMessage(object obj, string type)
         {
             base.SendMessage(obj, type);

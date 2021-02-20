@@ -17,12 +17,15 @@ namespace PythonConsole
 
         public static PythonConsole Instance => _instance;
 
+        public RenderableObjManager RenderManager { get; private set; } = new RenderableObjManager();
+
         private int _startUpTrials;
         private TcpClient _client;
         private Queue _simulationQueue;
         private RemoteFuncManager _remoteFuncManager;
 
         private volatile ConsoleState _state = ConsoleState.Initializing;
+
         public ConsoleState State {
             get => _state;
             private set => _state = value;
@@ -178,18 +181,14 @@ namespace PythonConsole
             } while (State == ConsoleState.ScriptRunning && ExecuteSynchronously);
         }
 
-        public void KillInstance()
-        {
-            this.State = ConsoleState.Dead;
-            try {
-                TcpClient.process.Kill();
-            } catch { }
-        }
-
         public static void CreateInstance()
         {
             if(_instance != null) {
                 _instance.State = ConsoleState.Dead;
+                try {
+                    TcpClient.process.Kill();
+                }
+                catch { }
             }
             _instance = new PythonConsole(ModInfo.SyncExecution.value);
         }

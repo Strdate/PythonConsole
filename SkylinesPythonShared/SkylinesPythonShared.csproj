@@ -54,11 +54,13 @@
     <Compile Include="Messages\NetSegmentListMessage.cs" />
     <Compile Include="Messages\NetSegmentMessage.cs" />
     <Compile Include="Messages\PropMessage.cs" />
+    <Compile Include="Messages\RenderVectorMessage.cs" />
     <Compile Include="Messages\TreeMessage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Messages\RunScriptMessage.cs" />
     <Compile Include="Protocol\Contracts.cs" />
     <Compile Include="Protocol\TcpConversation.cs" />
+    <Compile Include="SharedStructures\Bezier.cs" />
     <Compile Include="SharedStructures\NetOptions.cs" />
     <Compile Include="SharedStructures\IPositionable.cs" />
     <Compile Include="SharedStructures\Vector.cs" />
