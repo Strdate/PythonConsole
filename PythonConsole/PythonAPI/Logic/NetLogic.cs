@@ -102,7 +102,9 @@ namespace PythonConsole
                 id = id,
                 position = node.m_position.FromUnity(),
                 prefab_name = node.Info.name,
-                elevation = node.Info.m_netAI.IsUnderground() ? -node.m_elevation : node.m_elevation
+                elevation = node.Info.m_netAI.IsUnderground() ? -node.m_elevation : node.m_elevation,
+                building_id = node.m_building,
+                seg_count = node.CountSegments()
             };
         }
 
@@ -140,7 +142,9 @@ namespace PythonConsole
                 name = info.name,
                 width = info.m_halfWidth * 2,
                 is_overground = info.m_netAI.IsOverground(),
-                is_underground = info.m_netAI.IsUnderground()
+                is_underground = info.m_netAI.IsUnderground(),
+                fw_vehicle_lane_count = info.m_forwardVehicleLaneCount,
+                bw_vehicle_lane_count = info.m_backwardVehicleLaneCount
             };
         }
 

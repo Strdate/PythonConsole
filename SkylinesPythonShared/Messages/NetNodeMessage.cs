@@ -13,6 +13,10 @@ namespace SkylinesPythonShared
 
         public string prefab_name { get; set; }
 
+        public ushort building_id { get; set; }
+
+        public int seg_count { get; set; }
+
         public int elevation { get; set; }
 
         public Vector position { get; set; }

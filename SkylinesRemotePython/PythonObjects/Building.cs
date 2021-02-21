@@ -41,5 +41,16 @@ namespace SkylinesRemotePython.API
         {
             AssignData(obj);
         }
+
+        public override string ToString()
+        {
+            return "{" + "\n" +
+                "type: " + type + "\n" +
+                "id: " + id + "\n" +
+                "position: " + pos + "\n" +
+                "angle: " + angle.ToString("F3") + "\n" +
+                "prefab_name: " + prefab_name + "\n" +
+                "}";
+        }
     }
 }

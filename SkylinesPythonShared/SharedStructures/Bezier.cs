@@ -50,5 +50,16 @@ namespace SkylinesPythonShared.API
 		public Vector c { get; private set; }
 
 		public Vector d { get; private set; }
+
+		public override string ToString()
+		{
+			return "{" + "\n" +
+				"type: " + nameof(Bezier) + "\n" +
+				"a: " + a + "\n" +
+				"b: " + b + "\n" +
+				"c: " + c + "\n" +
+				"d: " + d + "\n" +
+				"}";
+		}
 	}
 }

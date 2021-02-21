@@ -18,24 +18,24 @@ namespace SkylinesRemotePython.API
 
         public Prop get_prop(int id)
         {
-            return new Prop(client.RemoteCall<PropMessage>(Contracts.GetPropFromId, id), this);
+            return new Prop(client.RemoteCall<PropMessage>(Contracts.GetPropFromId, (uint)id), this);
         }
 
         public Tree get_tree(long id)
         {
-            return new Tree(client.RemoteCall<TreeMessage>(Contracts.GetTreeFromId, id), this);
+            return new Tree(client.RemoteCall<TreeMessage>(Contracts.GetTreeFromId, (uint)id), this);
         }
 
         public Building get_building(int id)
         {
-            return new Building(client.RemoteCall<BuildingMessage>(Contracts.GetBuildingFromId, id), this);
+            return new Building(client.RemoteCall<BuildingMessage>(Contracts.GetBuildingFromId, (uint)id), this);
         }
 
         public Node get_node(int id) => Node.GetNetNode((uint)id, this);
 
         public Segment get_segment(int id)
         {
-            return new Segment(client.RemoteCall<NetSegmentMessage>(Contracts.GetSegmentFromId, id), this);
+            return new Segment(client.RemoteCall<NetSegmentMessage>(Contracts.GetSegmentFromId, (uint)id), this);
         }
 
         public Prop create_prop(Vector position, string type, double angle = 0)

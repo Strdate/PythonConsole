@@ -38,6 +38,8 @@ namespace PythonConsole
         private string newFileName;
 
         private bool _capsProcessed;
+        private bool _f5Processed;
+        private DateTime _f5PressedTime = DateTime.Now;
 
         private ScriptEditorFile currentFile;
 
@@ -275,6 +277,16 @@ namespace PythonConsole
                 _capsProcessed = false;
             }
 
+            if (GUIUtility.keyboardControl == editor.controlID && Event.current.keyCode == KeyCode.F5) {
+                if(ModInfo.F5toExec.value && !_f5Processed && (DateTime.Now - _f5PressedTime).TotalMilliseconds > 500) {
+                    _f5Processed = true;
+                    _f5PressedTime = DateTime.Now;
+                    Execute();
+                }
+            } else {
+                _f5Processed = false;
+            }
+
             if (currentFile != null)
             {
                 currentFile.Source = text;
@@ -283,6 +295,15 @@ namespace PythonConsole
             GUILayout.EndScrollView();
 
             editorArea.End();
+        }
+
+        private void Execute()
+        {
+            if(PythonConsole.Instance?.State == ConsoleState.Ready) {
+                AbortFileActions();
+                PythonConsole.Instance.ScheduleExecution(currentFile.Source);
+                lastError = string.Empty;
+            }
         }
 
         private void DrawFooter()
@@ -296,10 +317,8 @@ namespace PythonConsole
             if(state != ConsoleState.Dead) {
                 GUI.enabled = state == ConsoleState.Ready;
 
-                if (GUILayout.Button("Execute")) {
-                    AbortFileActions();
-                    PythonConsole.Instance.ScheduleExecution(currentFile.Source);
-                    lastError = string.Empty;
+                if (GUILayout.Button("Execute (F5)")) {
+                    Execute();
                 }
 
                 GUI.enabled = state == ConsoleState.ScriptRunning;

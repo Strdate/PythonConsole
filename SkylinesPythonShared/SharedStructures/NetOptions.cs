@@ -23,5 +23,16 @@ namespace SkylinesPythonShared.API
             this.invert = invert;
             this.node_spacing = node_spacing;
         }
+
+        public override string ToString()
+        {
+            return "{" + "\n" +
+                "type: " + nameof(NetOptions) + "\n" +
+                "prefab_name: " + prefab_name + "\n" +
+                "elevation_mode: " + elevation_mode + "\n" +
+                "invert: " + invert + "\n" +
+                "node_spacing: " + node_spacing + "\n" +
+                "}";
+        }
     }
 }

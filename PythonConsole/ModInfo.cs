@@ -20,7 +20,8 @@ namespace PythonConsole
         public static ModInfo Instance { get; private set; }
 
         public static readonly SavedInputKey ScriptEditorShortcut = new SavedInputKey("ScriptEditorShortcut", settingsFileName, SavedInputKey.Encode(KeyCode.S, false, false, true), true);
-        public static readonly SavedInputKey ClipboardToolShortcut = new SavedInputKey("ClipboardToolShortcut", settingsFileName, SavedInputKey.Encode(KeyCode.C, false, false, true), true);
+        public static readonly SavedInputKey ClipboardToolShortcut = new SavedInputKey("ClipboardToolShortcut", settingsFileName, SavedInputKey.Encode(KeyCode.A, false, false, true), true);
+        public static readonly SettingsBool F5toExec = new SettingsBool("Use F5 to execute scipts", "Pressing F5 shortcut will execute current script", "F5toExec", true);
         public static readonly SettingsBool SyncExecution = new SettingsBool("Execute scripts synchronously (needs engine restart)", "Script execution will freeze simulation, but it may take less time", "SyncExecution", false);
 
         public ModInfo()
@@ -48,6 +49,7 @@ namespace PythonConsole
 
                 group.AddSpace(10);
 
+                F5toExec.Draw(group);
                 SyncExecution.Draw(group, (b) => {
                     PythonConsole.CreateInstance();
                 });

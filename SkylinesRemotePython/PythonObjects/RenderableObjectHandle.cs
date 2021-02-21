@@ -18,5 +18,13 @@ namespace SkylinesRemotePython.API
         {
             this.id = id;
         }
+
+        public override string ToString()
+        {
+            return "{" + "\n" +
+                "type: " + nameof(RenderableObjectHandle) + "\n" +
+                "id: " + id + "\n" +
+                "}";
+        }
     }
 }

@@ -17,6 +17,12 @@ namespace SkylinesRemotePython.API
 
         public int elevation { get; private set; }
 
+        public int building_id { get; private set; }
+
+        public Building building => building_id == 0 ? null : new Building(api.client.RemoteCall<BuildingMessage>(Contracts.GetBuildingFromId, (uint)building_id), api);
+
+        public int seg_count { get; private set; }
+
         public void move(IPositionable pos) => MoveImpl(pos.position, null);
 
         private CachedObj<List<Segment>> _cachedSegments;
@@ -38,6 +44,8 @@ namespace SkylinesRemotePython.API
             prefab_name = msg.prefab_name;
             _position = msg.position;
             elevation = msg.elevation;
+            building_id = msg.building_id;
+            seg_count = msg.seg_count;
             _cachedSegments = new CachedObj<List<Segment>>(() => api.client.RemoteCall<List<NetSegmentMessage>>(Contracts.GetSegmentsForNodeId, id).Select((obj) => new Segment(obj, api)).ToList()); ;
         }
 
@@ -49,6 +57,17 @@ namespace SkylinesRemotePython.API
         internal static Node GetNetNode(uint id, GameAPI api)
         {
             return new Node(api.client.RemoteCall<NetNodeMessage>(Contracts.GetNodeFromId, id), api);
+        }
+
+        public override string ToString()
+        {
+            return "{" + "\n" +
+                "type: " + type + "\n" +
+                "id: " + id + "\n" +
+                "position: " + pos + "\n" +
+                "prefab_name: " + prefab_name + "\n" +
+                "seg_count: " + seg_count + "\n" +
+                "}";
         }
     }
 }

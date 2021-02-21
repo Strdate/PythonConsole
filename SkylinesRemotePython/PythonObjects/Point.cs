@@ -18,5 +18,13 @@ namespace SkylinesRemotePython.API
             position = vector;
         }
 
+        public override string ToString()
+        {
+            return "{" + "\n" +
+                "type: " + type + "\n" +
+                "position: " + pos + "\n" +
+                "}";
+        }
+
     }
 }

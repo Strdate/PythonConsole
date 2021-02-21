@@ -15,5 +15,9 @@ namespace SkylinesPythonShared
         public bool is_overground { get; set; }
 
         public bool is_underground { get; set; }
+
+        public int fw_vehicle_lane_count { get; set; }
+
+        public int bw_vehicle_lane_count { get; set; }
     }
 }
