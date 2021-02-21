@@ -8,12 +8,17 @@ namespace SkylinesPythonShared.API
     [Serializable]
     public class Vector : InstanceMessage, IPositionable
     {
+        [Doc("X cooord")]
         public double x { get; private set; }
+        [Doc("Y cooord (height)")]
         public double y { get; private set; }
+        [Doc("Z cooord")]
         public double z { get; private set; }
 
+        [Doc("Is height (Y coord) defined")]
         public bool is_height_defined { get; private set; }
 
+        [Doc("Returns itself")]
         public Vector position => this;
 
         private Vector()
@@ -21,6 +26,7 @@ namespace SkylinesPythonShared.API
             
         }
 
+        [Doc("Creates new vector given all three coords")]
         public Vector(double X, double Y, double Z)
         {
             this.x = X;
@@ -37,6 +43,7 @@ namespace SkylinesPythonShared.API
             this.is_height_defined = is_height_defined;
         }
 
+        [Doc("Creates new vector given the X and Z coord")]
         public static Vector vector_xz(double X, double Z)
         {
             return new Vector()
@@ -66,6 +73,7 @@ namespace SkylinesPythonShared.API
             return hashCode;
         }
 
+        [Doc("Returns angle in XZ plane")]
         public double flat_angle(Vector other = null)
         {
             if(other == null) {
@@ -78,6 +86,7 @@ namespace SkylinesPythonShared.API
             return angle > 0 ? angle : angle + 2*pi;
         }
 
+        [Doc("Rotates vector in XZ plane")]
         public Vector flat_rotate(double angle, Vector pivot = null)
         {
             pivot = pivot ?? zero;
@@ -90,10 +99,14 @@ namespace SkylinesPythonShared.API
 
             return newPoint;
         }
+
+        [Doc("Vector length")]
         public double magnitude => Math.Sqrt(x * x + y * y + z * z);
 
+        [Doc("Returns new vectors with length 1")]
         public Vector normalized => new Vector(x / magnitude, y / magnitude, z / magnitude);
 
+        [Doc("Returns new vector with undefined Y coord")]
         public Vector flat => new Vector() {
             x = this.x,
             z = this.z,
