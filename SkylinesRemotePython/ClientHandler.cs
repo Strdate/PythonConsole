@@ -46,7 +46,9 @@ namespace SkylinesRemotePython
         public MessageHeader GetMessage(string assertedType = null)
         {
             MessageHeader msg = AwaitMessage();
+#if DEBUG
             Console.WriteLine("In: " + msg.messageType);
+#endif
 
             if (msg.messageType == "s_script_abort") {
                 Console.WriteLine("Abort script");
@@ -82,7 +84,9 @@ namespace SkylinesRemotePython
         public override void SendMessage(object obj, string type)
         {
             base.SendMessage(obj, type);
+#if DEBUG
             Console.WriteLine("Out: " + type);
+#endif
         }
 
         private void HandleGeneralMessage(MessageHeader msg)

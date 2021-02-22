@@ -9,19 +9,73 @@ using System.Text;
 
 namespace SkylinesRemotePython
 {
-    public static class Help
+    public static class PythonHelp
     {
+        [ThreadStatic]
+        private static int toStringRecursionDepth;
+
+        public static string RuntimeToString(object obj)
+        {
+            string result;
+            if(toStringRecursionDepth > 10) {
+                return "???";
+            }
+            try {
+                toStringRecursionDepth++;
+                Type type = obj.GetType();
+                var props = type.GetProperties();
+                var builder = new StringBuilder();
+                builder.AppendLine(type.Name + " {");
+
+                foreach (var prop in props) {
+                    var docAtr = prop.GetCustomAttribute(typeof(DocAttribute), true);
+                    var noToStrAtr = prop.GetCustomAttribute(typeof(ToStringIgnoreAttribute), true);
+                    if (docAtr != null && noToStrAtr == null) {
+                        object value = null;
+                        bool error = false;
+                        try {
+                            value = prop.GetValue(obj);
+                        }
+                        catch { error = true; }
+
+                        Type valueType = value?.GetType();
+
+                        string valueStr;
+                        if(error) {
+                            valueStr = "error";
+                        } else if(value == null) {
+                            valueStr = "null";
+                        } else if(valueType.Namespace == "System") {
+                            valueStr = value.ToString();
+                        } else if(typeof(ISimpleToString).IsAssignableFrom(valueType)) {
+                            valueStr = ((ISimpleToString)value).SimpleToString();
+                        } else {
+                            valueStr = valueType.Name;
+                        }
+
+                        string text = "  " + prop.Name + ": " + valueStr;
+                        builder.AppendLine(text);
+                    }
+                }
+                builder.Append("}");
+                result = builder.ToString();
+            } finally {
+                toStringRecursionDepth--;
+            }
+            return result;
+        }
+
         public static string GetHelp(object obj)
         {
             Type type = obj is PythonType pt ? pt.__clrtype__() : obj.GetType();
             
             var classAtr = (DocAttribute)type.GetCustomAttribute(typeof(DocAttribute));
-            string classText = classAtr != null ? classAtr.Description + "\n" : "";
+            string classText = classAtr != null ? classAtr.Description + "\n\n" : "";
 
             var methods = type.GetMethods();
             var methodSet = new SortedDictionary<string,string>();
             foreach(var method in methods) {
-                var atrs = method.GetCustomAttributes(typeof(DocAttribute), false);
+                var atrs = method.GetCustomAttributes(typeof(DocAttribute), true);
                 if(atrs.Length > 0) {
                     DocAttribute atr = atrs[0] as DocAttribute;
                     bool isVoid = method.ReturnType == typeof(void);
@@ -33,7 +87,7 @@ namespace SkylinesRemotePython
 
             var constructors = type.GetConstructors();
             foreach (var ctor in constructors) {
-                var atrs = ctor.GetCustomAttributes(typeof(DocAttribute), false);
+                var atrs = ctor.GetCustomAttributes(typeof(DocAttribute), true);
                 if (atrs.Length > 0) {
                     DocAttribute atr = atrs[0] as DocAttribute;
                     string text = ctor.Name + "(" + FormatParams(ctor) + ")" + " - " + atr.Description;
@@ -44,7 +98,7 @@ namespace SkylinesRemotePython
             var props = type.GetProperties();
             var propSet = new SortedDictionary<string, string>();
             foreach (var prop in props) {
-                var atrs = prop.GetCustomAttributes(typeof(DocAttribute), false);
+                var atrs = prop.GetCustomAttributes(typeof(DocAttribute), true);
                 if (atrs.Length > 0) {
                     DocAttribute atr = atrs[0] as DocAttribute;
                     string text = (type == typeof(GameAPI) ? "game." : "") + prop.Name + ": " + prop.PropertyType.Name + " - " + atr.Description;
@@ -53,8 +107,8 @@ namespace SkylinesRemotePython
                 }
             }
 
-            return "\n====\nHelp (" + type.Name + ")\n" + classText + "====\n" + (methodSet.Count > 0 ? "Methods:\n" + SortedSetToString(methodSet) : "")
-                + (propSet.Count > 0 ? "Properties:\n" + SortedSetToString(propSet) : "");
+            return "\n====\nHelp (" + type.Name + ")\n====\n\n" + classText + (methodSet.Count > 0 ? "Methods:\n" + SortedSetToString(methodSet) : "")
+                + (propSet.Count > 0 ? "\nProperties:\n" + SortedSetToString(propSet) + "\n": "");
         }
 
         private static string FormatParams(MethodBase method)

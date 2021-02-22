@@ -172,7 +172,7 @@ namespace SkylinesRemotePython.API
         public void help(object obj = null)
         {
             obj = obj ?? this;
-            string text = Help.GetHelp(obj);
+            string text = PythonHelp.GetHelp(obj);
             client.SendMessage(text, "c_output_message");
         }
 
@@ -184,7 +184,7 @@ namespace SkylinesRemotePython.API
 
         public override string ToString()
         {
-            return "Provides API to manipulate in-game objects, such as buildings or roads";
+            return PythonHelp.GetHelp(this);
         }
     }
 }

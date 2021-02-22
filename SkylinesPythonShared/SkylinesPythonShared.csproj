@@ -59,12 +59,14 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Messages\RunScriptMessage.cs" />
     <Compile Include="Protocol\Contracts.cs" />
-    <Compile Include="Protocol\DocAttribute.cs" />
+    <Compile Include="Protocol\Attributes.cs" />
+    <Compile Include="Protocol\Interfaces.cs" />
     <Compile Include="Protocol\TcpConversation.cs" />
     <Compile Include="SharedStructures\Bezier.cs" />
     <Compile Include="SharedStructures\NetOptions.cs" />
     <Compile Include="SharedStructures\IPositionable.cs" />
     <Compile Include="SharedStructures\Vector.cs" />
+    <Compile Include="Util.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

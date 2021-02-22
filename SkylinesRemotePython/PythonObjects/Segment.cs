@@ -6,40 +6,58 @@ using System.Text;
 
 namespace SkylinesRemotePython.API
 {
+    [Doc("Network object (road, pipe, power line etc.)")]
     public class Segment : CitiesObject
     {
         public override string type => "segment";
 
+        [ToStringIgnore]
+        [Doc("Network asset name (eg. 'Highway')")]
         public string prefab_name { get; private set; }
 
+        [Doc("Network asset")]
         public NetPrefab prefab => NetPrefab.GetNetPrefab(prefab_name, api);
 
+        [ToStringIgnore]
+        [Doc("ID of start node (junction)")]
         public int start_node_id { get; private set; }
 
+        [ToStringIgnore]
+        [Doc("ID of end node (junction)")]
         public int end_node_id { get; private set; }
 
+        [Doc("Road direction at start node")]
         public Vector start_dir { get; private set; }
 
+        [Doc("Road direction at end node")]
         public Vector end_dir { get; private set; }
 
+        [Doc("Underlying bezier shape")]
         public Bezier bezier { get; private set; }
 
+        [Doc("Road middle position")]
         public Vector middle_pos {
             get => position;
             set => position = value;
         }
 
+        [Doc("Moves bezier control point to the new position")]
         public void move(IPositionable pos) => MoveImpl(pos.position, null);
+
+        [Doc("Road length")]
         public float length { get; private set; }
 
+        [Doc("Road start node (junction)")]
         public Node start_node {
             get => Node.GetNetNode((uint)start_node_id, api);
         }
 
+        [Doc("Road end node (junction)")]
         public Node end_node {
             get => Node.GetNetNode((uint)end_node_id, api);
         }
 
+        [Doc("Returns the other junction given the first one")]
         public Node get_other_node(object node)
         {
             uint? nodeId = node as uint?;
@@ -56,6 +74,7 @@ namespace SkylinesRemotePython.API
             return null;
         }
 
+        [Doc("Deletes the road. keep_nodes param specifies if the nodes should be deleted too if there are no roads left that connect to them")]
         public bool delete(bool keep_nodes)
         {
             if (deleted) {
@@ -96,17 +115,6 @@ namespace SkylinesRemotePython.API
         internal Segment(NetSegmentMessage obj, GameAPI api) : base(api)
         {
             AssignData(obj);
-        }
-
-        public override string ToString()
-        {
-            return "{" + "\n" +
-                "type: " + type + "\n" +
-                "id: " + id + "\n" +
-                "middle_pos: " + pos + "\n" +
-                "prefab_name: " + prefab_name + "\n" +
-                "length: " + length.ToString("F3") + "\n" +
-                "}";
         }
     }
 }

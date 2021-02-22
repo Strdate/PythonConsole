@@ -5,18 +5,24 @@ using System.Collections.Generic;
 using System.Text;
 
 namespace SkylinesRemotePython.API {
-    public abstract class CitiesObject : ApiRefObject, IPositionable
+    public abstract class CitiesObject : ApiRefObject, IPositionable, ISimpleToString
     {
+        [Doc("Game ID")]
         public uint id { get; protected set; }
 
+        [Doc("Returns if object exists")]
         public bool deleted { get; protected set; }
 
         protected Vector _position;
+
+        [Doc("Object position")]
         public virtual Vector position { 
             get => _position;
             set => MoveImpl(value, null);//throw new Exception($"Position of {type} cannot be changed");
         }
 
+        [ToStringIgnore]
+        [Doc("Object position")]
         public Vector pos {
             get => position;
             set => position = value;
@@ -24,10 +30,12 @@ namespace SkylinesRemotePython.API {
         
         internal double _angle;
 
+        [Doc("Reloads object properties from game")]
         public abstract void refresh();
 
         internal abstract void AssignData(InstanceMessage msg);
 
+        [Doc("Object type (node, buidling, prop etc.)")]
         public virtual string type => "";
 
         internal CitiesObject(GameAPI api) : base(api)
@@ -46,6 +54,7 @@ namespace SkylinesRemotePython.API {
             }));
         }
 
+        [Doc("Delete object")]
         public virtual bool delete()
         {
             if(deleted) {
@@ -86,6 +95,16 @@ namespace SkylinesRemotePython.API {
         public static bool operator !=(CitiesObject lhs, CitiesObject rhs)
         {
             return !(lhs == rhs);
+        }
+
+        public override string ToString()
+        {
+            return PythonHelp.RuntimeToString(this);
+        }
+
+        public string SimpleToString()
+        {
+            return "id " + id;
         }
     }
 }

@@ -6,17 +6,21 @@ using System.Text;
 
 namespace SkylinesRemotePython.API
 {
+    [Doc("Free standing prop object")]
     public class Prop : CitiesObject
     {
         public override string type => "prop";
 
+        [Doc("Prop type (eg. 'Large Fountain')")]
         public string prefab_name { get; private set; }
 
+        [Doc("Prop rotation in rad")]
         public double angle {
             get => _angle;
             set => MoveImpl(null, (float?)value);
         }
 
+        [Doc("Move to new position")]
         public void move(IPositionable pos, double? angle = null) => MoveImpl(pos.position, (float?)angle);
 
         public override void refresh()
@@ -39,17 +43,6 @@ namespace SkylinesRemotePython.API
         internal Prop(PropMessage obj, GameAPI api) : base(api)
         {
             AssignData(obj);
-        }
-
-        public override string ToString()
-        {
-            return "{" + "\n" +
-                "type: " + type + "\n" +
-                "id: " + id + "\n" +
-                "position: " + pos + "\n" +
-                "angle: " + angle.ToString("F3") + "\n" +
-                "prefab_name: " + prefab_name + "\n" +
-                "}";
         }
     }
 }

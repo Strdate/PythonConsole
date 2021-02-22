@@ -6,17 +6,21 @@ using System.Text;
 
 namespace SkylinesRemotePython.API
 {
+    [Doc("Structure for building objects (eg. 'Water Tower')")]
     public class Building : CitiesObject
     {
         public override string type => "building";
 
+        [Doc("Prefab name - eg. 'Elementary School'")]
         public string prefab_name { get; private set; }
 
+        [Doc("Building roation in rad")]
         public double angle {
             get => _angle;
             set => MoveImpl(null, (float?)value);
         }
 
+        [Doc("Move to new position")]
         public void move(IPositionable pos, double? angle = null) => MoveImpl(pos.position, (float?)angle);
 
         public override void refresh()
@@ -40,17 +44,6 @@ namespace SkylinesRemotePython.API
         internal Building(BuildingMessage obj, GameAPI api) : base(api)
         {
             AssignData(obj);
-        }
-
-        public override string ToString()
-        {
-            return "{" + "\n" +
-                "type: " + type + "\n" +
-                "id: " + id + "\n" +
-                "position: " + pos + "\n" +
-                "angle: " + angle.ToString("F3") + "\n" +
-                "prefab_name: " + prefab_name + "\n" +
-                "}";
         }
     }
 }

@@ -13,4 +13,8 @@ namespace SkylinesPythonShared
             this.Description = description;
         }
     }
+
+    public class ToStringIgnoreAttribute : System.Attribute
+    {
+    }
 }

@@ -1,4 +1,5 @@
 ﻿using ColossalFramework.Threading;
+using MoveIt;
 using SkylinesPythonShared;
 using System;
 using System.Collections;
@@ -177,6 +178,7 @@ namespace PythonConsole
                     if(ExecuteSynchronously) {
                         Thread.Sleep(1);
                     }
+                    MoveItTool.instance.SimulationStep();
                 }
             } while (State == ConsoleState.ScriptRunning && ExecuteSynchronously);
         }

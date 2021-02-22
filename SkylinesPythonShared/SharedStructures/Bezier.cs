@@ -6,8 +6,10 @@ using System.Text;
 namespace SkylinesPythonShared.API
 {
 	[Serializable]
-    public class Bezier
+	[Doc("Abstract bezier structure")]
+	public class Bezier
     {
+		[Doc("Creates new bezier from 4 control points")]
 		public Bezier(Vector _a, Vector _b, Vector _c, Vector _d)
 		{
 			this.a = _a;
@@ -16,6 +18,7 @@ namespace SkylinesPythonShared.API
 			this.d = _d;
 		}
 
+		[Doc("Returns point on bezier (t is number from 0 to 1)")]
 		public Vector position(float t)
 		{
 			float num = 1f - t;
@@ -26,6 +29,7 @@ namespace SkylinesPythonShared.API
 			return new Vector(this.a.x * num5 + this.b.x * num4 + this.c.x * num3 + this.d.x * num2, this.a.y * num5 + this.b.y * num4 + this.c.y * num3 + this.d.y * num2, this.a.z * num5 + this.b.z * num4 + this.c.z * num3 + this.d.z * num2);
 		}
 
+		[Doc("Returns tangent vector to the bezier (t is number from 0 to 1)")]
 		public Vector tangent(float t)
 		{
 			float num = t * t;
@@ -36,30 +40,37 @@ namespace SkylinesPythonShared.API
 			return new Vector(this.a.x * num5 + this.b.x * num4 + this.c.x * num3 + this.d.x * num2, this.a.y * num5 + this.b.y * num4 + this.c.y * num3 + this.d.y * num2, this.a.z * num5 + this.b.z * num4 + this.c.z * num3 + this.d.z * num2);
 		}
 
+		[Doc("Returns normal vector to the bezier. Y coord is undefined")]
 		public Vector flat_normal(float t)
         {
 			return tangent(t).flat_rotate(Vector.pi / 2);
         }
 
+		[Doc("Returns inverted bezier")]
 		public Bezier inverted => new Bezier(this.d, this.c, this.b, this.a);
 
+		[Doc("Point A (start)")]
 		public Vector a { get; private set; }
 
+		[Doc("Point B")]
 		public Vector b { get; private set; }
 
+		[Doc("Point C")]
 		public Vector c { get; private set; }
 
+		[Doc("Point D (end)")]
 		public Vector d { get; private set; }
 
 		public override string ToString()
 		{
-			return "{" + "\n" +
+			return Util.RuntimeToString(this);
+			/*return "{" + "\n" +
 				"type: " + nameof(Bezier) + "\n" +
 				"a: " + a + "\n" +
 				"b: " + b + "\n" +
 				"c: " + c + "\n" +
 				"d: " + d + "\n" +
-				"}";
+				"}";*/
 		}
 	}
 }

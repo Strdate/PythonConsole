@@ -6,12 +6,15 @@ using System.Text;
 namespace SkylinesPythonShared.API
 {
     [Serializable]
-    public class Vector : InstanceMessage, IPositionable
+    [Doc("3D Vector class")]
+    public class Vector : InstanceMessage, IPositionable, ISimpleToString
     {
         [Doc("X cooord")]
         public double x { get; private set; }
+
         [Doc("Y cooord (height)")]
         public double y { get; private set; }
+
         [Doc("Z cooord")]
         public double z { get; private set; }
 
@@ -26,7 +29,7 @@ namespace SkylinesPythonShared.API
             
         }
 
-        [Doc("Creates new vector given all three coords")]
+        [Doc("Creates new vector given all 3 coords")]
         public Vector(double X, double Y, double Z)
         {
             this.x = X;
@@ -73,7 +76,7 @@ namespace SkylinesPythonShared.API
             return hashCode;
         }
 
-        [Doc("Returns angle in XZ plane")]
+        [Doc("Returns angle in XZ plane. If 'other' vector is null, returns angle with the X axis")]
         public double flat_angle(Vector other = null)
         {
             if(other == null) {
@@ -118,8 +121,15 @@ namespace SkylinesPythonShared.API
             return "[" + x.ToString("F3") + ", " + (is_height_defined ? y.ToString("F3") : "undefined") + ", " + z.ToString("F3") + "]";
         }
 
+        public string SimpleToString()
+        {
+            return ToString();
+        }
+
+        [Doc("Returns zero vector")]
         public static Vector zero => new Vector(0, 0, 0);
 
+        [Doc("PI constant")]
         public static double pi => 3.141592653;
 
         public static Vector operator +(Vector a, Vector b)
