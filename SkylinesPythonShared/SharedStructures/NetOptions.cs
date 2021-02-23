@@ -33,18 +33,11 @@ namespace SkylinesPythonShared.API
         public override string ToString()
         {
             return Util.RuntimeToString(this);
-            /*return "{" + "\n" +
-                "type: " + nameof(NetOptions) + "\n" +
-                "prefab_name: " + prefab_name + "\n" +
-                "elevation_mode: " + elevation_mode + "\n" +
-                "invert: " + invert + "\n" +
-                "node_spacing: " + node_spacing + "\n" +
-                "}";*/
         }
 
         public string SimpleToString()
         {
-            return ToString().Replace("\n","\n\n");
+            return ToString();
         }
     }
 }

@@ -52,6 +52,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ClipboardTool\RenderableCircle.cs" />
     <Compile Include="ClipboardTool\RenderableVector.cs" />
     <Compile Include="ClipboardTool\RenderableObj.cs" />
     <Compile Include="ClipboardTool\RenderableObjManager.cs" />

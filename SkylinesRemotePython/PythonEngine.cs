@@ -33,6 +33,7 @@ namespace SkylinesRemotePython
             _scope.SetVariable("vector_xz", new Func<double,double, Vector>(Vector.vector_xz));
             MethodInfo method = typeof(GameAPI).GetMethod("help", BindingFlags.Public | BindingFlags.Instance);
             _scope.SetVariable("help", Delegate.CreateDelegate(typeof(GameAPI.__HelpDeleg), _gameAPI, method));
+            _scope.SetVariable("help_all", new Action(_gameAPI.help_all));
             _scope.SetVariable("game", _gameAPI);
 
             var outputStream = new MemoryStream();

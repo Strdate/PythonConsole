@@ -54,6 +54,7 @@
     <Compile Include="Messages\NetSegmentListMessage.cs" />
     <Compile Include="Messages\NetSegmentMessage.cs" />
     <Compile Include="Messages\PropMessage.cs" />
+    <Compile Include="Messages\RenderCircleMessage.cs" />
     <Compile Include="Messages\RenderVectorMessage.cs" />
     <Compile Include="Messages\TreeMessage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

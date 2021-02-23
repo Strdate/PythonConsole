@@ -144,6 +144,11 @@ namespace PythonConsole
             return PythonConsole.Instance.RenderManager.AddObj(new RenderableVector((RenderVectorMessage)msg));
         }
 
+        public static object RenderCircle(object msg)
+        {
+            return PythonConsole.Instance.RenderManager.AddObj(new RenderableCircle((RenderCircleMessage)msg));
+        }
+
         public static object RemoveRenderedObject(object msg)
         {
             PythonConsole.Instance.RenderManager.RemoveObj((int)msg);

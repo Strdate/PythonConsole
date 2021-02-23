@@ -40,7 +40,11 @@ namespace PythonConsole
                 {
                     FileName = "dotnet",
                     Arguments = "\"" + Path.Combine(destPath, "SkylinesRemotePython.dll") + "\"",
+#if DEBUG
                     UseShellExecute = true,
+#else
+                    UseShellExecute = false,
+#endif
                     RedirectStandardOutput = false,
                     RedirectStandardError = false,
                     CreateNoWindow = true

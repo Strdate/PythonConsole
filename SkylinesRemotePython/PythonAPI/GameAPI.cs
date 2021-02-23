@@ -166,6 +166,22 @@ namespace SkylinesRemotePython.API
             }), this);
         }
 
+        [Doc("Draws circle on map. Returns handle which can be used to delete the circle")]
+        public RenderableObjectHandle draw_circle(IPositionable position, double radius = 5, string color = "red")
+        {
+            return new RenderableObjectHandle(client.RemoteCall<int>(Contracts.RenderCircle, new RenderCircleMessage() {
+                position = position.position,
+                radius = (float)radius,
+                color = color
+            }), this);
+        }
+
+        [Doc("Clears all lines drawn on map")]
+        public void clear()
+        {
+            client.RemoteVoidCall(Contracts.RemoveRenderedObject, 0);
+        }
+
         public delegate void __HelpDeleg(object obj = null);
 
         [Doc("Prints help for given object")]
@@ -176,10 +192,11 @@ namespace SkylinesRemotePython.API
             client.SendMessage(text, "c_output_message");
         }
 
-        [Doc("Clears all lines drawn on map")]
-        public void clear()
+        [Doc("Dumps all available documentation in the output")]
+        public void help_all()
         {
-            client.RemoteVoidCall(Contracts.RemoveRenderedObject, 0);
+            string text = PythonHelp.DumpDoc();
+            client.SendMessage(text, "c_output_message");
         }
 
         public override string ToString()

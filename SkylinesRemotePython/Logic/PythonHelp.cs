@@ -53,11 +53,11 @@ namespace SkylinesRemotePython
                             valueStr = valueType.Name;
                         }
 
-                        string text = "  " + prop.Name + ": " + valueStr;
+                        string text = Repeat("  ",toStringRecursionDepth) + prop.Name + ": " + valueStr;
                         builder.AppendLine(text);
                     }
                 }
-                builder.Append("}");
+                builder.Append(Repeat("  ", toStringRecursionDepth - 1) + "}");
                 result = builder.ToString();
             } finally {
                 toStringRecursionDepth--;
@@ -67,7 +67,7 @@ namespace SkylinesRemotePython
 
         public static string GetHelp(object obj)
         {
-            Type type = obj is PythonType pt ? pt.__clrtype__() : obj.GetType();
+            Type type = obj is PythonType pt ? pt.__clrtype__() : (obj is Type tp ? tp : obj.GetType());
             
             var classAtr = (DocAttribute)type.GetCustomAttribute(typeof(DocAttribute));
             string classText = classAtr != null ? classAtr.Description + "\n\n" : "";
@@ -111,6 +111,22 @@ namespace SkylinesRemotePython
                 + (propSet.Count > 0 ? "\nProperties:\n" + SortedSetToString(propSet) + "\n": "");
         }
 
+        public static string DumpDoc()
+        {
+            return DumpDocInAssembly(Assembly.GetExecutingAssembly()) + DumpDocInAssembly(Assembly.Load("SkylinesPythonShared"));
+        }
+
+        private static string DumpDocInAssembly(Assembly assembly)
+        {
+            StringBuilder b = new StringBuilder();
+            foreach (Type type in assembly.GetTypes()) {
+                if (type.GetCustomAttribute(typeof(DocAttribute), true) != null) {
+                    b.AppendLine(GetHelp(type));
+                }
+            }
+            return b.ToString();
+        }
+
         private static string FormatParams(MethodBase method)
         {
             var paramStrings = method.GetParameters().Select(param => param.ParameterType.Name + (param.IsOptional ? "?" : "") + " " + param.Name + (param.IsOptional && param.DefaultValue != null ? " = " +
@@ -125,6 +141,11 @@ namespace SkylinesRemotePython
                 strB.AppendLine(pair.Value);
             }
             return strB.ToString();
+        }
+
+        private static string Repeat(string value, int count)
+        {
+            return new StringBuilder(value.Length * count).Insert(0, value, count).ToString();
         }
     }
 }
