@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 using System.Xml.Serialization;
 using UnityEngine;
 
-namespace MoveIt
+namespace PythonConsole.MoveIt
 {
     public class SegmentState : InstanceState
     {

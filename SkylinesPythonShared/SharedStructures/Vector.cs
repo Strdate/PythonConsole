@@ -103,6 +103,12 @@ namespace SkylinesPythonShared.API
             return newPoint;
         }
 
+        [Doc("Returns new vector with changed y value")]
+        public Vector increase_y(double value)
+        {
+            return new Vector(x, y + value, z);
+        }
+
         [Doc("Vector length")]
         public double magnitude => Math.Sqrt(x * x + y * y + z * z);
 
@@ -131,6 +137,18 @@ namespace SkylinesPythonShared.API
 
         [Doc("PI constant")]
         public static double pi => 3.141592653;
+
+        [Doc("Linearlly interpolates new postion between a and b")]
+        public static Vector Lerp(Vector a, Vector b, double t)
+        {
+            t = Clamp01(t);
+            return new Vector(a.x + (b.x - a.x) * t, a.y + (b.y - a.y) * t, a.z + (b.z - a.z) * t);
+        }
+
+        private static double Clamp01(double x)
+        {
+            return x > 1 ? 1 : (x < 0 ? 0 : x);
+        }
 
         public static Vector operator +(Vector a, Vector b)
         {

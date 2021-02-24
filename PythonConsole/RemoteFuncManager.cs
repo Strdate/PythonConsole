@@ -34,7 +34,7 @@ namespace PythonConsole
             }
             catch(Exception ex)
             {
-                client.SendMessage(ex.Message, "s_exception");
+                client.SendMessage(ex.Message + " (source: " + info.contract.FuncName + ")", "s_exception");
             }
             if(info.contract.RetType != null) {
                 client.SendMessage(retVal, "s_ret_" + info.contract.RetType);

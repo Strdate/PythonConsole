@@ -91,12 +91,22 @@ namespace PythonConsole
 #if DEBUG
             // tolerated error = +-1
             if (!(min * 12 - 1 <= elevation && elevation <= max * 12 + 1))
-                Debug.LogWarning($"RoundaboutBuilder: ELevation out of range expected {min * 12 - 1} <= {elevation} <={max * 12 + 1}");
+                Debug.LogWarning($"Elevation out of range expected {min * 12 - 1} <= {elevation} <={max * 12 + 1}");
 #endif
 
             elevation = Mathf.Clamp(elevation, min * 12, max * 12); // 12 is from NetTool.GetElevation()
             elevation = Mathf.Abs(elevation);
             return (byte)Mathf.Clamp(elevation, 1, 255); // underground/overground road should not have 0 elevation.
+        }
+
+        public static float GetTerrainOffset(Vector3 position)
+        {
+            return position.y - TerrainHeight(position);
+        }
+
+        public static float GetTerrainIncludeWater(Vector3 position)
+        {
+            return Math.Max(Singleton<TerrainManager>.instance.WaterLevel(new Vector2(position.x, position.z)),TerrainHeight(position));
         }
 
         public static float TerrainHeight(Vector3 position)

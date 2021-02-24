@@ -6,7 +6,7 @@ using System.Xml.Serialization;
 using UnityEngine;
 
 
-namespace MoveIt
+namespace PythonConsole.MoveIt
 {
     public class NodeState : InstanceState
     {

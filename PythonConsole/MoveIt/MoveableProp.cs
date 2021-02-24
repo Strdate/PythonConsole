@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using ColossalFramework.Math;
 
 
-namespace MoveIt
+namespace PythonConsole.MoveIt
 {
     public class PropState : InstanceState
     {

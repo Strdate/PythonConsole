@@ -2,6 +2,7 @@
 using SkylinesPythonShared;
 using SkylinesRemotePython.API;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -109,6 +110,11 @@ namespace SkylinesRemotePython
 
             return "\n====\nHelp (" + type.Name + ")\n====\n\n" + classText + (methodSet.Count > 0 ? "Methods:\n" + SortedSetToString(methodSet) : "")
                 + (propSet.Count > 0 ? "\nProperties:\n" + SortedSetToString(propSet) + "\n": "");
+        }
+
+        public static string PrintList(IEnumerable collection)
+        {
+            return "[" + string.Join(", ", Enumerable.ToArray<object>(collection.Cast<object>())) + "]\n" ;
         }
 
         public static string DumpDoc()

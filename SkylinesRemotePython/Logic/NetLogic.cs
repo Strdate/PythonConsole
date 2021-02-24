@@ -23,7 +23,7 @@ namespace SkylinesRemotePython
             return list.Select(e => new Segment(e, api)).ToList();
         }
 
-        internal Segment CreateSegmentImpl(IPositionable startNode, IPositionable endNode, object type, Vector start_dir, Vector end_dir, Vector middle_pos)
+        internal Segment CreateSegmentImpl(IPositionable startNode, IPositionable endNode, object type, Vector start_dir, Vector end_dir, IPositionable middle_pos)
         {
             NetOptions options = NetOptionsUtil.Ensure(type);
             CreateSegmentMessage msg = new CreateSegmentMessage() {
@@ -34,12 +34,12 @@ namespace SkylinesRemotePython
                 net_options = options,
                 start_dir = start_dir,
                 end_dir = end_dir,
-                control_point = middle_pos
+                control_point = middle_pos?.position
             };
             return new Segment(api.client.RemoteCall<NetSegmentMessage>(Contracts.CreateSegment, msg), api);
         }
 
-        internal IList<Segment> CreateSegmentsImpl(IPositionable startNode, IPositionable endNode, object type, Vector start_dir, Vector end_dir, Vector middle_pos)
+        internal IList<Segment> CreateSegmentsImpl(IPositionable startNode, IPositionable endNode, object type, Vector start_dir, Vector end_dir, IPositionable middle_pos)
         {
             NetOptions options = NetOptionsUtil.Ensure(type);
             CreateSegmentMessage msg = new CreateSegmentMessage() {
@@ -50,7 +50,7 @@ namespace SkylinesRemotePython
                 net_options = options,
                 start_dir = start_dir,
                 end_dir = end_dir,
-                control_point = middle_pos,
+                control_point = middle_pos?.position,
                 auto_split = true
             };
             return NetLogic.PrepareSegmentList(api.client.RemoteCall<NetSegmentListMessage>(Contracts.CreateSegments, msg).list, api);

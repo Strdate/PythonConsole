@@ -1,6 +1,7 @@
 ﻿using SkylinesPythonShared;
 using SkylinesPythonShared.API;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 
@@ -45,11 +46,11 @@ namespace SkylinesRemotePython.API
         }
 
         [Doc("Creates prop")]
-        public Prop create_prop(Vector position, string prefab_name, double angle = 0)
+        public Prop create_prop(IPositionable position, string prefab_name, double angle = 0)
         {
             var msg = new CreatePropMessage()
             {
-                Position = position,
+                Position = position.position,
                 Type = prefab_name,
                 Angle = angle
             };
@@ -58,10 +59,10 @@ namespace SkylinesRemotePython.API
         }
 
         [Doc("Creates tree")]
-        public Tree create_tree(Vector position, string prefab_name)
+        public Tree create_tree(IPositionable position, string prefab_name)
         {
             var msg = new CreateTreeMessage() {
-                Position = position,
+                Position = position.position,
                 prefab_name = prefab_name
             };
 
@@ -69,10 +70,10 @@ namespace SkylinesRemotePython.API
         }
 
         [Doc("Creates building")]
-        public Building create_building(Vector position, string type, double angle = 0)
+        public Building create_building(IPositionable position, string type, double angle = 0)
         {
             var msg = new CreateBuildingMessage() {
-                Position = position,
+                Position = position.position,
                 Type = type,
                 Angle = angle
             };
@@ -81,13 +82,13 @@ namespace SkylinesRemotePython.API
         }
 
         [Doc("Creates node (eg. segment junction)")]
-        public Node create_node(Vector position, object prefab)
+        public Node create_node(IPositionable position, object prefab)
         {
             if(!(prefab is string) && !(prefab is NetPrefab)) {
                 throw new Exception("Prefab must be string or NetPrefab");
             }
             CreateNodeMessage msg = new CreateNodeMessage() {
-                Position = position,
+                Position = position.position,
                 Type = prefab is NetPrefab ? ((NetPrefab)prefab).name : (string)prefab
             };
 
@@ -101,7 +102,7 @@ namespace SkylinesRemotePython.API
         }
 
         [Doc("Creates segment (road). Don't use this method, but CreateSegments(..)")]
-        public Segment create_segment(IPositionable startNode, IPositionable endNode, object type, Vector middle_pos)
+        public Segment create_segment(IPositionable startNode, IPositionable endNode, object type, IPositionable middle_pos)
         {
             return _netLogic.CreateSegmentImpl(startNode, endNode, type, null, null, middle_pos);
         }
@@ -125,7 +126,7 @@ namespace SkylinesRemotePython.API
         }
 
         [Doc("Creates segment (road) and automatically splits it in smaller pieces")]
-        public IList<Segment> create_segments(IPositionable startNode, IPositionable endNode, object type, Vector middle_pos)
+        public IList<Segment> create_segments(IPositionable startNode, IPositionable endNode, object type, IPositionable middle_pos)
         {
             return _netLogic.CreateSegmentsImpl(startNode, endNode, type, null, null, middle_pos);
         }
@@ -149,9 +150,9 @@ namespace SkylinesRemotePython.API
         }
 
         [Doc("Returns terrain height at a given point (height is Y coord)")]
-        public float terrain_height(Vector pos)
+        public float terrain_height(IPositionable pos)
         {
-            return client.RemoteCall<float>(Contracts.GetTerrainHeight, pos);
+            return client.RemoteCall<float>(Contracts.GetTerrainHeight, pos.position);
         }
 
         [Doc("Draws line on map. Returns handle which can be used to delete the line. Use clear() to delete all lines")]
@@ -180,6 +181,12 @@ namespace SkylinesRemotePython.API
         public void clear()
         {
             client.RemoteVoidCall(Contracts.RemoveRenderedObject, 0);
+        }
+
+        [Doc("Prints collection content")]
+        public void print_list(IEnumerable collection)
+        {
+            client.SendMessage(PythonHelp.PrintList(collection), "c_output_message");
         }
 
         public delegate void __HelpDeleg(object obj = null);

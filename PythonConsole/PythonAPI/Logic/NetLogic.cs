@@ -1,6 +1,6 @@
 ﻿using ColossalFramework;
 using ColossalFramework.Math;
-using MoveIt;
+using PythonConsole.MoveIt;
 using SkylinesPythonShared;
 using SkylinesPythonShared.API;
 using System;
@@ -15,12 +15,12 @@ namespace PythonConsole
     {
         public static NetSegmentMessage CreateSegment(CreateSegmentMessage data)
         {
-            ParseNetOptions(data.net_options, out NetInfo info, out bool invert);
+            ParseNetOptions(data.net_options, out NetInfo info, out bool invert, out TerrainMode mode);
 
             ushort startNodeId = data.start_node_id;
             ushort endNodeId = data.end_node_id;
-            ref NetNode startNode = ref EnsureNode(ref startNodeId, data.start_postition, info);
-            ref NetNode endNode = ref EnsureNode(ref endNodeId, data.end_postition, info);
+            ref NetNode startNode = ref EnsureNode(ref startNodeId, data.start_postition, info, mode);
+            ref NetNode endNode = ref EnsureNode(ref endNodeId, data.end_postition, info, mode);
 
             GetSegmentVectors(data, ref startNode, ref endNode, out Vector3 startDir, out Vector3 endDir);
 
@@ -29,12 +29,12 @@ namespace PythonConsole
 
         public static NetSegmentListMessage CreateSegments(CreateSegmentMessage data)
         {
-            ParseNetOptions(data.net_options, out NetInfo info, out bool invert);
+            ParseNetOptions(data.net_options, out NetInfo info, out bool invert, out TerrainMode mode);
 
             ushort startNodeId = data.start_node_id;
             ushort endNodeId = data.end_node_id;
-            ref NetNode startNode = ref EnsureNode(ref startNodeId, data.start_postition, info);
-            ref NetNode endNode = ref EnsureNode(ref endNodeId, data.end_postition, info);
+            ref NetNode startNode = ref EnsureNode(ref startNodeId, data.start_postition, info, mode);
+            ref NetNode endNode = ref EnsureNode(ref endNodeId, data.end_postition, info, mode);
 
             GetSegmentVectors(data, ref startNode, ref endNode, out Vector3 firstStartDir, out Vector3 lastEndDir);
 
@@ -46,6 +46,7 @@ namespace PythonConsole
             int numOfSegments = Mathf.Min(1000, Mathf.FloorToInt(length / (float)data.net_options.node_spacing) + 1);
 
             List<NetSegmentMessage> segments = new List<NetSegmentMessage>();
+            bool straight = NetSegment.IsStraight(startNode.m_position, firstStartDir, endNode.m_position, lastEndDir);
 
             ushort prevNodeId = 0;
             Vector3 prevVector = firstStartDir;
@@ -59,13 +60,23 @@ namespace PythonConsole
                 } else {
                     curStartNodeId = prevNodeId;
                 }
-                Vector3 startDir = prevVector;
+                Vector3 startDir = straight ? firstStartDir : prevVector;
 
-                Vector3 endPos = bezier.Position(t1);
+                // Maybe startElevation.m_elevation can be used instead, but it is not reliable
+                float startElevation = NetUtil.GetTerrainOffset(startNode.m_position);
+                float endElevation = NetUtil.GetTerrainOffset(endNode.m_position);
+
+                Vector3 endPos = straight ? LerpPosition(startNode.m_position, endNode.m_position, t1, info) : bezier.Position(t1);
                 Vector3 endDir;
                 if (i + 1 < numOfSegments) {
+                    if (mode == TerrainMode.Follow) {
+                        endPos.y = NetUtil.GetTerrainIncludeWater(endPos);
+                    }
+                    if (mode == TerrainMode.Lerp) {
+                        endPos.y = NetUtil.GetTerrainIncludeWater(endPos) + Mathf.Lerp(startElevation, endElevation, t1);
+                    }
                     curEndNodeId = NetUtil.CreateNode(info, endPos);
-                    endDir = -VectorUtils.NormalizeXZ(VectorUtils.NormalizeXY(bezier.Tangent(t1)));
+                    endDir = straight ? lastEndDir : -VectorUtils.NormalizeXZ(VectorUtils.NormalizeXY(bezier.Tangent(t1)));
                 } else {
                     curEndNodeId = endNodeId;
                     endDir = lastEndDir;
@@ -82,11 +93,14 @@ namespace PythonConsole
             };
         }
 
-        private static ref NetNode EnsureNode(ref ushort id, Vector position, NetInfo info)
+        private static ref NetNode EnsureNode(ref ushort id, Vector position, NetInfo info, TerrainMode terrainMode)
         {
             if(id == 0) {
+                if(!position.is_height_defined && terrainMode == TerrainMode.Lerp) {
+                    throw new Exception("'Lerp' follow terrain option is not supported if any of the nodes has undefined elevation");
+                }
                 Vector3 vect = position.ToUnity();
-                Vector3 pos = new Vector3(vect.x, position.is_height_defined ? vect.y : NetUtil.TerrainHeight(vect), vect.z);
+                Vector3 pos = new Vector3(vect.x, position.is_height_defined && terrainMode != TerrainMode.Follow ? vect.y : NetUtil.TerrainHeight(vect), vect.z);
                 id = NetUtil.CreateNode(info, pos);
             }
             return ref NetUtil.Node(id);
@@ -148,7 +162,7 @@ namespace PythonConsole
             };
         }
 
-        private static void ParseNetOptions(NetOptions options, out NetInfo info, out bool invert)
+        private static void ParseNetOptions(NetOptions options, out NetInfo info, out bool invert, out TerrainMode mode)
         {
             info = PrefabCollection<NetInfo>.FindLoaded(options.prefab_name);
             Util.Assert(info, "Prefab '" + options.prefab_name + "' not found");
@@ -174,7 +188,21 @@ namespace PythonConsole
                     info = roadAI?.m_tunnelInfo ?? info;
                     break;
                 default:
-                    throw new Exception("'" + elevationMode + "' is not valid elevation mode");
+                    throw new Exception("'" + elevationMode + "' is not valid elevation mode. Allowed values: default, ground, elevated, bridge, tunnel, slope");
+            }
+
+            switch(options.follow_terrain.ToLower()) {
+                case "true":
+                    mode = TerrainMode.Follow;
+                    break;
+                case "false":
+                    mode = TerrainMode.DontFollow;
+                    break;
+                case "auto_offset":
+                    mode = TerrainMode.Lerp;
+                    break;
+                default:
+                    throw new Exception("'" + options.follow_terrain + "' is not valid follow terrain option. Allowed values: true, false, auto_offset");
             }
 
             invert = options.invert;
@@ -195,5 +223,24 @@ namespace PythonConsole
             }
         }
 
+        private static Vector3 LerpPosition(Vector3 refPos1, Vector3 refPos2, float t, NetInfo info)
+        {
+            float snap = info.m_netAI.GetLengthSnap();
+            if (snap != 0f) {
+                Vector2 vector = new Vector2(refPos2.x - refPos1.x, refPos2.z - refPos1.z);
+                float magnitude = vector.magnitude;
+                if (magnitude != 0f) {
+                    t = Mathf.Round(t * magnitude / snap + 0.01f) * (snap / magnitude);
+                }
+            }
+            return Vector3.Lerp(refPos1, refPos2, t);
+        }
+
+        private enum TerrainMode
+        {
+            Follow,
+            DontFollow,
+            Lerp
+        }
     }
 }

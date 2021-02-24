@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 
-namespace MoveIt
+namespace PythonConsole.MoveIt
 {
     public class MoveItTool
     {

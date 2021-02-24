@@ -6,7 +6,7 @@ using System.Linq;
 using System.Xml.Serialization;
 using UnityEngine;
 
-namespace MoveIt
+namespace PythonConsole.MoveIt
 {
     [Serializable]
     public struct IntegrationEntry {

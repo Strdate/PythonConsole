@@ -6,6 +6,7 @@ using SkylinesPythonShared;
 using SkylinesPythonShared.API;
 using SkylinesRemotePython.API;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
@@ -31,6 +32,7 @@ namespace SkylinesRemotePython
             _scope.SetVariable("Vector", DynamicHelpers.GetPythonTypeFromType(typeof(Vector)));
             _scope.SetVariable("NetOptions", DynamicHelpers.GetPythonTypeFromType(typeof(NetOptions)));
             _scope.SetVariable("vector_xz", new Func<double,double, Vector>(Vector.vector_xz));
+            _scope.SetVariable("print_list", new Action<IEnumerable>(_gameAPI.print_list));
             MethodInfo method = typeof(GameAPI).GetMethod("help", BindingFlags.Public | BindingFlags.Instance);
             _scope.SetVariable("help", Delegate.CreateDelegate(typeof(GameAPI.__HelpDeleg), _gameAPI, method));
             _scope.SetVariable("help_all", new Action(_gameAPI.help_all));
