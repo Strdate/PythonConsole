@@ -139,6 +139,11 @@ namespace PythonConsole
             return NetUtil.TerrainHeight(((Vector)msg).ToUnity());
         }
 
+        public static object GetWaterLevel(object msg)
+        {
+            return NetUtil.GetTerrainIncludeWater(((Vector)msg).ToUnity());
+        }
+
         public static object RenderVector(object msg)
         {
             return PythonConsole.Instance.RenderManager.AddObj(new RenderableVector((RenderVectorMessage)msg));

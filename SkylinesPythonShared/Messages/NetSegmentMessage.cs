@@ -26,5 +26,7 @@ namespace SkylinesPythonShared
         public Bezier bezier { get; set; }
 
         public float length { get; set; }
+
+        public bool is_straight { get; set; }
     }
 }

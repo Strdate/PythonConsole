@@ -27,17 +27,10 @@ namespace SkylinesRemotePython
             this.client = client;
             _engine = Python.CreateEngine();
             _scope = _engine.CreateScope();
-            _gameAPI = new GameAPI(client);
+            _gameAPI = new GameAPI(client, _scope);
 
-            _scope.SetVariable("Vector", DynamicHelpers.GetPythonTypeFromType(typeof(Vector)));
-            _scope.SetVariable("NetOptions", DynamicHelpers.GetPythonTypeFromType(typeof(NetOptions)));
-            _scope.SetVariable("vector_xz", new Func<double,double, Vector>(Vector.vector_xz));
-            _scope.SetVariable("print_list", new Action<IEnumerable>(_gameAPI.print_list));
-            MethodInfo method = typeof(GameAPI).GetMethod("help", BindingFlags.Public | BindingFlags.Instance);
-            _scope.SetVariable("help", Delegate.CreateDelegate(typeof(GameAPI.__HelpDeleg), _gameAPI, method));
-            _scope.SetVariable("help_all", new Action(_gameAPI.help_all));
-            _scope.SetVariable("game", _gameAPI);
-
+            PrepareStaticLocals();
+            
             var outputStream = new MemoryStream();
             var outputStreamWriter = new TcpStreamWriter(outputStream, client);
             _engine.Runtime.IO.SetOutput(outputStream, outputStreamWriter);
@@ -46,7 +39,7 @@ namespace SkylinesRemotePython
         public void RunScript(object obj)
         {
             RunScriptMessage msg = (RunScriptMessage)obj;
-            PrepareLocals(msg.clipboard);
+            PrepareDynamicLocals(msg.clipboard);
             try
             {
                 var source = _engine.CreateScriptSourceFromString(msg.script, SourceCodeKind.Statements);
@@ -67,7 +60,21 @@ namespace SkylinesRemotePython
             }
         }
 
-        private void PrepareLocals(InstanceMessage[] arr)
+        private void PrepareStaticLocals()
+        {
+            _scope.SetVariable("Vector", DynamicHelpers.GetPythonTypeFromType(typeof(Vector)));
+            _scope.SetVariable("NetOptions", DynamicHelpers.GetPythonTypeFromType(typeof(NetOptions)));
+            _scope.SetVariable("vector_xz", new Func<double, double, Vector>(Vector.vector_xz));
+            _scope.SetVariable("print_list", new Action<IEnumerable>(_gameAPI.print_list));
+            MethodInfo method = typeof(GameAPI).GetMethod("help", BindingFlags.Public | BindingFlags.Instance);
+            _scope.SetVariable("help", Delegate.CreateDelegate(typeof(GameAPI.__HelpDeleg), _gameAPI, method));
+            _scope.SetVariable("help_all", new Action(_gameAPI.help_all));
+            _scope.SetVariable("list_globals", new Action(_gameAPI.list_globals));
+            _scope.SetVariable("g", _gameAPI);
+            _scope.SetVariable("game", _gameAPI);
+        }
+
+        private void PrepareDynamicLocals(InstanceMessage[] arr)
         {
             List<object> res = new List<object>();
             object obj;

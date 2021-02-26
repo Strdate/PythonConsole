@@ -46,7 +46,7 @@ namespace PythonConsole
         private readonly ModalUI modalUI = new ModalUI();
 
         public ScriptEditor()
-            : base("Python Console", new Rect(16.0f, 16.0f, 640.0f, 480.0f))
+            : base("Python Console", new Rect(16.0f, 16.0f, 800.0f, 540.0f))
         {
             headerArea = new GUIArea(this)
                 .OffsetBy(vertical: 32f)
@@ -73,8 +73,13 @@ namespace PythonConsole
         public void ReloadProjectWorkspace()
         {
             AbortFileActions();
+            bool isDefaultPath = false;
             string configPath = UnityPythonObject.Instance.Config.ScriptWorkspacePath;
-            projectWorkspacePath = configPath == null || configPath == "" ? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),"SkylinesPython") : configPath;
+            projectWorkspacePath = configPath;
+            if(configPath == null || configPath == "") {
+                projectWorkspacePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "SkylinesPython");
+                isDefaultPath = true;
+            }
             if (projectWorkspacePath.Length == 0)
             {
                 lastError = "Invalid project workspace path";
@@ -97,10 +102,7 @@ namespace PythonConsole
                         if (Path.GetFileName(file) == ExampleScriptFileName)
                         {
                             exampleFileExists = true;
-                            if (currentFile == null)
-                            {
-                                currentFile = fileContent;
-                            }
+                            currentFile = fileContent;
                         }
                     }
                 }
@@ -114,6 +116,16 @@ namespace PythonConsole
                     {
                         currentFile = exampleFile;
                     }
+                }
+
+                if(isDefaultPath) {
+                    try {
+                        string archivePath = Path.Combine(ModPath.Instsance.AssemblyPath, "ExamplePythonScripts.zip");
+                        string destPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), Path.Combine("SkylinesPython","Examples"));
+                        using (var unzip = new Unzip(archivePath)) {
+                            unzip.ExtractToDirectory(destPath);
+                        }
+                    } catch { }
                 }
             }
             catch (Exception ex)

@@ -47,6 +47,9 @@ namespace SkylinesRemotePython.API
         [Doc("Road length")]
         public float length { get; private set; }
 
+        [Doc("Is segment straight")]
+        public bool is_straight { get; private set; }
+
         [Doc("Road start node (junction)")]
         public Node start_node {
             get => Node.GetNetNode((uint)start_node_id, api);
@@ -110,6 +113,7 @@ namespace SkylinesRemotePython.API
             length = msg.length;
             _position = msg.middle_pos;
             bezier = msg.bezier;
+            is_straight = msg.is_straight;
         }
 
         internal Segment(NetSegmentMessage obj, GameAPI api) : base(api)

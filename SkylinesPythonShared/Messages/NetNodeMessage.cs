@@ -17,7 +17,7 @@ namespace SkylinesPythonShared
 
         public int seg_count { get; set; }
 
-        public int elevation { get; set; }
+        public float terrain_offset { get; set; }
 
         public Vector position { get; set; }
     }

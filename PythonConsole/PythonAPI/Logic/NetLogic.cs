@@ -116,7 +116,7 @@ namespace PythonConsole
                 id = id,
                 position = node.m_position.FromUnity(),
                 prefab_name = node.Info.name,
-                elevation = node.Info.m_netAI.IsUnderground() ? -node.m_elevation : node.m_elevation,
+                terrain_offset = node.m_position.y - NetUtil.GetTerrainIncludeWater(node.m_position),
                 building_id = node.m_building,
                 seg_count = node.CountSegments()
             };
@@ -145,7 +145,8 @@ namespace PythonConsole
                 end_dir = segment.m_endDirection.FromUnity(),
                 length = segment.m_averageLength,
                 middle_pos = segment.m_middlePosition.FromUnity(),
-                bezier = bezier
+                bezier = bezier,
+                is_straight = segment.IsStraight()
             };
         }
 

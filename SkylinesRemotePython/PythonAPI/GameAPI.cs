@@ -1,4 +1,5 @@
-﻿using SkylinesPythonShared;
+﻿using Microsoft.Scripting.Hosting;
+using SkylinesPythonShared;
 using SkylinesPythonShared.API;
 using System;
 using System.Collections;
@@ -12,10 +13,13 @@ namespace SkylinesRemotePython.API
     {
         internal ClientHandler client;
         internal NetLogic _netLogic;
-        internal GameAPI(ClientHandler client)
+        internal ScriptScope _scope;
+
+        internal GameAPI(ClientHandler client, ScriptScope scope)
         {
             this.client = client;
             _netLogic = new NetLogic(this);
+            _scope = scope;
         }
 
         [Doc("Returns prop object from its id")]
@@ -155,6 +159,12 @@ namespace SkylinesRemotePython.API
             return client.RemoteCall<float>(Contracts.GetTerrainHeight, pos.position);
         }
 
+        [Doc("Returns water level including terrain height at a given point")]
+        public float water_level(IPositionable pos)
+        {
+            return client.RemoteCall<float>(Contracts.GetWaterLevel, pos.position);
+        }
+
         [Doc("Draws line on map. Returns handle which can be used to delete the line. Use clear() to delete all lines")]
         public RenderableObjectHandle draw_line(IPositionable vector, IPositionable origin, string color = "red", double length = 20, double size = 0.1)
         {
@@ -204,6 +214,13 @@ namespace SkylinesRemotePython.API
         {
             string text = PythonHelp.DumpDoc();
             client.SendMessage(text, "c_output_message");
+        }
+
+        [Doc("Prints all variables available in the global scope")]
+        public void list_globals()
+        {
+            string vars = string.Join(", ",_scope.GetVariableNames());
+            client.SendMessage("Variables in global scope: " + vars + "\n", "c_output_message");
         }
 
         public override string ToString()

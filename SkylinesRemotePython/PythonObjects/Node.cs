@@ -18,8 +18,8 @@ namespace SkylinesRemotePython.API
         [Doc("Node asset object (eg. 'Basic Road')")]
         public NetPrefab prefab => NetPrefab.GetNetPrefab(prefab_name, api);
 
-        [Doc("Elevation over terrain")]
-        public int elevation { get; private set; }
+        [Doc("Elevation over terrain or water level")]
+        public double terrain_offset { get; private set; }
 
         [Doc("ID of building (usually pillar)")]
         public int building_id { get; private set; }
@@ -53,7 +53,7 @@ namespace SkylinesRemotePython.API
             id = msg.id;
             prefab_name = msg.prefab_name;
             _position = msg.position;
-            elevation = msg.elevation;
+            terrain_offset = msg.terrain_offset;
             building_id = msg.building_id;
             seg_count = msg.seg_count;
             _cachedSegments = new CachedObj<List<Segment>>(() => api.client.RemoteCall<List<NetSegmentMessage>>(Contracts.GetSegmentsForNodeId, id).Select((obj) => new Segment(obj, api)).ToList()); ;

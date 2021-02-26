@@ -15,14 +15,14 @@ namespace SkylinesRemotePython.API {
 
         protected Vector _position;
 
-        [Doc("Object position")]
+        [Doc("Object position. Can be assigned to to move the object")]
         public virtual Vector position { 
             get => _position;
             set => MoveImpl(value, null);//throw new Exception($"Position of {type} cannot be changed");
         }
 
         [ToStringIgnore]
-        [Doc("Object position")]
+        [Doc("Object position. Can be assigned to to move the object")]
         public Vector pos {
             get => position;
             set => position = value;

@@ -24,6 +24,7 @@ namespace SkylinesPythonShared
         public static Contract DeleteObject = new Contract() { FuncName = "DeleteObject", RetType = "bool" };
         public static Contract ExistsPrefab = new Contract() { FuncName = "ExistsPrefab", RetType = "bool" };
         public static Contract GetTerrainHeight = new Contract() { FuncName = "GetTerrainHeight", RetType = "float" };
+        public static Contract GetWaterLevel = new Contract() { FuncName = "GetWaterLevel", RetType = "float" };
         public static Contract RenderVector = new Contract() { FuncName = "RenderVector", RetType = "int" };
         public static Contract RenderCircle = new Contract() { FuncName = "RenderCircle", RetType = "int" };
         public static Contract RemoveRenderedObject = new Contract() { FuncName = "RemoveRenderedObject", RetType = null };
