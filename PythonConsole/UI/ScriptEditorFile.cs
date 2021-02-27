@@ -8,9 +8,9 @@
 print(""Hello world!!"")
 
 # Press ALT+A to activate the Clipboard tool. With this tool you can inspect properties of
-# in-game objects, such as Buildings, Props, Trees, Segments etc. Click on any object and
+# in-game objects, such as buildings, props, trees, segments etc. Click on any object and
 # label 'var: cb' should appear. From now on 'cb' (short for clipboard) is the name of
-# python variable, that you can access to manipulate with the object using python console.
+# python variable that you can access to manipulate with the object using python console.
 # Uncomment the following line and execute the script:
 
 # print(cb)
@@ -23,18 +23,31 @@ print(""Hello world!!"")
 # The point should now live in the 'cb' variable.
 # Comment back the previous script line 'print(cb)' and uncomment the following:
 
-# game.create_tree(cb, ""Conifer"")
+# my_tree = game.create_tree(cb, ""Conifer"")
 
-# A conifer tree should apper on the selected point.
-#
-# Navigate to the 'examples' subfolder in the textfield above and hit reload
-# to see more examples.
+# A conifer tree should appear on the selected point. Moreover, you can now manipulate
+# it using the my_tree variable. Comment back the previous line and execute the following:
+
+# my_tree.position += Vector(15, 0, 0)
+
+# Every time you execute this line the tree moves 15 units along the game X axis.
+# (X and Z axes represent the horizontal position of the object, while Y axis represents
+# its height)
+# You can also list all available properties and methods of the object:
+
+# help(my_tree)
+
+# Finally you might want to delete the object:
+
+# my_tree.delete()
+
+# You can find more examples how to use this mod by navigating to the 'examples' subfolder
+# in the textfield at the top of this window and hitting reload.
 #
 # Useful commands:
 #
 # help() - prints basic set of commands
-# help(cb) - prints available commands for the given object. Try selecting any object
-#   and executing this command
+# help(cb) - prints available commands for the given object
 # help_all() - Dumps all documentation in the output (that's a lot of text)
 # list_globals() - Prints all variables available in the global scope
 #

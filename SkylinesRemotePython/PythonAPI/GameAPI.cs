@@ -106,9 +106,9 @@ namespace SkylinesRemotePython.API
         }
 
         [Doc("Creates segment (road). Don't use this method, but CreateSegments(..)")]
-        public Segment create_segment(IPositionable startNode, IPositionable endNode, object type, IPositionable middle_pos)
+        public Segment create_segment(IPositionable startNode, IPositionable endNode, object type, IPositionable control_point)
         {
-            return _netLogic.CreateSegmentImpl(startNode, endNode, type, null, null, middle_pos);
+            return _netLogic.CreateSegmentImpl(startNode, endNode, type, null, null, control_point);
         }
 
         [Doc("Creates segment (road). Don't use this method, but CreateSegments(..)")]
@@ -123,19 +123,19 @@ namespace SkylinesRemotePython.API
             return PathBuilder.BeginPath(this, startNode, options);
         }
 
-        [Doc("Creates straight segment (road) and automatically splits it in smaller pieces")]
+        [Doc("Creates set of straight segments (road). Returns array of created segments")]
         public IList<Segment> create_segments(IPositionable startNode, IPositionable endNode, object type)
         {
             return _netLogic.CreateSegmentsImpl(startNode, endNode, type, null, null, null);
         }
 
-        [Doc("Creates segment (road) and automatically splits it in smaller pieces")]
-        public IList<Segment> create_segments(IPositionable startNode, IPositionable endNode, object type, IPositionable middle_pos)
+        [Doc("Creates set of straight segments (road) with specified control point of the underlying bezier curve")]
+        public IList<Segment> create_segments(IPositionable startNode, IPositionable endNode, object type, IPositionable control_point)
         {
-            return _netLogic.CreateSegmentsImpl(startNode, endNode, type, null, null, middle_pos);
+            return _netLogic.CreateSegmentsImpl(startNode, endNode, type, null, null, control_point);
         }
 
-        [Doc("Creates segment (road) and automatically splits it in smaller pieces")]
+        [Doc("Creates set of straight segments (road) with specified direction vectors at the start and end position")]
         public IList<Segment> create_segments(IPositionable startNode, IPositionable endNode, object type, Vector start_dir, Vector end_dir)
         {
             return _netLogic.CreateSegmentsImpl(startNode, endNode, type, start_dir, end_dir, null);
@@ -147,7 +147,7 @@ namespace SkylinesRemotePython.API
             return NetPrefab.GetNetPrefab(name, this);
         }
 
-        [Doc("Is name valid prefab (network, building, tree etc.)")]
+        [Doc("Returns if name is a valid prefab (network, building, tree etc.)")]
         public bool is_prefab(string name)
         {
             return client.RemoteCall<bool>(Contracts.ExistsPrefab, name);
