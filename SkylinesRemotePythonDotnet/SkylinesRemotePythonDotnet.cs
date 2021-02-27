@@ -1,25 +1,28 @@
-﻿using System;
+﻿using SkylinesRemotePython;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 
-namespace SkylinesRemotePython
+namespace SkylinesRemotePythonDotnet
 {
-    public class SkylinesRemotePython
+    public class SkylinesRemotePythonDotnet
     {
         public static readonly string VERSION = "0.0.0";
 
         private static ManualResetEvent manualResetEvt = new ManualResetEvent(false);
         static void Main(string[] args)
         {
+            Console.WriteLine("This is remote python engine window for Cities:Skylines");
             Console.WriteLine("Startup...");
             int port = 0;
-            for (var i = 0; i < args.Length; i++)
-            {
-                if (args[i] == "-port" && i + 1 < args.Length)
-                {
-                    if(!Int32.TryParse(args[i + 1], out port))
-                    {
+            for (var i = 0; i < args.Length; i++) {
+                if (args[i] == "-port" && i + 1 < args.Length) {
+                    if (!Int32.TryParse(args[i + 1], out port)) {
                         throw new Exception("Argument '" + args[i + 1] + "' is not a valid port");
                     }
                 }
@@ -32,10 +35,9 @@ namespace SkylinesRemotePython
             socket.Listen(10);
             Console.WriteLine("Listening on " + port + "...");
 
-            while (true)
-            {
+            while (true) {
                 manualResetEvt.Reset();
-                socket.BeginAccept(new AsyncCallback(SkylinesRemotePython.AcceptCallback), socket);
+                socket.BeginAccept(new AsyncCallback(AcceptCallback), socket);
                 manualResetEvt.WaitOne();
             }
 

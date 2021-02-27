@@ -75,11 +75,6 @@ namespace SkylinesRemotePython.API {
                    id == other.id;
         }
 
-        public override int GetHashCode()
-        {
-            return HashCode.Combine(id, type);
-        }
-
         public static bool operator ==(CitiesObject lhs, CitiesObject rhs)
         {
             if (System.Object.ReferenceEquals(lhs, null)) {
@@ -105,6 +100,14 @@ namespace SkylinesRemotePython.API {
         public string SimpleToString()
         {
             return "id " + id;
+        }
+
+        public override int GetHashCode()
+        {
+            int hashCode = -1056084179;
+            hashCode = hashCode * -1521134295 + id.GetHashCode();
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(type);
+            return hashCode;
         }
     }
 }

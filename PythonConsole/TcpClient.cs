@@ -1,4 +1,5 @@
-﻿using SkylinesPythonShared;
+﻿using ColossalFramework.IO;
+using SkylinesPythonShared;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -28,7 +29,7 @@ namespace PythonConsole
         public static void StartUpServer()
         {
             string archivePath = Path.Combine(ModPath.Instsance.AssemblyPath,"SkylinesRemotePython.zip");
-            string destPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SkylinesRemotePython");
+            string destPath = Path.Combine(DataLocation.executableDirectory, "SkylinesRemotePython");
 
             using (var unzip = new Unzip(archivePath))
             {
@@ -38,12 +39,13 @@ namespace PythonConsole
             {
                 StartInfo = new ProcessStartInfo
                 {
-                    FileName = "dotnet",
-                    Arguments = "\"" + Path.Combine(destPath, "SkylinesRemotePython.dll") + "\"",
+                    FileName = Path.Combine(destPath, "SkylinesRemotePythonDotnet.exe"),
+                    Arguments = null,
 #if DEBUG
                     UseShellExecute = true,
 #else
                     UseShellExecute = false,
+                    WindowStyle = ProcessWindowStyle.Minimized,
 #endif
                     RedirectStandardOutput = false,
                     RedirectStandardError = false,
