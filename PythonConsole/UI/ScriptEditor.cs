@@ -13,8 +13,8 @@ namespace PythonConsole
         private const string ExampleScriptFileName = "Script.py";
 
         private const float HeaderHeight = 90.0f;
-        private const float FooterHeight = 40.0f;
-        private const float OutputHeight = 180.0f;
+        private const float FooterHeight = 55.0f;
+        private const float OutputHeight = 200.0f;
 
         private readonly List<ScriptEditorFile> projectFiles = new List<ScriptEditorFile>();
 
@@ -33,6 +33,7 @@ namespace PythonConsole
 
         private string projectWorkspacePath = string.Empty;
 
+        private bool outputVisible = true;
         private bool renamingFile;
         private bool deletingFile;
         private string newFileName;
@@ -48,26 +49,34 @@ namespace PythonConsole
         public ScriptEditor()
             : base("Python Console", new Rect(16.0f, 16.0f, 800.0f, 540.0f))
         {
-            headerArea = new GUIArea(this)
-                .OffsetBy(vertical: 32f)
+            headerArea = new GUIArea(this);
+
+            editorArea = new GUIArea(this, new Vector2(8, 0));
+
+            footerArea = new GUIArea(this, new Vector2(8, 4));
+
+            outputArea = new GUIArea(this, new Vector2(8, 4));
+            ResetAreaHeights();
+        }
+
+        private void ResetAreaHeights()
+        {
+            headerArea.OffsetBy(vertical: 32f)
                 .ChangeSizeRelative(height: 0)
                 .ChangeSizeBy(height: HeaderHeight);
 
-            editorArea = new GUIArea(this, new Vector2(8,0))
-                .OffsetBy(vertical: 32.0f + HeaderHeight)
-                .ChangeSizeBy(height: -(32.0f + HeaderHeight + FooterHeight + OutputHeight));
+            editorArea.OffsetBy(vertical: 32.0f + HeaderHeight)
+                .ChangeSizeBy(height: -(32.0f + HeaderHeight + FooterHeight + (outputVisible ? OutputHeight : 0)));
 
-            footerArea = new GUIArea(this, new Vector2(8, 4))
-                .OffsetRelative(vertical: 1f)
-                .OffsetBy(vertical: -FooterHeight-OutputHeight)
+            footerArea.OffsetRelative(vertical: 1f)
+                .OffsetBy(vertical: -FooterHeight - (outputVisible ? OutputHeight : 0))
                 .ChangeSizeRelative(height: 0)
                 .ChangeSizeBy(height: FooterHeight);
 
-            outputArea = new GUIArea(this)
-                .OffsetRelative(vertical: 1f)
-                .OffsetBy(vertical: -OutputHeight)
+            outputArea.OffsetRelative(vertical: 1f)
+                .OffsetBy(vertical: -(outputVisible ? OutputHeight : 0))
                 .ChangeSizeRelative(height: 0)
-                .ChangeSizeBy(height: OutputHeight);
+                .ChangeSizeBy(height: (outputVisible ? OutputHeight : 0));
         }
 
         public void ReloadProjectWorkspace()
@@ -339,20 +348,13 @@ namespace PythonConsole
                     AbortFileActions();
                     PythonConsole.Instance.AbortScript();
                 }
-
-                GUI.enabled = true;
-
-                if (GUILayout.Button("Clear output")) {
-                    AbortFileActions();
-                    lastError = string.Empty;
-                    output = string.Empty;
-                }
             } else {
                 if (GUILayout.Button("Restart engine")) {
                     PythonConsole.CreateInstance();
                 }
             }
-            
+
+            GUI.enabled = true;
 
             GUILayout.Label(state == ConsoleState.ScriptRunning ? "Executing..." : (state == ConsoleState.ScriptAborting ? "Aborting..." : (lastError != "" ? "Last error: " + lastError : "")));
 
@@ -444,21 +446,41 @@ namespace PythonConsole
 
             GUILayout.EndHorizontal();
 
+            GUILayout.BeginHorizontal();
+
+            GUI.enabled = true;
+
+            if (GUILayout.Button(outputVisible ? "Hide output" : "Show output", GUILayout.ExpandWidth(false))) {
+                AbortFileActions();
+                outputVisible = !outputVisible;
+                ResetAreaHeights();
+            }
+
+            if(outputVisible) {
+                if (GUILayout.Button("Clear", GUILayout.ExpandWidth(false))) {
+                    AbortFileActions();
+                    lastError = string.Empty;
+                    output = string.Empty;
+                }
+            }
+
+            GUILayout.EndHorizontal();
+
             footerArea.End();
         }
 
         private void DrawOutput()
         {
             outputArea.Begin();
+            if (outputVisible) {
+                outputScrollPosition = GUILayout.BeginScrollView(outputScrollPosition);
 
-            outputScrollPosition = GUILayout.BeginScrollView(outputScrollPosition);
+                GUI.SetNextControlName(OutputAreaControlName);
 
-            GUI.SetNextControlName(OutputAreaControlName);
+                GUILayout.TextArea(output != "" ? output : "Script output...", GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
 
-            GUILayout.TextArea(output != "" ? output : "Script output...", GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
-
-            GUILayout.EndScrollView();
-
+                GUILayout.EndScrollView();
+            }
             outputArea.End();
         }
 

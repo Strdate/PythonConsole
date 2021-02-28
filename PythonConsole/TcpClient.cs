@@ -43,13 +43,13 @@ namespace PythonConsole
                     Arguments = null,
 #if DEBUG
                     UseShellExecute = true,
+                    CreateNoWindow = false,
 #else
                     UseShellExecute = false,
-                    WindowStyle = ProcessWindowStyle.Minimized,
+                    CreateNoWindow = true,
 #endif
                     RedirectStandardOutput = false,
-                    RedirectStandardError = false,
-                    CreateNoWindow = true
+                    RedirectStandardError = false
                 }
 
             };

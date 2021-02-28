@@ -110,8 +110,12 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
-    <None Include="Resource\Examples\Script.py" />
-    <None Include="Resource\Examples\Sinus.py" />
+    <None Include="Resource\Examples\Script.py">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Resource\Examples\Sinus.py">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

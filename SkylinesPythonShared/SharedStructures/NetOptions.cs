@@ -24,7 +24,7 @@ namespace SkylinesPythonShared.API
         [Doc("Spacing betwwen two nodes (pillars). Default 100")]
         public int node_spacing { get; private set; }
 
-        [Doc("Example call: NetOptions(\"Basic Road\", \"elevated\", true)")]
+        [Doc("Example call: NetOptions(\"Basic Road\", false, \"elevated\", true)")]
         public NetOptions(string prefab_name, object follow_terrain = null, string elevation_mode = "default", bool invert = false, int node_spacing = 100)
         {
             follow_terrain = follow_terrain ?? "false";
