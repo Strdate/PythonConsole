@@ -17,4 +17,9 @@ After first build:
 
 ### How does this mod work?
 
-TODO :)
+The mod consists of 3 different parts:
+
+ - The Cities:Skylines mod itself
+ - External application that runs the [IronPython](https://ironpython.net/) engine
+   - Unfortunately the engine cannot run directly inside the game, as it requires dotnet framework 4.0 or higher (C:S runs on version 3.5)
+ - Shared library that contains messaging protocol and shared logic
