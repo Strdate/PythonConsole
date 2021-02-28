@@ -110,6 +110,7 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
+    <None Include="Resource\Examples\AdvancedRoads.py" />
     <None Include="Resource\Examples\Script.py">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

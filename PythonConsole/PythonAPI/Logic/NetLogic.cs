@@ -217,8 +217,8 @@ namespace PythonConsole
             } else if (data.control_point != null) {
                 VectUtil.DirectionVectorsFromMiddlePos(startNode.m_position, endNode.m_position, data.control_point.ToUnity(), out startDir, out endDir);
             } else if (data.start_dir != null && data.end_dir != null) {
-                startDir = data.start_dir.ToUnity().normalized;
-                endDir = data.end_dir.ToUnity().normalized;
+                startDir = data.start_dir.ToUnity();
+                endDir = data.end_dir.ToUnity();
             } else {
                 throw new Exception("Cannot calculate segment from provided vectors");
             }

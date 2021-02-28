@@ -1,5 +1,4 @@
-﻿# Press ALT+A to activate the Clipboard tool. With this tool you can inspect properties of
-# Warning! Do not save any script in this subfolder as it will be overwritten.
+﻿# Warning! Do not save any script in this subfolder as it will be overwritten.
 #
 # Building roads
 # --------------
@@ -31,7 +30,7 @@
 #
 # Example call:
 
-# game.create_segments(cba[0], cba[1], NetOptions("Highway", false, "elevated", true) )
+# game.create_segments(cba[0], cba[1], NetOptions("Highway", False, "elevated", True) )
 
 # Learn more about NetOptions by calling 'help(NetOptions)'
 #
@@ -46,5 +45,5 @@
 # The path_to method might take control point or direction vectors as the second
 # and third argument.
 #
-# See more examples by opening another script file at the top of this window.
+# See more examples by opening another script file - eg. AdvancedRoads.py
 #

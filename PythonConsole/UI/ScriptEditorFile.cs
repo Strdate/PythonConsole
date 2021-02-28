@@ -41,8 +41,8 @@ print(""Hello world!!"")
 
 # my_tree.delete()
 
-# You can find more examples how to use this mod by navigating to the 'examples' subfolder
-# in the textfield at the top of this window and hitting reload.
+# You can find more examples how to use this mod (such as building roads) by navigating to
+# the 'examples' subfolder in the textfield at the top of this window and hitting reload.
 #
 # Useful commands:
 #

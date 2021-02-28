@@ -13,15 +13,17 @@ namespace PythonConsole
         private const string ExampleScriptFileName = "Script.py";
 
         private const float HeaderHeight = 90.0f;
-        private const float FooterHeight = 55.0f;
+        private const float ButtonsHeight = 30.0f;
         private const float OutputHeight = 200.0f;
+        private const float FooterHeight = 35.0f;
 
         private readonly List<ScriptEditorFile> projectFiles = new List<ScriptEditorFile>();
 
         private readonly GUIArea headerArea;
         private readonly GUIArea editorArea;
-        private readonly GUIArea footerArea;
+        private readonly GUIArea buttonsArea;
         private readonly GUIArea outputArea;
+        private readonly GUIArea footerArea;
 
         //private IModEntryPoint currentMod;
         private string lastError = string.Empty;
@@ -53,9 +55,11 @@ namespace PythonConsole
 
             editorArea = new GUIArea(this, new Vector2(8, 0));
 
-            footerArea = new GUIArea(this, new Vector2(8, 4));
+            buttonsArea = new GUIArea(this, new Vector2(8, 4));
 
-            outputArea = new GUIArea(this, new Vector2(8, 4));
+            outputArea = new GUIArea(this, new Vector2(8, 0));
+
+            footerArea = new GUIArea(this, new Vector2(8, 4));
             ResetAreaHeights();
         }
 
@@ -66,17 +70,22 @@ namespace PythonConsole
                 .ChangeSizeBy(height: HeaderHeight);
 
             editorArea.OffsetBy(vertical: 32.0f + HeaderHeight)
-                .ChangeSizeBy(height: -(32.0f + HeaderHeight + FooterHeight + (outputVisible ? OutputHeight : 0)));
+                .ChangeSizeBy(height: -(32.0f + HeaderHeight + ButtonsHeight + (outputVisible ? OutputHeight : 0) + FooterHeight));
 
-            footerArea.OffsetRelative(vertical: 1f)
-                .OffsetBy(vertical: -FooterHeight - (outputVisible ? OutputHeight : 0))
+            buttonsArea.OffsetRelative(vertical: 1f)
+                .OffsetBy(vertical: -ButtonsHeight - (outputVisible ? OutputHeight : 0) - FooterHeight)
                 .ChangeSizeRelative(height: 0)
-                .ChangeSizeBy(height: FooterHeight);
+                .ChangeSizeBy(height: ButtonsHeight);
 
             outputArea.OffsetRelative(vertical: 1f)
-                .OffsetBy(vertical: -(outputVisible ? OutputHeight : 0))
+                .OffsetBy(vertical: -(outputVisible ? OutputHeight : 0) - FooterHeight)
                 .ChangeSizeRelative(height: 0)
                 .ChangeSizeBy(height: (outputVisible ? OutputHeight : 0));
+
+            footerArea.OffsetRelative(vertical: 1f)
+                .OffsetBy(vertical: -FooterHeight)
+                .ChangeSizeRelative(height: 0)
+                .ChangeSizeBy(height: FooterHeight);
         }
 
         public void ReloadProjectWorkspace()
@@ -163,11 +172,11 @@ namespace PythonConsole
         {
             DrawHeader();
 
-            if (projectFiles.Count > 0)
-            {
+            if (projectFiles.Count > 0) {
                 DrawEditor();
-                DrawFooter();
+                DrawButtonArea();
                 DrawOutput();
+                DrawFooter();
             }
             else
             {
@@ -327,9 +336,9 @@ namespace PythonConsole
             }
         }
 
-        private void DrawFooter()
+        private void DrawButtonArea()
         {
-            footerArea.Begin();
+            buttonsArea.Begin();
 
             GUILayout.BeginHorizontal();
 
@@ -445,7 +454,12 @@ namespace PythonConsole
             }
 
             GUILayout.EndHorizontal();
+            buttonsArea.End();
+        }
 
+        private void DrawFooter()
+        {
+            footerArea.Begin();
             GUILayout.BeginHorizontal();
 
             GUI.enabled = true;
@@ -456,7 +470,7 @@ namespace PythonConsole
                 ResetAreaHeights();
             }
 
-            if(outputVisible) {
+            if (outputVisible) {
                 if (GUILayout.Button("Clear", GUILayout.ExpandWidth(false))) {
                     AbortFileActions();
                     lastError = string.Empty;
@@ -465,7 +479,6 @@ namespace PythonConsole
             }
 
             GUILayout.EndHorizontal();
-
             footerArea.End();
         }
 

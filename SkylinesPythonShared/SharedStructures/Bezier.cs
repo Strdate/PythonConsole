@@ -64,13 +64,6 @@ namespace SkylinesPythonShared.API
 		public override string ToString()
 		{
 			return Util.RuntimeToString(this);
-			/*return "{" + "\n" +
-				"type: " + nameof(Bezier) + "\n" +
-				"a: " + a + "\n" +
-				"b: " + b + "\n" +
-				"c: " + c + "\n" +
-				"d: " + d + "\n" +
-				"}";*/
 		}
 	}
 }

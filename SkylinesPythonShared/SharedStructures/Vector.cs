@@ -124,7 +124,7 @@ namespace SkylinesPythonShared.API
 
         public override string ToString()
         {
-            return "[" + x.ToString("F3") + ", " + (is_height_defined ? y.ToString("F3") : "undefined") + ", " + z.ToString("F3") + "]";
+            return "{x: " + x.ToString("F3") + ", y: " + (is_height_defined ? y.ToString("F3") : "undefined") + ", z: " + z.ToString("F3") + "}";
         }
 
         public string SimpleToString()
