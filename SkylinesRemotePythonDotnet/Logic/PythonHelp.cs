@@ -102,7 +102,8 @@ namespace SkylinesRemotePython
                 var atrs = prop.GetCustomAttributes(typeof(DocAttribute), true);
                 if (atrs.Length > 0) {
                     DocAttribute atr = atrs[0] as DocAttribute;
-                    string text = (type == typeof(GameAPI) ? "game." : "") + prop.Name + ": " + prop.PropertyType.Name + " - " + atr.Description;
+                    bool hasSetter = prop.GetSetMethod() != null;
+                    string text = (type == typeof(GameAPI) ? "game." : "") + prop.Name + ": " + prop.PropertyType.Name + " " + (hasSetter ? "(get/set) " : "" ) + "- " + atr.Description;
                     string textPrefix = (prop.GetGetMethod().IsStatic ? "static " : "") + text;
                     propSet.Add(text, textPrefix);
                 }

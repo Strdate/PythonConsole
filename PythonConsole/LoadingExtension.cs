@@ -31,6 +31,7 @@ namespace PythonConsole
             if (go != null) {
                 UnityEngine.Object.Destroy(go);
             }
+            PythonConsole.KillInstance();
         }
 
         public void OnReleased()

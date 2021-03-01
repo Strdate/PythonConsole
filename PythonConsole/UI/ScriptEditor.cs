@@ -33,7 +33,7 @@ namespace PythonConsole
         private Vector2 outputScrollPosition = Vector2.zero;
         private Vector2 projectFilesScrollPosition = Vector2.zero;
 
-        private string projectWorkspacePath = string.Empty;
+        public string projectWorkspacePath { get; private set; } = string.Empty;
 
         private bool outputVisible = true;
         private bool renamingFile;

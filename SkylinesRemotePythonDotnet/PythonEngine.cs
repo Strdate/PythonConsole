@@ -1,4 +1,5 @@
 ﻿using IronPython.Hosting;
+using IronPython.Runtime.Operations;
 using IronPython.Runtime.Types;
 using Microsoft.Scripting;
 using Microsoft.Scripting.Hosting;
@@ -9,6 +10,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 
@@ -40,6 +42,8 @@ namespace SkylinesRemotePython
         {
             RunScriptMessage msg = (RunScriptMessage)obj;
             PrepareDynamicLocals(msg.clipboard);
+            _engine.SetSearchPaths(msg.searchPaths.ToList());
+
             try
             {
                 var source = _engine.CreateScriptSourceFromString(msg.script, SourceCodeKind.Statements);
@@ -51,7 +55,14 @@ namespace SkylinesRemotePython
                 }
                 catch(Exception ex)
                 {
-                    client.SendMessage(ex.Message, "c_exception");
+                    string details = "";
+                    try {
+                        var frame = PythonOps.GetDynamicStackFrames(ex).First();
+                        string fileName = frame.GetFileName();
+                        details = " (" + (fileName == "<string>" ? "script" : fileName) + ": line " + frame.GetFileLineNumber() + ")";
+                    } catch { }
+                    
+                    client.SendMessage(ex.Message + details, "c_exception");
                 }
             }
             catch(Exception ex)

@@ -1,8 +1,10 @@
 ﻿using ColossalFramework;
+using ColossalFramework.IO;
 using ColossalFramework.UI;
 using ICities;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using UnityEngine;
@@ -13,7 +15,7 @@ namespace PythonConsole
     {
         public string Name => "Python Console";
 
-        public string Description => "Press ALT+S to open the console [ALPHA 0.0.2]";
+        public string Description => "Press ALT+S to open the console [ALPHA 0.0.3]";
 
         public const string settingsFileName = "PythonConsole";
 
@@ -24,6 +26,7 @@ namespace PythonConsole
         public static readonly SettingsBool F5toExec = new SettingsBool("Use F5 to execute scipts", "Pressing F5 shortcut will execute current script", "F5toExec", true);
         public static readonly SettingsBool SyncExecution = new SettingsBool("Execute scripts synchronously (needs engine restart)", "Script execution will freeze simulation, but it may take less time", "SyncExecution", false);
 
+        public static readonly string RemotePythonFolder = Path.Combine(DataLocation.executableDirectory, "SkylinesRemotePython");
         public ModInfo()
         {
             Instance = this;

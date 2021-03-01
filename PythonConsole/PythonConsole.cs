@@ -142,7 +142,8 @@ namespace PythonConsole
                 if (State == ConsoleState.Ready) {
                     RunScriptMessage msg = new RunScriptMessage() {
                         script = script,
-                        clipboard = GetClipboardObjects()
+                        clipboard = GetClipboardObjects(),
+                        searchPaths = GetSearchPaths()
                     };
                     _stopWatch = new Stopwatch();
                     _stopWatch.Start();
@@ -167,6 +168,15 @@ namespace PythonConsole
             return SelectionTool.Instance.Clipboard.Where((obj) => obj.Exists).Select((obj) => obj.ToMessage()).ToArray();
         }
 
+        private string[] GetSearchPaths()
+        {
+            return new string[]{
+                UnityPythonObject.Instance.scriptEditor.projectWorkspacePath,
+                Path.Combine(UnityPythonObject.Instance.scriptEditor.projectWorkspacePath, "imports"),
+                Path.Combine(ModInfo.RemotePythonFolder, "imports")
+            };
+        }
+
         public void SimulationStep()
         {
             do {
@@ -183,15 +193,20 @@ namespace PythonConsole
             } while (State == ConsoleState.ScriptRunning && ExecuteSynchronously);
         }
 
-        public static void CreateInstance()
+        public static void KillInstance()
         {
-            if(_instance != null) {
+            if (_instance != null) {
                 _instance.State = ConsoleState.Dead;
                 try {
                     TcpClient.process.Kill();
                 }
                 catch { }
             }
+        }
+
+        public static void CreateInstance()
+        {
+            KillInstance();
             _instance = new PythonConsole(ModInfo.SyncExecution.value);
         }
     }

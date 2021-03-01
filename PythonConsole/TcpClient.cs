@@ -29,17 +29,16 @@ namespace PythonConsole
         public static void StartUpServer()
         {
             string archivePath = Path.Combine(ModPath.Instsance.AssemblyPath,"SkylinesRemotePython.zip");
-            string destPath = Path.Combine(DataLocation.executableDirectory, "SkylinesRemotePython");
 
             using (var unzip = new Unzip(archivePath))
             {
-                unzip.ExtractToDirectory(destPath);
+                unzip.ExtractToDirectory(ModInfo.RemotePythonFolder);
             }
             process = new Process
             {
                 StartInfo = new ProcessStartInfo
                 {
-                    FileName = Path.Combine(destPath, "SkylinesRemotePythonDotnet.exe"),
+                    FileName = Path.Combine(ModInfo.RemotePythonFolder, "SkylinesRemotePythonDotnet.exe"),
                     Arguments = null,
 #if DEBUG
                     UseShellExecute = true,

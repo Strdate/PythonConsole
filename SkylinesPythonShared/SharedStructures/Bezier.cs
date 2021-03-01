@@ -46,6 +46,7 @@ namespace SkylinesPythonShared.API
 			return tangent(t).flat_rotate(Vector.pi / 2);
         }
 
+		[ToStringIgnore]
 		[Doc("Returns inverted bezier")]
 		public Bezier inverted => new Bezier(this.d, this.c, this.b, this.a);
 

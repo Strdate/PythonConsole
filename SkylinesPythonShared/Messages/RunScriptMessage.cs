@@ -11,5 +11,7 @@ namespace SkylinesPythonShared
         public string script { get; set; }
 
         public InstanceMessage[] clipboard { get; set; }
+
+        public string[] searchPaths { get; set; }
     }
 }
