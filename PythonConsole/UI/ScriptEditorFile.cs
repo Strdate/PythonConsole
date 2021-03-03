@@ -44,6 +44,11 @@ print(""Hello world!!"")
 # You can find more examples how to use this mod (such as building roads) by navigating to
 # the 'examples' subfolder in the textfield at the top of this window and hitting reload.
 #
+# As well as that you can find documentation in the mod description and on the wiki:
+#
+# https://github.com/Strdate/PythonConsole/wiki/Clipboard-Tool
+#
+#
 # Useful commands:
 #
 # help() - prints basic set of commands

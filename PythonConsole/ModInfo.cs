@@ -27,6 +27,7 @@ namespace PythonConsole
         public static readonly SettingsBool SyncExecution = new SettingsBool("Execute scripts synchronously (needs engine restart)", "Script execution will freeze simulation, but it may take less time", "SyncExecution", false);
 
         public static readonly string RemotePythonFolder = Path.Combine(DataLocation.executableDirectory, "SkylinesRemotePython");
+        public static readonly int DEF_PORT = 6672;
         public ModInfo()
         {
             Instance = this;

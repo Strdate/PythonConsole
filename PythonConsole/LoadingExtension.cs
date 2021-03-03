@@ -27,6 +27,9 @@ namespace PythonConsole
 
         public void OnLevelUnloading()
         {
+            try {
+                UnityPythonObject.Instance.scriptEditor.Visible = false;
+            } catch { }
             var go = UnityEngine.Object.FindObjectOfType<SelectionToolControl>();
             if (go != null) {
                 UnityEngine.Object.Destroy(go);

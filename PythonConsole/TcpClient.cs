@@ -18,7 +18,7 @@ namespace PythonConsole
         public static TcpClient CreateClient()
         {
             Socket s = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            s.Connect(IPAddress.Parse("127.0.0.1"), 6672);
+            s.Connect(IPAddress.Parse("127.0.0.1"), GetPortNumber());
             return new TcpClient(s);
         }
         protected TcpClient(Socket s) : base(s)
@@ -39,7 +39,7 @@ namespace PythonConsole
                 StartInfo = new ProcessStartInfo
                 {
                     FileName = Path.Combine(ModInfo.RemotePythonFolder, "SkylinesRemotePythonDotnet.exe"),
-                    Arguments = null,
+                    Arguments = "-port " + GetPortNumber(),
 #if DEBUG
                     UseShellExecute = true,
                     CreateNoWindow = false,
@@ -53,6 +53,15 @@ namespace PythonConsole
 
             };
             process.Start();
+        }
+
+        private static int GetPortNumber()
+        {
+            int port = UnityPythonObject.Instance.Config.tcpPort;
+            if (port < 1 || port > 65535) {
+                port = ModInfo.DEF_PORT;
+            }
+            return port;
         }
 
         public void CloseSocket()

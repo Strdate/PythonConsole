@@ -13,6 +13,9 @@ namespace PythonConsole
 
         #region General
 
+        [XmlElement("tcpPort")]
+        public int tcpPort { get; set; } = 0;
+
         [XmlElement("customPrefabsObject")]
         public bool CustomPrefabsObject { get; set; } = true;
 
