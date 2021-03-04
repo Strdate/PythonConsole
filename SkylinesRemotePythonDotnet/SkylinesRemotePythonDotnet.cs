@@ -8,47 +8,49 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SkylinesRemotePythonDotnet
+namespace SkylinesRemotePython
 {
     public class SkylinesRemotePythonDotnet
     {
         public static readonly string VERSION = "0.0.0";
 
+        public static ManualResetEvent exitEvent = new ManualResetEvent(false);
+
         private static ManualResetEvent manualResetEvt = new ManualResetEvent(false);
         static void Main(string[] args)
         {
-            Console.WriteLine("This is remote python engine window for Cities:Skylines");
-            Console.WriteLine("Startup...");
-            int port = 0;
-            for (var i = 0; i < args.Length; i++) {
-                if (args[i] == "-port" && i + 1 < args.Length) {
-                    if (!Int32.TryParse(args[i + 1], out port)) {
-                        throw new Exception("Argument '" + args[i + 1] + "' is not a valid port");
+            try {
+                Console.WriteLine("\nThis is remote python engine window for Cities:Skylines\n");
+                Console.WriteLine("You can change the default tcp port in Cities_Skylines\\PythonConsoleMod.xml");
+                Console.WriteLine("Startup...");
+                int port = 0;
+                for (var i = 0; i < args.Length; i++) {
+                    if (args[i] == "-port" && i + 1 < args.Length) {
+                        if (!Int32.TryParse(args[i + 1], out port)) {
+                            throw new Exception("Argument '" + args[i + 1] + "' is not a valid port");
+                        }
                     }
                 }
+                port = port == 0 ? 6672 : port;
+
+                Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                socket.Bind(new IPEndPoint(IPAddress.Parse("127.0.0.1"), port));
+
+                socket.Listen(1);
+                Console.WriteLine("Listening on " + port + "...");
+
+                //while (true) {
+                    manualResetEvt.Reset();
+                    socket.BeginAccept(new AsyncCallback(AcceptCallback), socket);
+                    manualResetEvt.WaitOne();
+                //}
+            } catch(Exception ex) {
+                Console.WriteLine(ex);
             }
-            port = port == 0 ? 6672 : port;
 
-            Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            socket.Bind(new IPEndPoint(IPAddress.Parse("127.0.0.1"), port));
-
-            socket.Listen(10);
-            Console.WriteLine("Listening on " + port + "...");
-
-            while (true) {
-                manualResetEvt.Reset();
-                socket.BeginAccept(new AsyncCallback(AcceptCallback), socket);
-                manualResetEvt.WaitOne();
-            }
-
-            /*Socket accepteddata = socket.Accept(); // 5
-            data = new byte[accepteddata.SendBufferSize]; // 6
-            int j = accepteddata.Receive(data); // 7
-            byte[] adata = new byte[j];         // 7
-            for (int i = 0; i < j; i++)         // 7
-                adata[i] = data[i];             // 7
-            string dat = Encoding.Default.GetString(adata); // 8
-            Console.WriteLine(dat);                         // 8*/
+            exitEvent.WaitOne();
+            Console.WriteLine("Press any key to exit...");
+            Console.ReadLine();
         }
 
         public static void AcceptCallback(IAsyncResult ar)

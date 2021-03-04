@@ -24,7 +24,8 @@ namespace PythonConsole
         public static readonly SavedInputKey ScriptEditorShortcut = new SavedInputKey("ScriptEditorShortcut", settingsFileName, SavedInputKey.Encode(KeyCode.S, false, false, true), true);
         public static readonly SavedInputKey ClipboardToolShortcut = new SavedInputKey("ClipboardToolShortcut", settingsFileName, SavedInputKey.Encode(KeyCode.A, false, false, true), true);
         public static readonly SettingsBool F5toExec = new SettingsBool("Use F5 to execute scipts", "Pressing F5 shortcut will execute current script", "F5toExec", true);
-        public static readonly SettingsBool SyncExecution = new SettingsBool("Execute scripts synchronously (needs engine restart)", "Script execution will freeze simulation, but it may take less time", "SyncExecution", false);
+        public static readonly SettingsBool SyncExecution = new SettingsBool("Execute scripts synchronously (requires engine restart)", "Script execution will freeze simulation, but it may take less time", "SyncExecution", false);
+        public static readonly SettingsBool ShowRemoteConsole = new SettingsBool("Debug: Show remote python console", "The external python program will run in a visible console window (requires engine restart)", "ShowRemoteConsole", false);
 
         public static readonly string RemotePythonFolder = Path.Combine(DataLocation.executableDirectory, "SkylinesRemotePython");
         public static readonly int DEF_PORT = 6672;
@@ -57,11 +58,12 @@ namespace PythonConsole
                 SyncExecution.Draw(group, (b) => {
                     PythonConsole.CreateInstance();
                 });
+                ShowRemoteConsole.Draw(group);
 
                 group.AddSpace(10);
 
                 group.AddButton("Kill python engine", () => {
-                    PythonConsole.CreateInstance();
+                    PythonConsole.KillInstance();
                 });
 
             }

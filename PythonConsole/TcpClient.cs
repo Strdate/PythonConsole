@@ -29,6 +29,8 @@ namespace PythonConsole
         public static void StartUpServer()
         {
             string archivePath = Path.Combine(ModPath.Instsance.AssemblyPath,"SkylinesRemotePython.zip");
+            bool useShellExecute = ModInfo.ShowRemoteConsole.value;
+            bool createNoWindow = !ModInfo.ShowRemoteConsole.value;
 
             using (var unzip = new Unzip(archivePath))
             {
@@ -40,13 +42,8 @@ namespace PythonConsole
                 {
                     FileName = Path.Combine(ModInfo.RemotePythonFolder, "SkylinesRemotePythonDotnet.exe"),
                     Arguments = "-port " + GetPortNumber(),
-#if DEBUG
-                    UseShellExecute = true,
-                    CreateNoWindow = false,
-#else
-                    UseShellExecute = false,
-                    CreateNoWindow = true,
-#endif
+                    UseShellExecute = useShellExecute,
+                    CreateNoWindow = createNoWindow,
                     RedirectStandardOutput = false,
                     RedirectStandardError = false
                 }

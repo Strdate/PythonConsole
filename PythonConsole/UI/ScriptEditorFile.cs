@@ -46,7 +46,7 @@ print(""Hello world!!"")
 #
 # As well as that you can find documentation in the mod description and on the wiki:
 #
-# https://github.com/Strdate/PythonConsole/wiki/Clipboard-Tool
+# https://github.com/Strdate/PythonConsole/wiki
 #
 #
 # Useful commands:

@@ -47,9 +47,9 @@ namespace SkylinesRemotePython.API
         }
 
         [Doc("Creates multiple segments to the given position")]
-        public PathBuilder path_to(IPositionable endNode, Vector middle_pos)
+        public PathBuilder path_to(IPositionable endNode, IPositionable middle_pos)
         {
-            PathToImpl(last_position, endNode, options, null, null, middle_pos);
+            PathToImpl(last_position, endNode, options, null, null, middle_pos.position);
             return this;
         }
 

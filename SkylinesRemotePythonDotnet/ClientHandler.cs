@@ -36,7 +36,9 @@ namespace SkylinesRemotePython
                     if (ex.Message == "Abort script") {
                         SendMessage(null, "c_ready");
                     } else {
-                        throw;
+                        Console.WriteLine(ex);
+                        SkylinesRemotePythonDotnet.exitEvent.Set();
+                        break;
                     }
                 }
                 
