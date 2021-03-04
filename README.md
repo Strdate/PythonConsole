@@ -23,3 +23,13 @@ The mod consists of 3 different parts:
  - External application that runs the [IronPython](https://ironpython.net/) engine
    - Unfortunately the engine cannot run directly inside the game, as it requires dotnet framework 4.0 or higher (C:S runs on version 3.5)
  - Shared library that contains messaging protocol and shared logic
+
+How does it all work together?
+
+ - The external application is shipped in a zip file with the mod
+ - After the mod loads, the application is unzipped in `Cities_Skylines\SkylinesRemotePython` folder and launched
+ - The application creates a tcp server to which the mod then connects
+
+### Credits
+
+This mod contains source code from [Move It](https://github.com/Quboid/CS-MoveIt) and [ModTools](https://github.com/bloodypenguin/Skylines-ModTools)
