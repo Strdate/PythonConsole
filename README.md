@@ -1,6 +1,6 @@
 # Python Console Mod
 
-Python Console mod allows you to programatically interact with Cities:Skylines game engine through an easy-to-learn python interface.
+Python Console mod allows you to programatically interact with Cities:Skylines game engine through an easy-to-learn python interface. User documentation can be found on [wiki](https://github.com/Strdate/PythonConsole/wiki).
 
 ## Developer isntructions
 
