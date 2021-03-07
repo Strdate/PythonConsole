@@ -26,22 +26,20 @@ namespace SkylinesRemotePython
 
         private void HandleClient()
         {
-            engine = new PythonEngine(this);
-            while (true)
-            {
-                try {
-                    HandleGeneralMessage(GetMessage());
-                } catch(Exception ex) {
-                    Console.WriteLine(ex.Message);
-                    if (ex.Message == "Abort script") {
-                        SendMessage(null, "c_ready");
-                    } else {
-                        Console.WriteLine(ex);
-                        SkylinesRemotePythonDotnet.exitEvent.Set();
-                        break;
+            try {
+                engine = new PythonEngine(this);
+                while (true) {
+                    try {
+                        HandleGeneralMessage(GetMessage());
                     }
+                    catch (AbortScriptException) {
+                        SendMessage(null, "c_ready");
+                    }
+
                 }
-                
+            } catch(Exception ex) {
+                Console.WriteLine(ex);
+                SkylinesRemotePythonDotnet.exitEvent.Set();
             }
         }
 
@@ -54,7 +52,7 @@ namespace SkylinesRemotePython
 
             if (msg.messageType == "s_script_abort") {
                 Console.WriteLine("Abort script");
-                throw new Exception("Abort script");
+                throw new AbortScriptException();
             }
 
             if (msg.messageType == "s_exception")
@@ -98,5 +96,10 @@ namespace SkylinesRemotePython
                 case "s_script_run": engine.RunScript(msg.payload); break;
             }
         }
+    }
+
+    public class AbortScriptException : Exception
+    {
+
     }
 }

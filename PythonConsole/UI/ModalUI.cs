@@ -22,6 +22,7 @@ namespace PythonConsole
                 if (modalView == null) {
                     return;
                 }
+                modalView.isInteractive = false;
             }
 
             if (middleButtonState != MouseButtonState.None) {
