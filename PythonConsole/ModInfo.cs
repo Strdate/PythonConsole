@@ -15,7 +15,7 @@ namespace PythonConsole
     {
         public string Name => "Python Console";
 
-        public string Description => "Press ALT+S to open the console [BETA 0.1.0]";
+        public string Description => "Press ALT+S to open the console [BETA 0.1.1]";
 
         public const string settingsFileName = "PythonConsole";
 

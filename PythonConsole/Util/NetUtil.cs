@@ -137,6 +137,12 @@ namespace PythonConsole
             NetNode startNode = Node(startNodeId);
             NetNode endNode = Node(endNodeId);
 
+            startDirection.y = 0;
+            endDirection.y = 0;
+            startDirection.Normalize();
+            endDirection.Normalize();
+
+
             if ((startNode.m_flags & NetNode.Flags.Created) == NetNode.Flags.None || (endNode.m_flags & NetNode.Flags.Created) == NetNode.Flags.None)
                 throw new Exception("Failed to create NetSegment: Invalid node(s)");
 
@@ -149,6 +155,15 @@ namespace PythonConsole
                 throw new Exception("Failed to create NetSegment");
 
             Singleton<SimulationManager>.instance.m_currentBuildIndex++;
+
+            var seg = Segment(newSegmentId);
+            seg.m_startDirection = seg.FindDirection(newSegmentId, seg.m_startNode);
+            seg.m_endDirection = seg.FindDirection(newSegmentId, seg.m_endNode);
+
+            Manager.UpdateSegmentRenderer(newSegmentId, true);
+
+            Manager.UpdateNode(startNodeId);
+            Manager.UpdateNode(endNodeId);
 
             if (dispatchPlacementEffects)
             {
