@@ -19,7 +19,8 @@ namespace PythonConsole
             this.client = client;
             foreach (var field in typeof(Contracts).GetFields(BindingFlags.Static | BindingFlags.Public)) {
                 Contract contract = (Contract)field.GetValue(null);
-                CallMethod del = (CallMethod)Delegate.CreateDelegate(typeof(CallMethod), typeof(GameAPI), contract.FuncName);
+                MethodInfo method = typeof(GameAPI).GetMethod(contract.FuncName, BindingFlags.Public | BindingFlags.Static);
+                CallMethod del = (CallMethod)Delegate.CreateDelegate(typeof(CallMethod), method);
                 funcDict.Add("c_callfunc_" + contract.FuncName, new TargetInfo(del, contract));
             }
         }
