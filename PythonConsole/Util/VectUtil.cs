@@ -10,8 +10,8 @@ namespace PythonConsole
     {
         public static void DirectionVectorsFromMiddlePos(Vector3 startPos, Vector3 endPos, Vector3 middlePos, out Vector3 startDir, out Vector3 endDir)
         {
-            startDir = (middlePos - startPos).normalized;
-            endDir = (middlePos - endPos).normalized;
+            startDir = (middlePos - startPos).FlatNormalized();
+            endDir = (middlePos - endPos).FlatNormalized();
         }
     }
 }

@@ -20,6 +20,14 @@ namespace PythonConsole
             return new SkylinesPythonShared.API.Vector(vect.x, vect.y, vect.z);
         }
 
+        public static Vector3 FlatNormalized(this Vector3 vect)
+        {
+            Vector3 newVect = vect;
+            newVect.y = 0;
+            newVect.Normalize();
+            return newVect;
+        }
+
         public static Bezier FromUnity(this Bezier3 x)
         {
             return new Bezier(x.a.FromUnity(), x.b.FromUnity(), x.c.FromUnity(), x.d.FromUnity());

@@ -16,6 +16,15 @@ namespace SkylinesRemotePython.API
         [Doc("Current end of the road")]
         public Node last_node { get; private set; }
 
+        [Doc("Start of the road")]
+        public Node first_node { get; private set; }
+
+        [Doc("Returns list of the last batch of segments built with path_to function")]
+        public IList<Segment> last_segments { get; private set; }
+
+        [Doc("Returns list of all segments built with this PathBuilder")]
+        public IList<Segment> segments { get; private set; } = new List<Segment>();
+
         [Doc("Road type, elevation etc.")]
         public NetOptions options { get; set; }
 
@@ -62,7 +71,10 @@ namespace SkylinesRemotePython.API
 
         private void PathToImpl(IPositionable last_position, IPositionable endNode, object options, Vector start_dir, Vector end_dir, Vector middle_pos)
         {
-            last_node = api._netLogic.CreateSegmentsImpl(last_position, endNode, options, start_dir, end_dir, middle_pos).Last().end_node;
+            last_segments = api._netLogic.CreateSegmentsImpl(last_position, endNode, options, start_dir, end_dir, middle_pos);
+            segments = segments.Concat(last_segments).ToList();
+            first_node = first_node ?? last_segments.First().start_node;
+            last_node = last_segments.Last().end_node;
             this.last_position = last_node;
         }
 
