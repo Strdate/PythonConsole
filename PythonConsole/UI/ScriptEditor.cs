@@ -94,10 +94,11 @@ namespace PythonConsole
             bool isDefaultPath = false;
             string configPath = UnityPythonObject.Instance.Config.ScriptWorkspacePath;
             projectWorkspacePath = configPath;
-            if(configPath == null || configPath == "") {
-                projectWorkspacePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "SkylinesPython");
-                isDefaultPath = true;
+            string defaultPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "SkylinesPython");
+            if (configPath == null || configPath == "") {
+                projectWorkspacePath = defaultPath;
             }
+            isDefaultPath = Util.NormalizePath(projectWorkspacePath) == Util.NormalizePath(defaultPath);
             if (projectWorkspacePath.Length == 0)
             {
                 lastError = "Invalid project workspace path";

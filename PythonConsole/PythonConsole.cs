@@ -173,6 +173,7 @@ namespace PythonConsole
             return new string[]{
                 UnityPythonObject.Instance.scriptEditor.projectWorkspacePath,
                 Path.Combine(UnityPythonObject.Instance.scriptEditor.projectWorkspacePath, "imports"),
+                Path.Combine(UnityPythonObject.Instance.scriptEditor.projectWorkspacePath, "examples"),
                 Path.Combine(ModInfo.RemotePythonFolder, "imports")
             };
         }
