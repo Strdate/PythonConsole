@@ -75,17 +75,28 @@ namespace SkylinesRemotePython
 
         private void PrepareStaticLocals()
         {
-            _scope.SetVariable("Vector", DynamicHelpers.GetPythonTypeFromType(typeof(Vector)));
-            _scope.SetVariable("Point", DynamicHelpers.GetPythonTypeFromType(typeof(Point)));
-            _scope.SetVariable("NetOptions", DynamicHelpers.GetPythonTypeFromType(typeof(NetOptions)));
-            _scope.SetVariable("vector_xz", new Func<double, double, Vector>(Vector.vector_xz));
-            _scope.SetVariable("print_list", new Action<IEnumerable>(_gameAPI.print_list));
+            SetStaticLocal(typeof(Vector));
+            SetStaticLocal(typeof(Point));
+            SetStaticLocal(typeof(NetOptions));
+            SetStaticLocal("vector_xz", new Func<double, double, Vector>(Vector.vector_xz));
+            SetStaticLocal("print_list", new Action<IEnumerable>(_gameAPI.print_list));
             MethodInfo method = typeof(GameAPI).GetMethod("help", BindingFlags.Public | BindingFlags.Instance);
-            _scope.SetVariable("help", Delegate.CreateDelegate(typeof(GameAPI.__HelpDeleg), _gameAPI, method));
-            _scope.SetVariable("help_all", new Action(_gameAPI.help_all));
-            _scope.SetVariable("list_globals", new Action(_gameAPI.list_globals));
-            _scope.SetVariable("g", _gameAPI);
-            _scope.SetVariable("game", _gameAPI);
+            SetStaticLocal("help", Delegate.CreateDelegate(typeof(GameAPI.__HelpDeleg), _gameAPI, method));
+            SetStaticLocal("help_all", new Action(_gameAPI.help_all));
+            SetStaticLocal("list_globals", new Action(_gameAPI.list_globals));
+            SetStaticLocal("g", _gameAPI);
+            SetStaticLocal("game", _gameAPI);
+        }
+
+        private void SetStaticLocal(Type type)
+        {
+            object obj = DynamicHelpers.GetPythonTypeFromType(type);
+            _scope.SetVariable(type.Name, obj);
+        }
+
+        private void SetStaticLocal(string name, object obj)
+        {
+            _scope.SetVariable(name, obj);
         }
 
         private void PrepareDynamicLocals(InstanceMessage[] arr)
