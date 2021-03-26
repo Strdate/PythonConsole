@@ -180,5 +180,11 @@ namespace PythonConsole
         {
             return ManagersLogic.ConvertResourceCell((int)msg);
         }
+
+        public static object SetNaturalResource(object msg)
+        {
+            ManagersLogic.SetNaturalResource((SetNaturalResourceMessage)msg);
+            return null;
+        }
     }
 }

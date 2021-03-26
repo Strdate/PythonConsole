@@ -101,5 +101,28 @@ namespace PythonConsole
             _base.water = cells[id].m_water;
             return _base;
         }
+
+        public static void SetNaturalResource(SetNaturalResourceMessage data)
+        {
+            ref var cell = ref Singleton<NaturalResourceManager>.instance.m_naturalResources[data.cell_id];
+            switch(data.type) {
+                case "ore":
+                    cell.m_ore = data.value;
+                    cell.m_modified |= 1;
+                    break;
+                case "oil":
+                    cell.m_oil = data.value;
+                    cell.m_modified |= 1;
+                    break;
+                case "fertility":
+                    cell.m_fertility = data.value;
+                    cell.m_modified |= 1;
+                    break;
+                case "pollution":
+                    cell.m_pollution = data.value;
+                    cell.m_modified |= 2;
+                    break;
+            }
+        }
     }
 }

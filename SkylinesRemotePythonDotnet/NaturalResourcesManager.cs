@@ -15,40 +15,43 @@ namespace SkylinesRemotePython
 
         private NaturalResourceCellBase[] _cachedCells;
 
+        // redundant hack - todo remove
+        private Dictionary<int, CellWrapper> _cacheDict = new Dictionary<int, CellWrapper>();
+
         public NaturalResourcesManager(ClientHandler client)
         {
             _client = client;
         }
 
-        public static NaturalResourceCell AtVector(Vector pos)
-        {
-            int num = Clamp((int)(pos.x / 33.75f + 256f), 0, 511);
-            int num2 = Clamp((int)(pos.z / 33.75f + 256f), 0, 511);
-            return new NaturalResourceCell(num2 * 512 + num);
-        }
-
         public void InvalidateCache()
         {
             _cachedCells = null;
+            _cacheDict.Clear();
         }
 
-        public NaturalResourceCellBase FromId(int id)
+        public ref NaturalResourceCellBase FromId(int id)
         {
             if(_cachedCells == null) {
                 if(PythonHelp.NoCache) {
-                   return _client.RemoteCall<NaturalResourceCellBase>(Contracts.GetNaturalResourceCellSingle, id);
+                    if(!_cacheDict.TryGetValue(id, out CellWrapper wrapper)) {
+                        var value = _client.RemoteCall<NaturalResourceCellBase>(Contracts.GetNaturalResourceCellSingle, id);
+                        wrapper = new CellWrapper(value);
+                        _cacheDict[id] = wrapper;
+                    }
+                    return ref wrapper._base;
                 }
                 _cachedCells = _client.RemoteCall<NaturalResourceCellBase[]>(Contracts.GetNaturalResourceCells, null);
             }
-            return _cachedCells[id];
-        }
-
-        private static int Clamp(int val, int min, int max)
-        {
-            if (min > val) return min;
-            else if (val > max) return max;
-            else return val;
+            return ref _cachedCells[id];
         }
     }
 
+    public class CellWrapper
+    {
+        public NaturalResourceCellBase _base;
+        public CellWrapper(NaturalResourceCellBase _base)
+        {
+            this._base = _base;
+        }
+    }
 }

@@ -39,6 +39,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MessagesIn\SetNaturalResourceMessage.cs" />
     <Compile Include="MessagesOut\BuildingMessage.cs" />
     <Compile Include="MessagesIn\CreateBuildingMessage.cs" />
     <Compile Include="MessagesIn\CreateNodeMessage.cs" />

@@ -15,7 +15,7 @@ namespace SkylinesRemotePython.API
         public string type => "point";
 
         [Doc("Returns natural resources and pollution at the point")]
-        public NaturalResourceCell resources => NaturalResourcesManager.AtVector(position);
+        public NaturalResourceCell resources => new NaturalResourceCell(position);
 
         [Doc("Position (Y is height)")]
         public Vector position { get; private set; }

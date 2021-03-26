@@ -30,6 +30,7 @@ namespace SkylinesPythonShared
         public static Contract GetNaturalResourceCells = new Contract() { FuncName = "GetNaturalResourceCells", RetType = "NaturalResourceCellBaseArray" };
         public static Contract GetNaturalResourceCellSingle = new Contract() { FuncName = "GetNaturalResourceCellSingle", RetType = "NaturalResourceCellBase" };
         public static Contract RemoveRenderedObject = new Contract() { FuncName = "RemoveRenderedObject", RetType = null };
+        public static Contract SetNaturalResource = new Contract() { FuncName = "SetNaturalResource", RetType = null };
     }
 
     public class Contract

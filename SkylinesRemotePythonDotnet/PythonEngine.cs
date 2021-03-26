@@ -78,6 +78,7 @@ namespace SkylinesRemotePython
             SetStaticLocal(typeof(Vector));
             SetStaticLocal(typeof(Point));
             SetStaticLocal(typeof(NetOptions));
+            SetStaticLocal(typeof(NaturalResourceCell));
             SetStaticLocal("vector_xz", new Func<double, double, Vector>(Vector.vector_xz));
             SetStaticLocal("print_list", new Action<IEnumerable>(_gameAPI.print_list));
             MethodInfo method = typeof(GameAPI).GetMethod("help", BindingFlags.Public | BindingFlags.Instance);
