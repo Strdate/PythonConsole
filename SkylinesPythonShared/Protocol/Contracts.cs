@@ -27,6 +27,8 @@ namespace SkylinesPythonShared
         public static Contract GetWaterLevel = new Contract() { FuncName = "GetWaterLevel", RetType = "float" };
         public static Contract RenderVector = new Contract() { FuncName = "RenderVector", RetType = "int" };
         public static Contract RenderCircle = new Contract() { FuncName = "RenderCircle", RetType = "int" };
+        public static Contract GetNaturalResourceCells = new Contract() { FuncName = "GetNaturalResourceCells", RetType = "NaturalResourceCellBaseArray" };
+        public static Contract GetNaturalResourceCellSingle = new Contract() { FuncName = "GetNaturalResourceCells", RetType = "NaturalResourceCellBase" };
         public static Contract RemoveRenderedObject = new Contract() { FuncName = "RemoveRenderedObject", RetType = null };
     }
 

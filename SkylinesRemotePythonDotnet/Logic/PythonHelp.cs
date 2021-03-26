@@ -13,6 +13,9 @@ namespace SkylinesRemotePython
     public static class PythonHelp
     {
         [ThreadStatic]
+        public static bool NoCache = false;
+
+        [ThreadStatic]
         private static int toStringRecursionDepth;
 
         public static string RuntimeToString(object obj)
@@ -23,6 +26,7 @@ namespace SkylinesRemotePython
             }
             try {
                 toStringRecursionDepth++;
+                NoCache = true;
                 Type type = obj.GetType();
                 var props = type.GetProperties();
                 var builder = new StringBuilder();
@@ -62,6 +66,7 @@ namespace SkylinesRemotePython
                 result = builder.ToString();
             } finally {
                 toStringRecursionDepth--;
+                NoCache = false;
             }
             return result;
         }

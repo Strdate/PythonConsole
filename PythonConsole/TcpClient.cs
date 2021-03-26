@@ -36,6 +36,11 @@ namespace PythonConsole
             {
                 unzip.ExtractToDirectory(ModInfo.RemotePythonFolder);
             }
+
+            if(ModInfo.DoNotLaunchRemoteConsole.value) {
+                return;
+            }
+
             process = new Process
             {
                 StartInfo = new ProcessStartInfo

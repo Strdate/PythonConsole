@@ -13,6 +13,8 @@ namespace SkylinesRemotePython
     {
         private PythonEngine engine;
 
+        [ThreadStatic]
+        public static ClientHandler Instance;
         public static void Accept(Socket listener, Socket handler)
         {
             ClientHandler client = new ClientHandler(handler);
@@ -21,7 +23,7 @@ namespace SkylinesRemotePython
 
         protected ClientHandler(Socket client) : base(client)
         {
-            
+            Instance = this;
         }
 
         private void HandleClient()

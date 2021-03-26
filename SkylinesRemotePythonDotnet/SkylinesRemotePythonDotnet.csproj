@@ -66,16 +66,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CachedObj.cs" />
+    <Compile Include="Util\CachedObj.cs" />
+    <Compile Include="CachedObjects.cs" />
     <Compile Include="ClientHandler.cs" />
+    <Compile Include="Util\KeyValCache.cs" />
     <Compile Include="Logic\NetLogic.cs" />
     <Compile Include="Logic\NetOptionsUtil.cs" />
     <Compile Include="Logic\PythonHelp.cs" />
+    <Compile Include="NaturalResourcesManager.cs" />
     <Compile Include="PythonAPI\GameAPI.cs" />
     <Compile Include="PythonEngine.cs" />
     <Compile Include="PythonObjects\ApiRefObject.cs" />
     <Compile Include="PythonObjects\Building.cs" />
     <Compile Include="PythonObjects\CitiesObject.cs" />
+    <Compile Include="PythonObjects\NaturalResourceCell.cs" />
     <Compile Include="PythonObjects\NetPrefab.cs" />
     <Compile Include="PythonObjects\Node.cs" />
     <Compile Include="PythonObjects\PathBuilder.cs" />
@@ -86,7 +90,7 @@
     <Compile Include="PythonObjects\Tree.cs" />
     <Compile Include="SkylinesRemotePythonDotnet.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TcpStreamWriter.cs" />
+    <Compile Include="Util\TcpStreamWriter.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

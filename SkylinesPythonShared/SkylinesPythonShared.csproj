@@ -63,10 +63,11 @@
     <Compile Include="Protocol\Attributes.cs" />
     <Compile Include="Protocol\Interfaces.cs" />
     <Compile Include="Protocol\TcpConversation.cs" />
-    <Compile Include="SharedStructures\Bezier.cs" />
-    <Compile Include="SharedStructures\NetOptions.cs" />
-    <Compile Include="SharedStructures\IPositionable.cs" />
-    <Compile Include="SharedStructures\Vector.cs" />
+    <Compile Include="SharedAPIStructures\Bezier.cs" />
+    <Compile Include="SharedAPIStructures\NetOptions.cs" />
+    <Compile Include="SharedAPIStructures\IPositionable.cs" />
+    <Compile Include="SharedAPIStructures\Vector.cs" />
+    <Compile Include="SharedPrivateStructures\NaturalResourceCellBase.cs" />
     <Compile Include="Util.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

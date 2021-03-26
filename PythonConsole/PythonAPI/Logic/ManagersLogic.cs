@@ -1,4 +1,5 @@
-﻿using PythonConsole.MoveIt;
+﻿using ColossalFramework;
+using PythonConsole.MoveIt;
 using SkylinesPythonShared;
 using System;
 using System.Collections.Generic;
@@ -86,6 +87,19 @@ namespace PythonConsole
                 default:
                     throw new Exception($"Cannot move {msg.type}");
             }
+        }
+
+        public static NaturalResourceCellBase ConvertResourceCell(int id)
+        {
+            var cells = Singleton<NaturalResourceManager>.instance.m_naturalResources;
+            NaturalResourceCellBase _base = default;
+            _base.ore = cells[id].m_ore;
+            _base.oil = cells[id].m_oil;
+            _base.forest = cells[id].m_forest;
+            _base.fertility = cells[id].m_fertility;
+            _base.pollution = cells[id].m_pollution;
+            _base.water = cells[id].m_water;
+            return _base;
         }
     }
 }
