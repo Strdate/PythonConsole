@@ -69,7 +69,6 @@
     <Compile Include="Util\CachedObj.cs" />
     <Compile Include="CachedObjects.cs" />
     <Compile Include="ClientHandler.cs" />
-    <Compile Include="Util\KeyValCache.cs" />
     <Compile Include="Logic\NetLogic.cs" />
     <Compile Include="Logic\NetOptionsUtil.cs" />
     <Compile Include="Logic\PythonHelp.cs" />
