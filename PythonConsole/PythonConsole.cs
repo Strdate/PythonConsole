@@ -55,7 +55,13 @@ namespace PythonConsole
                 try {
                     if (State == ConsoleState.Initializing) {
                         _client = TcpClient.CreateClient();
-                        _remoteFuncManager = new RemoteFuncManager(_client);
+                        try {
+                            _remoteFuncManager = new RemoteFuncManager(_client);
+                        } catch(Exception ex) {
+                            PrintAsync("Critical error in the python console mod\n" + ex);
+                            break;
+                        }
+                        
                         State = ConsoleState.Ready;
                         PrintAsync("Python engine ready\n");
                         break;

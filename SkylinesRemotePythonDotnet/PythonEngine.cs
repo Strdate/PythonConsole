@@ -31,7 +31,7 @@ namespace SkylinesRemotePython
             _engine = Python.CreateEngine();
             _scope = _engine.CreateScope();
             _gameAPI = new GameAPI(client, _scope);
-            //_cachedObjects = new CachedObjects(client);
+            _cachedObjects = new CachedObjects(client);
 
             PrepareStaticLocals();
             
@@ -76,7 +76,7 @@ namespace SkylinesRemotePython
         private void PrepareStaticLocals()
         {
             _scope.SetVariable("Vector", DynamicHelpers.GetPythonTypeFromType(typeof(Vector)));
-            //_scope.SetVariable("Point", DynamicHelpers.GetPythonTypeFromType(typeof(Point)));
+            _scope.SetVariable("Point", DynamicHelpers.GetPythonTypeFromType(typeof(Point)));
             _scope.SetVariable("NetOptions", DynamicHelpers.GetPythonTypeFromType(typeof(NetOptions)));
             _scope.SetVariable("vector_xz", new Func<double, double, Vector>(Vector.vector_xz));
             _scope.SetVariable("print_list", new Action<IEnumerable>(_gameAPI.print_list));
