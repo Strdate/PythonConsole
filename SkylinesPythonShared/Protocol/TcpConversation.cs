@@ -39,6 +39,11 @@ namespace SkylinesPythonShared
                 int pointer = 0;
                 while (pointer < adata.Length)
                 {
+                    if(adata.Length - pointer < 4) {
+                        _buffer = new byte[adata.Length - pointer];
+                        Array.Copy(adata, pointer, _buffer, 0, adata.Length - pointer);
+                        break;
+                    }
                     int msgLength = BitConverter.ToInt32(adata, pointer);
                     if (pointer + msgLength + 4 > adata.Length)
                     {
