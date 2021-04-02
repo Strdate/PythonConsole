@@ -190,7 +190,7 @@ namespace SkylinesRemotePython.API
         [Doc("Clears all lines drawn on map")]
         public void clear()
         {
-            client.RemoteVoidCall(Contracts.RemoveRenderedObject, 0);
+            client.RemoteCall<object>(Contracts.RemoveRenderedObject, 0);
         }
 
         [Doc("Prints collection content")]

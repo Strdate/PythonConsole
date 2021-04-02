@@ -190,7 +190,7 @@ namespace PythonConsole
                 if (State == ConsoleState.ScriptRunning || State == ConsoleState.Ready) {
                     while (_simulationQueue.Count > 0) {
                         MessageHeader header = (MessageHeader)_simulationQueue.Dequeue();
-                        _remoteFuncManager.HandleAPICall(header.payload, header.messageType);
+                        _remoteFuncManager.HandleAPICall(header.payload, header.messageType, header.ignoreReturnValue);
                     }
                     if(ExecuteSynchronously) {
                         Thread.Sleep(1);

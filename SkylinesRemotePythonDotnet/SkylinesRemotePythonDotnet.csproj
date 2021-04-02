@@ -66,6 +66,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="PythonAPI\EngineAPI.cs" />
     <Compile Include="Util\CachedObj.cs" />
     <Compile Include="CachedObjects.cs" />
     <Compile Include="ClientHandler.cs" />

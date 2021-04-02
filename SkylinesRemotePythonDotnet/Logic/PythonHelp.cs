@@ -20,6 +20,9 @@ namespace SkylinesRemotePython
 
         public static string RuntimeToString(object obj)
         {
+            if(obj == null) {
+                return "null";
+            }
             string result;
             if(toStringRecursionDepth > 10) {
                 return "???";

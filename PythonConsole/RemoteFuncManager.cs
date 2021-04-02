@@ -25,7 +25,7 @@ namespace PythonConsole
             }
         }
 
-        public void HandleAPICall(object msg, string type)
+        public void HandleAPICall(object msg, string type, bool isAsync)
         {
             object retVal = null;
             TargetInfo info = funcDict[type];
@@ -35,9 +35,13 @@ namespace PythonConsole
             }
             catch(Exception ex)
             {
-                client.SendMessage(ex.Message + " (source: " + info.contract.FuncName + ")", "s_exception");
+                if(isAsync) {
+                    UnityPythonObject.Instance.Print("Async error: " + ex.Message + " (source: " + info.contract.FuncName + ")\n");
+                } else {
+                    client.SendMessage(ex.Message + " (source: " + info.contract.FuncName + ")", "s_exception");
+                }
             }
-            if(info.contract.RetType != null) {
+            if(info.contract.RetType != null && !isAsync) {
                 client.SendMessage(retVal, "s_ret_" + info.contract.RetType);
             }
         }

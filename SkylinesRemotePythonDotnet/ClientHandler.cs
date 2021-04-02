@@ -13,6 +13,8 @@ namespace SkylinesRemotePython
     {
         private PythonEngine engine;
 
+        public bool AsynchronousMode { get; set; }
+
         [ThreadStatic]
         public static ClientHandler Instance;
         public static void Accept(Socket listener, Socket handler)
@@ -73,19 +75,18 @@ namespace SkylinesRemotePython
 
         public T RemoteCall<T>(Contract contract, object parameters)
         {
-            SendMessage(parameters, "c_callfunc_" + contract.FuncName);
+            bool isAsync = AsynchronousMode && contract.CanRunAsync;
+            SendMessage(parameters, "c_callfunc_" + contract.FuncName, isAsync);
+            if(isAsync || contract.RetType == null) {
+                return default(T);
+            }
             MessageHeader retMsg = GetMessage("s_ret_" + contract.RetType);
             return (T)retMsg.payload;
         }
 
-        public void RemoteVoidCall(Contract contract, object parameters)
+        public override void SendMessage(object obj, string type, bool ignoreReturnValue = false)
         {
-            SendMessage(parameters, "c_callfunc_" + contract.FuncName);
-        }
-
-        public override void SendMessage(object obj, string type)
-        {
-            base.SendMessage(obj, type);
+            base.SendMessage(obj, type, ignoreReturnValue);
 #if DEBUG
             Console.WriteLine("Out: " + type);
 #endif

@@ -22,16 +22,20 @@ namespace SkylinesRemotePython
 
         private ScriptEngine _engine;
         private ScriptScope _scope;
-        private GameAPI _gameAPI;
         private CachedObjects _cachedObjects;
+
+        private GameAPI _gameAPI;
+        private EngineAPI _engineAPI;
 
         public PythonEngine(ClientHandler client)
         {
             this.client = client;
             _engine = Python.CreateEngine();
             _scope = _engine.CreateScope();
-            _gameAPI = new GameAPI(client, _scope);
             _cachedObjects = new CachedObjects(client);
+
+            _gameAPI = new GameAPI(client, _scope);
+            _engineAPI = new EngineAPI(client);
 
             PrepareStaticLocals();
             
@@ -87,6 +91,7 @@ namespace SkylinesRemotePython
             SetStaticLocal("list_globals", new Action(_gameAPI.list_globals));
             SetStaticLocal("g", _gameAPI);
             SetStaticLocal("game", _gameAPI);
+            SetStaticLocal("engine", _engineAPI);
         }
 
         private void SetStaticLocal(Type type)
