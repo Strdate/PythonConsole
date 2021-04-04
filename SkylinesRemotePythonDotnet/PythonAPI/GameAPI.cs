@@ -8,6 +8,7 @@ using System.Text;
 
 namespace SkylinesRemotePython.API
 {
+    [Singleton("game")]
     [Doc("Contains basic set of functions for interaction with Cities:Skylines")]
     public class GameAPI
     {
@@ -213,6 +214,12 @@ namespace SkylinesRemotePython.API
         public void help_all()
         {
             string text = PythonHelp.DumpDoc();
+            client.SendMessage(text, "c_output_message");
+        }
+
+        public void help_markdown()
+        {
+            string text = PythonHelp.DumpDoc(true);
             client.SendMessage(text, "c_output_message");
         }
 

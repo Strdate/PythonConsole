@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace SkylinesRemotePython.API
 {
+    [Singleton("engine")]
     [Doc("Contains a set of functions to control the python engine")]
     public class EngineAPI
     {

@@ -14,6 +14,16 @@ namespace SkylinesPythonShared
         }
     }
 
+    public class SingletonAttribute : System.Attribute
+    {
+        public string Variable { get; private set; }
+
+        public SingletonAttribute(string variable)
+        {
+            this.Variable = variable;
+        }
+    }
+
     public class ToStringIgnoreAttribute : System.Attribute
     {
     }

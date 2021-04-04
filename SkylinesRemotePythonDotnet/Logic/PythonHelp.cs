@@ -74,12 +74,15 @@ namespace SkylinesRemotePython
             return result;
         }
 
-        public static string GetHelp(object obj)
+        public static string GetHelp(object obj, bool markdown = false)
         {
             Type type = obj is PythonType pt ? pt.__clrtype__() : (obj is Type tp ? tp : obj.GetType());
             
             var classAtr = (DocAttribute)type.GetCustomAttribute(typeof(DocAttribute));
-            string classText = classAtr != null ? classAtr.Description + "\n\n" : "";
+            string classText = classAtr != null ? classAtr.Description : null;
+
+            var singletonAtr = (SingletonAttribute)type.GetCustomAttribute(typeof(SingletonAttribute));
+            string namePrefix = singletonAtr != null ? singletonAtr.Variable + "." : "";
 
             var methods = type.GetMethods();
             var methodSet = new SortedDictionary<string,string>();
@@ -88,9 +91,16 @@ namespace SkylinesRemotePython
                 if(atrs.Length > 0) {
                     DocAttribute atr = atrs[0] as DocAttribute;
                     bool isVoid = method.ReturnType == typeof(void);
-                    string text = (type == typeof(GameAPI) ? "game." : "") + method.Name + "(" + FormatParams(method) + ")" + (isVoid ? "" : ": " + method.ReturnType.Name) + " - " + atr.Description;
-                    string textPrefix = (method.IsStatic ? "static " : "") + text;
-                    methodSet.Add(text, textPrefix);
+                    string text;
+                    string textWithPrefix;
+                    if(markdown) {
+                        text = "`" + namePrefix + method.Name + "(" + FormatParams(method) + ")`" + (isVoid ? "" : ": " + FormatClassLink(method.ReturnType, markdown)) + " - " + atr.Description;
+                        textWithPrefix = "* " + (method.IsStatic ? "static " : "") + text;
+                    } else {
+                        text = namePrefix + method.Name + "(" + FormatParams(method) + ")" + (isVoid ? "" : ": " + method.ReturnType.Name) + " - " + atr.Description;
+                        textWithPrefix = (method.IsStatic ? "static " : "") + text;
+                    }
+                    methodSet.Add(text, textWithPrefix);
                 }
             }
 
@@ -99,8 +109,16 @@ namespace SkylinesRemotePython
                 var atrs = ctor.GetCustomAttributes(typeof(DocAttribute), true);
                 if (atrs.Length > 0) {
                     DocAttribute atr = atrs[0] as DocAttribute;
-                    string text = ctor.Name + "(" + FormatParams(ctor) + ")" + " - " + atr.Description;
-                    methodSet.Add(text, "static " + text);
+                    string text;
+                    string textWithPrefix;
+                    if (markdown) {
+                        text = "`" + namePrefix + ctor.Name + "(" + FormatParams(ctor) + ")`" + " - " + atr.Description;
+                        textWithPrefix = "* static " + text;
+                    } else {
+                        text = namePrefix + ctor.Name + "(" + FormatParams(ctor) + ")" + " - " + atr.Description;
+                        textWithPrefix = "static " + text;
+                    }
+                    methodSet.Add(text, textWithPrefix);
                 }
             }
 
@@ -111,14 +129,52 @@ namespace SkylinesRemotePython
                 if (atrs.Length > 0) {
                     DocAttribute atr = atrs[0] as DocAttribute;
                     bool hasSetter = prop.GetSetMethod() != null;
-                    string text = (type == typeof(GameAPI) ? "game." : "") + prop.Name + ": " + prop.PropertyType.Name + " " + (hasSetter ? "(get/set) " : "" ) + "- " + atr.Description;
-                    string textPrefix = (prop.GetGetMethod().IsStatic ? "static " : "") + text;
-                    propSet.Add(text, textPrefix);
+                    string text;
+                    string textWithPrefix;
+                    if (markdown) {
+                        text = "`" + namePrefix + prop.Name + "`: " + FormatClassLink(prop.PropertyType, markdown) + " " + (hasSetter ? "(get/set) " : "") + "- " + atr.Description;
+                        textWithPrefix = "* " + (prop.GetGetMethod().IsStatic ? "static " : "") + text;
+                    } else {
+                        text = namePrefix + prop.Name + ": " + prop.PropertyType.Name + " " + (hasSetter ? "(get/set) " : "") + "- " + atr.Description;
+                        textWithPrefix = (prop.GetGetMethod().IsStatic ? "static " : "") + text;
+                    }
+                    propSet.Add(text, textWithPrefix);
                 }
             }
 
-            return "\n====\nHelp (" + type.Name + ")\n====\n\n" + classText + (methodSet.Count > 0 ? "Methods:\n" + SortedSetToString(methodSet) : "")
-                + (propSet.Count > 0 ? "\nProperties:\n" + SortedSetToString(propSet) + "\n": "");
+            return FormatClassHeader(type.Name, classText, markdown) + (methodSet.Count > 0 ? FormatH4("Methods:", markdown) + SortedSetToString(methodSet) : "")
+                + (propSet.Count > 0 ? FormatH4("Properties:",markdown) + SortedSetToString(propSet) : "");
+        }
+
+        private static string FormatClassLink(Type type, bool markdown)
+        {
+            if(markdown) {
+                if(type.Namespace == "SkylinesRemotePython.API" || type.Namespace == "SkylinesPythonShared.API") {
+                    return $"[`{type.Name}`](#Class-{type.Name})";
+                } else {
+                    return $"`{type.Name}`";
+                }
+            } else {
+                return type.Name;
+            }
+        }
+
+        private static string FormatClassHeader(string className, string classDescription, bool markdown)
+        {
+            if(markdown) {
+                return $"## Class {className}\n\n{(classDescription != null ? classDescription + "\n\n" : "")}";
+            } else {
+                return $"\n====\nHelp - {className}\n====\n\n{(classDescription != null ? classDescription + "\n\n" : "")}";
+            }
+        }
+
+        private static string FormatH4(string header, bool markdown)
+        {
+            if(markdown) {
+                return $"#### {header}\n\n";
+            } else {
+                return $"{header}\n";
+            }
         }
 
         public static string PrintList(IEnumerable collection)
@@ -126,17 +182,17 @@ namespace SkylinesRemotePython
             return "[" + string.Join(", ", Enumerable.ToArray<object>(collection.Cast<object>())) + "]\n" ;
         }
 
-        public static string DumpDoc()
+        public static string DumpDoc(bool markdown = false)
         {
-            return DumpDocInAssembly(Assembly.GetExecutingAssembly()) + DumpDocInAssembly(Assembly.Load("SkylinesPythonShared"));
+            return DumpDocInAssembly(Assembly.GetExecutingAssembly(), markdown) + DumpDocInAssembly(Assembly.Load("SkylinesPythonShared"), markdown);
         }
 
-        private static string DumpDocInAssembly(Assembly assembly)
+        private static string DumpDocInAssembly(Assembly assembly, bool markdown = false)
         {
             StringBuilder b = new StringBuilder();
             foreach (Type type in assembly.GetTypes()) {
                 if (type.GetCustomAttribute(typeof(DocAttribute), true) != null) {
-                    b.AppendLine(GetHelp(type));
+                    b.AppendLine(GetHelp(type, markdown));
                 }
             }
             return b.ToString();
@@ -155,7 +211,7 @@ namespace SkylinesRemotePython
             foreach(var pair in dict) {
                 strB.AppendLine(pair.Value);
             }
-            return strB.ToString();
+            return strB.ToString() + "\n";
         }
 
         private static string Repeat(string value, int count)
