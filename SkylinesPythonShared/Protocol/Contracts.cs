@@ -32,6 +32,10 @@ namespace SkylinesPythonShared
         public static Contract RemoveRenderedObject = new Contract() { FuncName = "RemoveRenderedObject", RetType = null };
         public static Contract SetNaturalResource = new Contract() { FuncName = "SetNaturalResource", RetType = null };
         public static Contract GetTreesStartingFromIndex = new Contract() { FuncName = "GetTreesStartingFromIndex", RetType = "BatchTreeMessage", IsBackgroundAsync = true };
+        public static Contract GetPropsStartingFromIndex = new Contract() { FuncName = "GetPropsStartingFromIndex", RetType = "BatchPropMessage", IsBackgroundAsync = true };
+        public static Contract GetBuildingsStartingFromIndex = new Contract() { FuncName = "GetBuildingsStartingFromIndex", RetType = "BatchBuildingsMessage", IsBackgroundAsync = true };
+        public static Contract GetNodesStartingFromIndex = new Contract() { FuncName = "GetNodesStartingFromIndex", RetType = "BatchNodeMessage", IsBackgroundAsync = true };
+        public static Contract GetSegmentsStartingFromIndex = new Contract() { FuncName = "GetSegmentsStartingFromIndex", RetType = "BatchSegmentMessage", IsBackgroundAsync = true };
     }
 
     public class Contract

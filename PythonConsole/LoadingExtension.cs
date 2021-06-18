@@ -20,9 +20,11 @@ namespace PythonConsole
             {
                 UnityPythonObject.Instance = new GameObject("UnityPythonObject").AddComponent<UnityPythonObject>();
             }
-            var selectionToolGo = new GameObject("SelectionToolControl");
-            selectionToolGo.transform.parent = UnityPythonObject.Instance.transform;
-            selectionToolGo.AddComponent<SelectionToolControl>();
+            if(!GameObject.FindObjectOfType<SelectionTool>()) {
+                var selectionToolGo = new GameObject("SelectionToolControlPython");
+                selectionToolGo.transform.parent = UnityPythonObject.Instance.transform;
+                selectionToolGo.AddComponent<SelectionToolControl>();
+            }
         }
 
         public void OnLevelUnloading()
@@ -30,10 +32,10 @@ namespace PythonConsole
             try {
                 UnityPythonObject.Instance.scriptEditor.Visible = false;
             } catch { }
-            var go = UnityEngine.Object.FindObjectOfType<SelectionToolControl>();
+            /*var go = UnityEngine.Object.FindObjectOfType<SelectionToolControl>();
             if (go != null) {
                 UnityEngine.Object.Destroy(go);
-            }
+            }*/
             PythonConsole.KillInstance();
         }
 

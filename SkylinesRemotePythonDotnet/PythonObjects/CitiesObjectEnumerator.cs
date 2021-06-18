@@ -18,7 +18,7 @@ namespace SkylinesRemotePython.API
 
     public class CitiesObjectEnumerator<T, K> : IEnumerator where T : CitiesObject where K : InstanceMessage
     {
-        private T[] treeBuffer = new T[0];
+        private T[] buffer = new T[0];
         private int pointer = -1;
         private uint gamePointer;
         private bool endOfStream;
@@ -29,16 +29,16 @@ namespace SkylinesRemotePython.API
             return (obj) => {
                 handle = -1;
                 var batch = (BatchObjectMessage)obj;
-                var trees = MsgToTrees(batch);
-                var newTrees = new T[treeBuffer.Length + trees.Length - pointer];
-                Array.Copy(treeBuffer, pointer, newTrees, 0, treeBuffer.Length - pointer);
-                Array.Copy(trees, 0, newTrees, treeBuffer.Length - pointer, trees.Length);
-                treeBuffer = newTrees;
+                var citiesObjects = MsgToCitiesObject(batch);
+                var newObjects = new T[buffer.Length + citiesObjects.Length - pointer];
+                Array.Copy(buffer, pointer, newObjects, 0, buffer.Length - pointer);
+                Array.Copy(citiesObjects, 0, newObjects, buffer.Length - pointer, citiesObjects.Length);
+                buffer = newObjects;
                 pointer = 0;
             };
         }
 
-        private T[] MsgToTrees(BatchObjectMessage msg)
+        private T[] MsgToCitiesObject(BatchObjectMessage msg)
         {
             gamePointer = msg.lastVisitedIndex;
             endOfStream = msg.endOfStream;
@@ -49,33 +49,53 @@ namespace SkylinesRemotePython.API
         private T CreeateObject(K msg, GameAPI api)
         {
             // let me die
-            if(typeof(T) == typeof(Tree)) {
+            if(typeof(T) == typeof(Prop)) {
+                return (T)(object)new Prop((PropMessage)(object)msg, api);
+            } else if (typeof(T) == typeof(Tree)) {
                 return (T)(object)new Tree((TreeMessage)(object)msg, api);
+            } else if (typeof(T) == typeof(Building)) {
+                return (T)(object)new Building((BuildingMessage)(object)msg, api);
+            } else if (typeof(T) == typeof(Node)) {
+                return (T)(object)new Node((NetNodeMessage)(object)msg, api);
+            } else if (typeof(T) == typeof(Segment)) {
+                return (T)(object)new Segment((NetSegmentMessage)(object)msg, api);
             }
-            return null;
+            throw new Exception("Engine error (report to developers). Cannot convert unknown type to CitiesObject");
         }
 
-        public CitiesObjectEnumerator() {
-            
+        private Contract GetContract()
+        {
+            if (typeof(T) == typeof(Prop)) {
+                return Contracts.GetPropsStartingFromIndex;
+            } else if (typeof(T) == typeof(Tree)) {
+                return Contracts.GetTreesStartingFromIndex;
+            } else if (typeof(T) == typeof(Building)) {
+                return Contracts.GetBuildingsStartingFromIndex;
+            } else if (typeof(T) == typeof(Node)) {
+                return Contracts.GetNodesStartingFromIndex;
+            } else if (typeof(T) == typeof(Segment)) {
+                return Contracts.GetSegmentsStartingFromIndex;
+            }
+            throw new Exception("Engine error (report to developers). Cannot convert unknown type to CitiesObject");
         }
 
-        public object Current => treeBuffer[pointer];
+        public object Current => buffer[pointer];
 
         public bool MoveNext()
         {
             pointer++;
-            if(pointer >= treeBuffer.Length) {
+            if(pointer >= buffer.Length) {
                 if(endOfStream) {
                     return false;
                 } else {
                     if(handle == -1) {
-                        handle = AsyncCallbackHandler.Instance.Call(GetCallbackMethod(), Contracts.GetTreesStartingFromIndex, gamePointer);
+                        handle = AsyncCallbackHandler.Instance.Call(GetCallbackMethod(), GetContract(), gamePointer);
                     }
                     AsyncCallbackHandler.Instance.WaitOnHandle(handle);
                 }
             }
-            if(treeBuffer.Length - pointer < 100 && handle == -1 && !endOfStream) {
-                handle = AsyncCallbackHandler.Instance.Call(GetCallbackMethod(), Contracts.GetTreesStartingFromIndex, gamePointer);
+            if(buffer.Length - pointer < 100 && handle == -1 && !endOfStream) {
+                handle = AsyncCallbackHandler.Instance.Call(GetCallbackMethod(), GetContract(), gamePointer);
             }
             return true;
         }

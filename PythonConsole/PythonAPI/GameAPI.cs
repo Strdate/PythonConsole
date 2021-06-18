@@ -21,11 +21,6 @@ namespace PythonConsole
             return ManagersLogic.PrepareTree((uint)((uint)msg));
         }
 
-        public static object GetTreesStartingFromIndex(object msg)
-        {
-            return ManagersLogic.PrepareTreesStartingFromIndex((uint)((uint)msg));
-        }
-
         public static object GetBuildingFromId(object msg)
         {
             return ManagersLogic.PrepareBuilding((ushort)((uint)msg));
@@ -39,6 +34,32 @@ namespace PythonConsole
         {
             return NetLogic.PrepareSegment((ushort)((uint)msg));
         }
+
+        public static object GetTreesStartingFromIndex(object msg)
+        {
+            return ManagersLogic.PrepareTreesStartingFromIndex((uint)((uint)msg));
+        }
+
+        public static object GetPropsStartingFromIndex(object msg)
+        {
+            return ManagersLogic.PreparePropsStartingFromIndex((ushort)((uint)msg));
+        }
+
+        public static object GetBuildingsStartingFromIndex(object msg)
+        {
+            return ManagersLogic.PrepareBuildingsStartingFromIndex((ushort)((uint)msg));
+        }
+
+        public static object GetNodesStartingFromIndex(object msg)
+        {
+            return NetLogic.PrepareNodesStartingFromIndex((ushort)((uint)msg));
+        }
+
+        public static object GetSegmentsStartingFromIndex(object msg)
+        {
+            return NetLogic.PrepareSegmentsStartingFromIndex((ushort)((uint)msg));
+        }
+
         public static object CreateProp(object msg)
         {
             var data = (CreatePropMessage)msg;
