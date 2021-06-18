@@ -21,6 +21,11 @@ namespace PythonConsole
             return ManagersLogic.PrepareTree((uint)((uint)msg));
         }
 
+        public static object GetTreesStartingFromIndex(object msg)
+        {
+            return ManagersLogic.PrepareTreesStartingFromIndex((uint)((uint)msg));
+        }
+
         public static object GetBuildingFromId(object msg)
         {
             return ManagersLogic.PrepareBuilding((ushort)((uint)msg));

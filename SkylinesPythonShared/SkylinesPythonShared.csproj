@@ -40,6 +40,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MessagesIn\SetNaturalResourceMessage.cs" />
+    <Compile Include="MessagesOut\BatchObjectMessage.cs" />
     <Compile Include="MessagesOut\BuildingMessage.cs" />
     <Compile Include="MessagesIn\CreateBuildingMessage.cs" />
     <Compile Include="MessagesIn\CreateNodeMessage.cs" />
@@ -47,6 +48,7 @@
     <Compile Include="MessagesIn\CreateSegmentMessage.cs" />
     <Compile Include="MessagesIn\CreateTreeMessage.cs" />
     <Compile Include="MessagesIn\DeleteObjectMessage.cs" />
+    <Compile Include="Messages\AsyncCallbackMessage.cs" />
     <Compile Include="Messages\InstanceMessage.cs" />
     <Compile Include="Messages\MessageHeader.cs" />
     <Compile Include="MessagesIn\MoveMessage.cs" />

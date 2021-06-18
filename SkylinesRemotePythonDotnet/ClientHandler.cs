@@ -47,37 +47,45 @@ namespace SkylinesRemotePython
             }
         }
 
-        public MessageHeader GetMessage(string assertedType = null)
+        public MessageHeader GetMessage(string assertedType = null, bool waitingForBackgroundCallback = false)
         {
-            MessageHeader msg = AwaitMessage();
+            while(true) {
+                MessageHeader msg = AwaitMessage();
 #if DEBUG
             Console.WriteLine("In: " + msg.messageType);
 #endif
+                if (msg.messageType == "async_callback") {
+                    engine._asyncCallbackHandler.HandleAsyncCallback(msg);
+                    if(waitingForBackgroundCallback) {
+                        return msg;
+                    }
+                    continue;
+                }
 
-            if (msg.messageType == "s_script_abort") {
-                Console.WriteLine("Abort script");
-                throw new AbortScriptException();
+                if (msg.messageType == "s_script_abort") {
+                    Console.WriteLine("Abort script");
+                    throw new AbortScriptException();
+                }
+
+                if (msg.messageType == "s_exception") {
+                    string text = (string)msg.payload;
+                    Console.WriteLine("Exception: " + text);
+                    throw new Exception(text);
+                }
+
+                if (assertedType != null && assertedType != msg.messageType) {
+                    throw new Exception("Invalid return message: expected '" + assertedType + "' but received '" + msg.messageType + "'");
+                }
+
+                return msg;
             }
-
-            if (msg.messageType == "s_exception")
-            {
-                string text = (string)msg.payload;
-                Console.WriteLine("Exception: " + text);
-                throw new Exception(text);
-            }
-
-            if (assertedType != null && assertedType != msg.messageType) {
-                throw new Exception("Invalid return message: expected '" + assertedType + "' but received '" + msg.messageType + "'");
-            }
-
-            return msg;
         }
 
         public T RemoteCall<T>(Contract contract, object parameters)
         {
             bool isAsync = AsynchronousMode && contract.CanRunAsync;
             SendMessage(parameters, "c_callfunc_" + contract.FuncName, isAsync);
-            if(isAsync || contract.RetType == null) {
+            if(isAsync || contract.RetType == null || contract.IsBackgroundAsync) {
                 return default(T);
             }
             MessageHeader retMsg = GetMessage("s_ret_" + contract.RetType);

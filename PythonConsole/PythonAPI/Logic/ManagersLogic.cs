@@ -37,6 +37,30 @@ namespace PythonConsole
             };
         }
 
+        public static BatchObjectMessage PrepareTreesStartingFromIndex(uint id)
+        {
+            var buffer = ManagersUtil.TreeManager.m_trees.m_buffer;
+            var resultArray = new TreeMessage[500];
+            int resultArrayIndex = 0;
+            bool endOfStream = true;
+            uint i;
+            for (i = id; i < buffer.Length; i++) {
+                if(ManagersUtil.ExistsTree(i)) {
+                    resultArray[resultArrayIndex] = PrepareTree(i);
+                    resultArrayIndex++;
+                    if(resultArrayIndex == 500) {
+                        endOfStream = false;
+                        break;
+                    }
+                }
+            }
+            return new BatchObjectMessage() {
+                array = resultArray,
+                endOfStream = endOfStream,
+                lastVisitedIndex = i
+            };
+        }
+
         public static BuildingMessage PrepareBuilding(ushort id)
         {
             if (!ManagersUtil.ExistsBuilding(id)) {

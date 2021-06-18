@@ -35,6 +35,12 @@ namespace SkylinesRemotePython.API
             return new Tree(client.RemoteCall<TreeMessage>(Contracts.GetTreeFromId, (uint)id), this);
         }
 
+        [Doc("todo")]
+        public CitiesObjectEnumerable<Tree> trees()
+        {
+            return new CitiesObjectEnumerable<Tree>();
+        }
+
         [Doc("Returns building object from its id")]
         public Building get_building(int id)
         {

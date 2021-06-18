@@ -1,4 +1,5 @@
 ﻿using SkylinesPythonShared;
+using SkylinesPythonShared.Messages;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,7 +32,11 @@ namespace PythonConsole
             TargetInfo info = funcDict[type];
             try
             {
-                retVal = info.method(msg);
+                if(info.contract.IsBackgroundAsync) {
+                    retVal = info.method(((AsyncCallbackMessage)msg).payload);
+                } else {
+                    retVal = info.method(msg);
+                }
             }
             catch(Exception ex)
             {
@@ -40,6 +45,12 @@ namespace PythonConsole
                 } else {
                     client.SendMessage(ex.Message + " (source: " + info.contract.FuncName + ")", "s_exception");
                 }
+            }
+            if(info.contract.IsBackgroundAsync) {
+                var amsg = new AsyncCallbackMessage();
+                amsg.callbackObjectKey = ((AsyncCallbackMessage)msg).callbackObjectKey;
+                amsg.payload = retVal;
+                client.SendMessage(amsg, "s_ret_" + info.contract.RetType);
             }
             if(info.contract.RetType != null && !isAsync) {
                 client.SendMessage(retVal, "s_ret_" + info.contract.RetType);
