@@ -29,11 +29,17 @@ namespace SkylinesRemotePython.API
             return new Prop(client.RemoteCall<PropMessage>(Contracts.GetPropFromId, (uint)id), this);
         }
 
+        [Doc("Returns prop iterator (can be used only in for loop)")]
+        public CitiesObjectEnumerable<Prop, PropMessage> props => new CitiesObjectEnumerable<Prop, PropMessage>();
+
         [Doc("Returns tree object from its id")]
         public Tree get_tree(long id)
         {
             return new Tree(client.RemoteCall<TreeMessage>(Contracts.GetTreeFromId, (uint)id), this);
         }
+
+        [Doc("Returns tree iterator (can be used only in for loop)")]
+        public CitiesObjectEnumerable<Tree, TreeMessage> trees => new CitiesObjectEnumerable<Tree, TreeMessage>();
 
         [Doc("Returns building object from its id")]
         public Building get_building(int id)
@@ -41,14 +47,23 @@ namespace SkylinesRemotePython.API
             return new Building(client.RemoteCall<BuildingMessage>(Contracts.GetBuildingFromId, (uint)id), this);
         }
 
+        [Doc("Returns building iterator (can be used only in for loop)")]
+        public CitiesObjectEnumerable<Building, BuildingMessage> buildings => new CitiesObjectEnumerable<Building, BuildingMessage>();
+
         [Doc("Returns node object from its id")]
         public Node get_node(int id) => Node.GetNetNode((uint)id, this);
+
+        [Doc("Returns node iterator (can be used only in for loop)")]
+        public CitiesObjectEnumerable<Node, NetNodeMessage> nodes => new CitiesObjectEnumerable<Node, NetNodeMessage>();
 
         [Doc("Returns segment object from its id")]
         public Segment get_segment(int id)
         {
             return new Segment(client.RemoteCall<NetSegmentMessage>(Contracts.GetSegmentFromId, (uint)id), this);
         }
+
+        [Doc("Returns segment iterator (can be used only in for loop)")]
+        public CitiesObjectEnumerable<Segment, NetSegmentMessage> segments => new CitiesObjectEnumerable<Segment, NetSegmentMessage>();
 
         [Doc("Creates prop")]
         public Prop create_prop(IPositionable position, string prefab_name, double angle = 0)

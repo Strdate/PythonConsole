@@ -150,6 +150,66 @@ namespace PythonConsole
             };
         }
 
+        public static BatchObjectMessage PrepareNodesStartingFromIndex(ushort id)
+        {
+            var buffer = NetUtil.Manager.m_nodes.m_buffer;
+            var resultArray = new NetNodeMessage[500];
+            int resultArrayIndex = 0;
+            bool endOfStream = true;
+            ushort i;
+            for (i = id; i < buffer.Length; i++) {
+                if (NetUtil.ExistsNode(i)) {
+                    resultArray[resultArrayIndex] = PrepareNode(i);
+                    resultArrayIndex++;
+                    if (resultArrayIndex == 500) {
+                        endOfStream = false;
+                        break;
+                    }
+                }
+                if (i == ushort.MaxValue) {
+                    break;
+                }
+            }
+            if (endOfStream) {
+                Array.Resize(ref resultArray, resultArrayIndex);
+            }
+            return new BatchObjectMessage() {
+                array = resultArray,
+                endOfStream = endOfStream,
+                lastVisitedIndex = i
+            };
+        }
+
+        public static BatchObjectMessage PrepareSegmentsStartingFromIndex(ushort id)
+        {
+            var buffer = NetUtil.Manager.m_segments.m_buffer;
+            var resultArray = new NetSegmentMessage[500];
+            int resultArrayIndex = 0;
+            bool endOfStream = true;
+            ushort i;
+            for (i = id; i < buffer.Length; i++) {
+                if (NetUtil.ExistsSegment(i)) {
+                    resultArray[resultArrayIndex] = PrepareSegment(i);
+                    resultArrayIndex++;
+                    if (resultArrayIndex == 500) {
+                        endOfStream = false;
+                        break;
+                    }
+                }
+                if (i == ushort.MaxValue) {
+                    break;
+                }
+            }
+            if (endOfStream) {
+                Array.Resize(ref resultArray, resultArrayIndex);
+            }
+            return new BatchObjectMessage() {
+                array = resultArray,
+                endOfStream = endOfStream,
+                lastVisitedIndex = i
+            };
+        }
+
         public static NetPrefabMessage PrepareNetInfo(string name)
         {
             NetInfo info = PrefabCollection<NetInfo>.FindLoaded(name);

@@ -88,7 +88,9 @@ namespace SkylinesRemotePython.API
                 type = type,
                 keep_nodes = keep_nodes
             });
-            refresh();
+            if (!api.client.AsynchronousMode) {
+                refresh();
+            }
             return deleted;
         }
 

@@ -24,18 +24,25 @@ namespace SkylinesRemotePython
         private ScriptScope _scope;
         private CachedObjects _cachedObjects;
 
-        private GameAPI _gameAPI;
         private EngineAPI _engineAPI;
+
+        internal GameAPI _gameAPI { get; private set; }
+        internal AsyncCallbackHandler _asyncCallbackHandler { get; private set; }
+
+        [ThreadStatic]
+        internal static PythonEngine Instance;
 
         public PythonEngine(ClientHandler client)
         {
             this.client = client;
+            Instance = this;
             _engine = Python.CreateEngine();
             _scope = _engine.CreateScope();
             _cachedObjects = new CachedObjects(client);
 
             _gameAPI = new GameAPI(client, _scope);
             _engineAPI = new EngineAPI(client);
+            _asyncCallbackHandler = new AsyncCallbackHandler(client);
 
             PrepareStaticLocals();
             

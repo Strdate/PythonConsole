@@ -51,6 +51,96 @@ namespace PythonConsole
             };
         }
 
+        public static BatchObjectMessage PreparePropsStartingFromIndex(ushort id)
+        {
+            var buffer = ManagersUtil.PropManager.m_props.m_buffer;
+            var resultArray = new PropMessage[500];
+            int resultArrayIndex = 0;
+            bool endOfStream = true;
+            ushort i;
+            for (i = id; i < buffer.Length; i++) {
+                if (ManagersUtil.ExistsProp(i)) {
+                    resultArray[resultArrayIndex] = PrepareProp(i);
+                    resultArrayIndex++;
+                    if (resultArrayIndex == 500) {
+                        endOfStream = false;
+                        break;
+                    }
+                }
+                if(i == ushort.MaxValue) {
+                    break;
+                }
+            }
+            if (endOfStream) {
+                Array.Resize(ref resultArray, resultArrayIndex);
+            }
+            return new BatchObjectMessage() {
+                array = resultArray,
+                endOfStream = endOfStream,
+                lastVisitedIndex = i
+            };
+        }
+
+        public static BatchObjectMessage PrepareTreesStartingFromIndex(uint id)
+        {
+            var buffer = ManagersUtil.TreeManager.m_trees.m_buffer;
+            var resultArray = new TreeMessage[500];
+            int resultArrayIndex = 0;
+            bool endOfStream = true;
+            uint i;
+            for (i = id; i < buffer.Length; i++) {
+                if (ManagersUtil.ExistsTree(i)) {
+                    resultArray[resultArrayIndex] = PrepareTree(i);
+                    resultArrayIndex++;
+                    if (resultArrayIndex == 500) {
+                        endOfStream = false;
+                        break;
+                    }
+                }
+                if (i == uint.MaxValue) {
+                    break;
+                }
+            }
+            if (endOfStream) {
+                Array.Resize(ref resultArray, resultArrayIndex);
+            }
+            return new BatchObjectMessage() {
+                array = resultArray,
+                endOfStream = endOfStream,
+                lastVisitedIndex = i
+            };
+        }
+
+        public static BatchObjectMessage PrepareBuildingsStartingFromIndex(ushort id)
+        {
+            var buffer = ManagersUtil.BuildingManager.m_buildings.m_buffer;
+            var resultArray = new BuildingMessage[500];
+            int resultArrayIndex = 0;
+            bool endOfStream = true;
+            ushort i;
+            for (i = id; i < buffer.Length; i++) {
+                if (ManagersUtil.ExistsBuilding(i)) {
+                    resultArray[resultArrayIndex] = PrepareBuilding(i);
+                    resultArrayIndex++;
+                    if (resultArrayIndex == 500) {
+                        endOfStream = false;
+                        break;
+                    }
+                }
+                if (i == ushort.MaxValue) {
+                    break;
+                }
+            }
+            if (endOfStream) {
+                Array.Resize(ref resultArray, resultArrayIndex);
+            }
+            return new BatchObjectMessage() {
+                array = resultArray,
+                endOfStream = endOfStream,
+                lastVisitedIndex = i
+            };
+        }
+
         public static InstanceMessage Move(MoveMessage msg)
         {
             switch (msg.type) {
