@@ -50,9 +50,8 @@ namespace PythonConsole
                 var amsg = new AsyncCallbackMessage();
                 amsg.callbackObjectKey = ((AsyncCallbackMessage)msg).callbackObjectKey;
                 amsg.payload = retVal;
-                client.SendMessage(amsg, "s_ret_" + info.contract.RetType);
-            }
-            if(info.contract.RetType != null && !isAsync) {
+                client.SendMessage(amsg, "async_callback");
+            } else if(info.contract.RetType != null && !isAsync) {
                 client.SendMessage(retVal, "s_ret_" + info.contract.RetType);
             }
         }

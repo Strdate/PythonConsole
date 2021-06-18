@@ -54,6 +54,9 @@ namespace PythonConsole
                     }
                 }
             }
+            if(endOfStream) {
+                Array.Resize(ref resultArray, resultArrayIndex);
+            }
             return new BatchObjectMessage() {
                 array = resultArray,
                 endOfStream = endOfStream,

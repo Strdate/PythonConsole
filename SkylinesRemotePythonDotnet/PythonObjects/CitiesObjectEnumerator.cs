@@ -41,6 +41,7 @@ namespace SkylinesRemotePython.API
         private T[] MsgToTrees(BatchObjectMessage msg)
         {
             gamePointer = msg.lastVisitedIndex;
+            endOfStream = msg.endOfStream;
             var api = PythonEngine.Instance._gameAPI;
             return msg.array.Select((obj) => CreeateObject((K)obj, api)).ToArray();
         }
@@ -58,7 +59,7 @@ namespace SkylinesRemotePython.API
             
         }
 
-        public object Current => throw new NotImplementedException();
+        public object Current => treeBuffer[pointer];
 
         public bool MoveNext()
         {
@@ -73,7 +74,7 @@ namespace SkylinesRemotePython.API
                     AsyncCallbackHandler.Instance.WaitOnHandle(handle);
                 }
             }
-            if(treeBuffer.Length - pointer < 100 && handle == -1) {
+            if(treeBuffer.Length - pointer < 100 && handle == -1 && !endOfStream) {
                 handle = AsyncCallbackHandler.Instance.Call(GetCallbackMethod(), Contracts.GetTreesStartingFromIndex, gamePointer);
             }
             return true;

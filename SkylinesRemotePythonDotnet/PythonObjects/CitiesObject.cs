@@ -64,7 +64,9 @@ namespace SkylinesRemotePython.API {
                 id = id,
                 type = type
             });
-            refresh();
+            if(!api.client.AsynchronousMode) {
+                refresh();
+            }
             return deleted;
         }
 

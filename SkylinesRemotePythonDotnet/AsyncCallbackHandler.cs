@@ -48,10 +48,10 @@ namespace SkylinesRemotePython
         public bool WaitOnHandle(long handle)
         {
             if(!callbackDict.ContainsKey(handle)) {
-                return false;
+                throw new Exception("Engine error (report to developers). Cannot wait on invalid handle");
             }
-            var newMsg = (AsyncCallbackMessage)client.GetMessage(waitingForBackgroundCallback: true).payload;
-            if (newMsg.callbackObjectKey != handle) {
+            var msg = client.GetMessage(waitingForBackgroundCallback: true);
+            if (((AsyncCallbackMessage)msg.payload).callbackObjectKey != handle) {
                 throw new Exception("Engine error (report to developers). Received different callback than expected");
             }
             return true;
