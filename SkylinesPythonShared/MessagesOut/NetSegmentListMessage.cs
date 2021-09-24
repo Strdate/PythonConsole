@@ -8,6 +8,6 @@ namespace SkylinesPythonShared
     [Serializable]
     public class NetSegmentListMessage
     {
-        public List<NetSegmentMessage> list { get; set; }
+        public List<NetSegmentData> list { get; set; }
     }
 }

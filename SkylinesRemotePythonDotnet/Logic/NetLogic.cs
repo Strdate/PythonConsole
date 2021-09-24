@@ -19,7 +19,7 @@ namespace SkylinesRemotePython
 
         public static List<Segment> PrepareSegmentList(object obj, GameAPI api)
         {
-            List<NetSegmentMessage> list = (List<NetSegmentMessage>)obj;
+            List<NetSegmentData> list = (List<NetSegmentData>)obj;
             return list.Select(e => new Segment(e, api)).ToList();
         }
 
@@ -36,7 +36,19 @@ namespace SkylinesRemotePython
                 end_dir = end_dir,
                 control_point = middle_pos?.position
             };
-            return new Segment(api.client.RemoteCall<NetSegmentMessage>(Contracts.CreateSegment, msg), api);
+
+            Segment shell = ObjectStorage.Instance.Segments.CreateShell();
+            long handle = api.client.RemoteCall(Contracts.CreateSegment, msg, (ret, error) => {
+                if (error != null) {
+                    shell.AssignData(null, error);
+                    return null;
+                }
+                shell.AssignData((PropData)ret);
+                ObjectStorage.Instance.Segments.AddShellToDictionary(shell.id, shell);
+                return null;
+            });
+            shell.initHandle = handle;
+            return shell;
         }
 
         internal IList<Segment> CreateSegmentsImpl(IPositionable startNode, IPositionable endNode, object type, Vector start_dir, Vector end_dir, IPositionable middle_pos)

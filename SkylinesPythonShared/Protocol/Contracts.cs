@@ -7,11 +7,6 @@ namespace SkylinesPythonShared
 {
     public static class Contracts
     {
-        public static Contract GetPropFromId = new Contract() { FuncName = "GetPropFromId", RetType = "Prop"};
-        public static Contract GetTreeFromId = new Contract() { FuncName = "GetTreeFromId", RetType = "Prop" };
-        public static Contract GetBuildingFromId = new Contract() { FuncName = "GetBuildingFromId", RetType = "Building" };
-        public static Contract GetNodeFromId = new Contract() { FuncName = "GetNodeFromId", RetType = "NetNode"};
-        public static Contract GetSegmentFromId = new Contract() { FuncName = "GetSegmentFromId", RetType = "NetSegment" };
         public static Contract GetSegmentsForNodeId = new Contract() { FuncName = "GetSegmentsForNodeId", RetType = "NetSegments" };
         public static Contract GetNetPrefabFromName = new Contract() { FuncName = "GetNetPrefabFromName", RetType = "NetPrefab" };
         public static Contract CreateProp = new Contract() { FuncName = "CreateProp", RetType = "Prop", CanRunAsync = true };
@@ -22,6 +17,7 @@ namespace SkylinesPythonShared
         public static Contract CreateSegments = new Contract() { FuncName = "CreateSegments", RetType = "SegmentList", CanRunAsync = true };
         public static Contract MoveObject = new Contract() { FuncName = "MoveObject", RetType = "AnyObject", CanRunAsync = true };
         public static Contract DeleteObject = new Contract() { FuncName = "DeleteObject", RetType = "bool", CanRunAsync = true };
+        public static Contract GetObjectFromId = new Contract() { FuncName = "DeleteObject", RetType = "any" };
         public static Contract ExistsPrefab = new Contract() { FuncName = "ExistsPrefab", RetType = "bool" };
         public static Contract GetTerrainHeight = new Contract() { FuncName = "GetTerrainHeight", RetType = "float" };
         public static Contract GetWaterLevel = new Contract() { FuncName = "GetWaterLevel", RetType = "float" };

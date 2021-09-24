@@ -7,16 +7,13 @@ using System.Text;
 namespace SkylinesRemotePython.API
 {
     [Doc("Free standing prop object")]
-    public class Prop : CitiesObject
+    public class Prop : CitiesObject<PropData>
     {
         public override string type => "prop";
 
-        [Doc("Prop type (eg. 'Large Fountain')")]
-        public string prefab_name { get; private set; }
-
         [Doc("Prop rotation in rad")]
         public double angle {
-            get => _angle;
+            get => _.angle;
             set => MoveImpl(null, (float?)value);
         }
 
@@ -25,24 +22,14 @@ namespace SkylinesRemotePython.API
 
         public override void refresh()
         {
-            AssignData(api.client.RemoteCall<PropMessage>(Contracts.GetPropFromId, id));
+            ObjectStorage.Instance.Props.RefreshInstance(this);
         }
 
-        internal override void AssignData(InstanceMessage data)
+        public Prop()
         {
-            PropMessage msg = data as PropMessage;
-            if (msg == null) {
-                deleted = true;
-                return;
+            if (!CitiesObjectController.AllowInstantiation) {
+                throw new Exception("Instantiation is not allowed!");
             }
-            id = msg.id;
-            prefab_name = msg.prefab_name;
-            _position = msg.position;
-            _angle = msg.angle;
-        }
-        internal Prop(PropMessage obj, GameAPI api) : base(api)
-        {
-            AssignData(obj);
         }
     }
 }

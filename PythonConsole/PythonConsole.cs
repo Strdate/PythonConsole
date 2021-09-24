@@ -169,7 +169,7 @@ namespace PythonConsole
             _client.SendMessage(null, "s_script_abort");
         }
 
-        private InstanceMessage[] GetClipboardObjects()
+        private SkylinesPythonShared.InstanceData[] GetClipboardObjects()
         {
             return SelectionTool.Instance.Clipboard.Where((obj) => obj.Exists).Select((obj) => obj.ToMessage()).ToArray();
         }

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace SkylinesRemotePython.API
 {
-    public class CitiesObjectEnumerable<T,K> : IEnumerable where T : CitiesObject where K : InstanceMessage
+    public class CitiesObjectEnumerable<T,K> : IEnumerable where T : CitiesObject where K : InstanceData
     {
         public IEnumerator GetEnumerator()
         {
@@ -16,7 +16,7 @@ namespace SkylinesRemotePython.API
         }
     }
 
-    public class CitiesObjectEnumerator<T, K> : IEnumerator where T : CitiesObject where K : InstanceMessage
+    public class CitiesObjectEnumerator<T, K> : IEnumerator where T : CitiesObject where K : InstanceData
     {
         private T[] buffer = new T[0];
         private int pointer = -1;
@@ -50,15 +50,15 @@ namespace SkylinesRemotePython.API
         {
             // let me die
             if(typeof(T) == typeof(Prop)) {
-                return (T)(object)new Prop((PropMessage)(object)msg, api);
+                return (T)(object)new Prop((PropData)(object)msg, api);
             } else if (typeof(T) == typeof(Tree)) {
-                return (T)(object)new Tree((TreeMessage)(object)msg, api);
+                return (T)(object)new Tree((TreeData)(object)msg, api);
             } else if (typeof(T) == typeof(Building)) {
-                return (T)(object)new Building((BuildingMessage)(object)msg, api);
+                return (T)(object)new Building((BuildingData)(object)msg, api);
             } else if (typeof(T) == typeof(Node)) {
-                return (T)(object)new Node((NetNodeMessage)(object)msg, api);
+                return (T)(object)new Node((NetNodeData)(object)msg, api);
             } else if (typeof(T) == typeof(Segment)) {
-                return (T)(object)new Segment((NetSegmentMessage)(object)msg, api);
+                return (T)(object)new Segment((NetSegmentData)(object)msg, api);
             }
             throw new Exception("Engine error (report to developers). Cannot convert unknown type to CitiesObject");
         }
@@ -89,13 +89,13 @@ namespace SkylinesRemotePython.API
                     return false;
                 } else {
                     if(handle == -1) {
-                        handle = AsyncCallbackHandler.Instance.Call(GetCallbackMethod(), GetContract(), gamePointer);
+                        handle = RemoteCaller.Instance.Call(GetCallbackMethod(), GetContract(), gamePointer);
                     }
-                    AsyncCallbackHandler.Instance.WaitOnHandle(handle);
+                    RemoteCaller.Instance.WaitOnHandle(handle);
                 }
             }
             if(buffer.Length - pointer < 100 && handle == -1 && !endOfStream) {
-                handle = AsyncCallbackHandler.Instance.Call(GetCallbackMethod(), GetContract(), gamePointer);
+                handle = RemoteCaller.Instance.Call(GetCallbackMethod(), GetContract(), gamePointer);
             }
             return true;
         }

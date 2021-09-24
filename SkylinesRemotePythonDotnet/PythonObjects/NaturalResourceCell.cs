@@ -90,14 +90,14 @@ namespace SkylinesRemotePython.API
         public byte water => _base.water;
 
         [Doc("Reloads cached values from the game")]
-        public void refresh() => CachedObjects.Instance.NaturalResources.InvalidateCache();
+        public void refresh() => ObjectStorage.Instance.NaturalResources.InvalidateCache();
 
         public string SimpleToString()
         {
             return PythonHelp.RuntimeToString(this);
         }
 
-        private ref NaturalResourceCellBase _base => ref CachedObjects.Instance.NaturalResources.FromId(natural_resources_cell_id);
+        private ref NaturalResourceCellBase _base => ref ObjectStorage.Instance.NaturalResources.FromId(natural_resources_cell_id);
 
         [Doc("Returns row ID of the natural resources coordinate system")]
         public static int row_id_from_vector(Vector pos)

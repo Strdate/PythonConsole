@@ -6,15 +6,12 @@ using System.Text;
 
 namespace SkylinesPythonShared
 {
-    [Serializable]
-    public class BuildingMessage : InstanceMessage
+    public abstract class InstanceData
     {
-        public ushort id { get; set; }
-
-        public string prefab_name { get; set; }
+        public uint id { get; set; }
 
         public Vector position { get; set; }
 
-        public float angle { get; set; }
+        public string prefab_name { get; set; }
     }
 }

@@ -5,19 +5,40 @@ using System.Collections.Generic;
 using System.Text;
 
 namespace SkylinesRemotePython.API {
-    public abstract class CitiesObject : ApiRefObject, IPositionable, ISimpleToString
+    public abstract class CitiesObject<T> : IPositionable, ISimpleToString where T : InstanceData
     {
+        private T _instanceData;
+
+        internal long initHandle;
+
+        public string initialization_error_msg { get; private set; }
+
+        protected T _ {
+            get {
+                if (_instanceData != null) {
+                    return _instanceData;
+                }
+                if (initialization_error_msg != null) {
+                    throw new Exception(initialization_error_msg);
+                }
+                ClientHandler.Instance.WaitOnHandle(initHandle);
+                return _instanceData;
+            }
+        }
+
         [Doc("Game ID")]
-        public uint id { get; protected set; }
+        public uint id => _.id;
+
+        [Doc("Object type (node, buidling, prop etc.)")]
+        public virtual string type => "";
 
         [Doc("Returns if object exists")]
         public bool deleted { get; protected set; }
 
-        protected Vector _position;
 
         [Doc("Object position. Can be assigned to to move the object")]
         public virtual Vector position { 
-            get => _position;
+            get => _.position;
             set => MoveImpl(value, null);//throw new Exception($"Position of {type} cannot be changed");
         }
 
@@ -27,25 +48,28 @@ namespace SkylinesRemotePython.API {
             get => position;
             set => position = value;
         }
-        
-        internal double _angle;
+
+        [Doc("Node asset name (eg. 'Basic Road', 'Elementary School')")]
+        public string prefab_name => _.prefab_name;
 
         [Doc("Reloads object properties from game")]
         public abstract void refresh();
 
-        internal abstract void AssignData(InstanceMessage msg);
-
-        [Doc("Object type (node, buidling, prop etc.)")]
-        public virtual string type => "";
-
-        internal CitiesObject(GameAPI api) : base(api)
+        internal virtual void AssignData(InstanceData msg, string initializationErrorMsg = null)
         {
-
+            if(initializationErrorMsg != null) {
+                initialization_error_msg = initializationErrorMsg;
+                return;
+            }
+            if (msg == null) {
+                deleted = true;
+            }
+            _instanceData = (T)msg;
         }
 
         protected void MoveImpl(Vector position, float? angle)
         {
-            AssignData(api.client.RemoteCall<InstanceMessage>(Contracts.MoveObject, new MoveMessage() {
+            AssignData(api.client.RemoteCall<InstanceData>(Contracts.MoveObject, new MoveMessage() {
                 id = id,
                 type = type,
                 position = position,
@@ -72,12 +96,12 @@ namespace SkylinesRemotePython.API {
 
         public override bool Equals(object obj)
         {
-            CitiesObject other = (CitiesObject)obj;
+            CitiesObject<T> other = (CitiesObject<T>)obj;
             return this.type == other.type &&
                    id == other.id;
         }
 
-        public static bool operator ==(CitiesObject lhs, CitiesObject rhs)
+        public static bool operator ==(CitiesObject<T> lhs, CitiesObject<T> rhs)
         {
             if (System.Object.ReferenceEquals(lhs, null)) {
                 if (System.Object.ReferenceEquals(rhs, null)) {
@@ -89,7 +113,7 @@ namespace SkylinesRemotePython.API {
             return lhs.id == rhs.id && lhs.type == rhs.type;
         }
 
-        public static bool operator !=(CitiesObject lhs, CitiesObject rhs)
+        public static bool operator !=(CitiesObject<T> lhs, CitiesObject<T> rhs)
         {
             return !(lhs == rhs);
         }
@@ -111,5 +135,12 @@ namespace SkylinesRemotePython.API {
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(type);
             return hashCode;
         }
+    }
+
+    internal class CitiesObjectController
+    {
+        // hack - types with new() constraint cannot have internal constructor which would prevent calling them from Python code
+        [ThreadStatic]
+        internal static bool AllowInstantiation;
     }
 }

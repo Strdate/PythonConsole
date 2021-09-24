@@ -66,11 +66,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AsyncCallbackHandler.cs" />
     <Compile Include="PythonAPI\EngineAPI.cs" />
     <Compile Include="PythonObjects\CitiesObjectEnumerator.cs" />
     <Compile Include="Util\CachedObj.cs" />
-    <Compile Include="CachedObjects.cs" />
+    <Compile Include="ObjectStorage.cs" />
     <Compile Include="ClientHandler.cs" />
     <Compile Include="Logic\NetLogic.cs" />
     <Compile Include="Logic\NetOptionsUtil.cs" />
@@ -92,6 +91,7 @@
     <Compile Include="PythonObjects\Tree.cs" />
     <Compile Include="SkylinesRemotePythonDotnet.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Util\ObjectInstanceStorage.cs" />
     <Compile Include="Util\TcpStreamWriter.cs" />
   </ItemGroup>
   <ItemGroup>

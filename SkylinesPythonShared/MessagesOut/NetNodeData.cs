@@ -7,18 +7,12 @@ using System.Text;
 namespace SkylinesPythonShared
 {
     [Serializable]
-    public class NetNodeMessage : InstanceMessage
+    public class NetNodeData : InstanceData
     {
-        public ushort id { get; set; }
-
-        public string prefab_name { get; set; }
-
         public ushort building_id { get; set; }
 
         public int seg_count { get; set; }
 
         public float terrain_offset { get; set; }
-
-        public Vector position { get; set; }
     }
 }

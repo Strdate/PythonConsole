@@ -26,44 +26,44 @@ namespace SkylinesRemotePython.API
         [Doc("Returns prop object from its id")]
         public Prop get_prop(int id)
         {
-            return new Prop(client.RemoteCall<PropMessage>(Contracts.GetPropFromId, (uint)id), this);
+            return ObjectStorage.Instance.Props.Get((uint)id, true);
         }
 
         [Doc("Returns prop iterator (can be used only in for loop)")]
-        public CitiesObjectEnumerable<Prop, PropMessage> props => new CitiesObjectEnumerable<Prop, PropMessage>();
+        public CitiesObjectEnumerable<Prop, PropData> props => new CitiesObjectEnumerable<Prop, PropData>();
 
         [Doc("Returns tree object from its id")]
         public Tree get_tree(long id)
         {
-            return new Tree(client.RemoteCall<TreeMessage>(Contracts.GetTreeFromId, (uint)id), this);
+            return ObjectStorage.Instance.Trees.Get((uint)id, true);
         }
 
         [Doc("Returns tree iterator (can be used only in for loop)")]
-        public CitiesObjectEnumerable<Tree, TreeMessage> trees => new CitiesObjectEnumerable<Tree, TreeMessage>();
+        public CitiesObjectEnumerable<Tree, TreeData> trees => new CitiesObjectEnumerable<Tree, TreeData>();
 
         [Doc("Returns building object from its id")]
         public Building get_building(int id)
         {
-            return new Building(client.RemoteCall<BuildingMessage>(Contracts.GetBuildingFromId, (uint)id), this);
+            return ObjectStorage.Instance.Buildings.Get((uint)id, true);
         }
 
         [Doc("Returns building iterator (can be used only in for loop)")]
-        public CitiesObjectEnumerable<Building, BuildingMessage> buildings => new CitiesObjectEnumerable<Building, BuildingMessage>();
+        public CitiesObjectEnumerable<Building, BuildingData> buildings => new CitiesObjectEnumerable<Building, BuildingData>();
 
         [Doc("Returns node object from its id")]
-        public Node get_node(int id) => Node.GetNetNode((uint)id, this);
+        public Node get_node(int id) => ObjectStorage.Instance.Nodes.Get((uint)id, true);
 
         [Doc("Returns node iterator (can be used only in for loop)")]
-        public CitiesObjectEnumerable<Node, NetNodeMessage> nodes => new CitiesObjectEnumerable<Node, NetNodeMessage>();
+        public CitiesObjectEnumerable<Node, NetNodeData> nodes => new CitiesObjectEnumerable<Node, NetNodeData>();
 
         [Doc("Returns segment object from its id")]
         public Segment get_segment(int id)
         {
-            return new Segment(client.RemoteCall<NetSegmentMessage>(Contracts.GetSegmentFromId, (uint)id), this);
+            return ObjectStorage.Instance.Segments.Get((uint)id, true);
         }
 
         [Doc("Returns segment iterator (can be used only in for loop)")]
-        public CitiesObjectEnumerable<Segment, NetSegmentMessage> segments => new CitiesObjectEnumerable<Segment, NetSegmentMessage>();
+        public CitiesObjectEnumerable<Segment, NetSegmentData> segments => new CitiesObjectEnumerable<Segment, NetSegmentData>();
 
         [Doc("Creates prop")]
         public Prop create_prop(IPositionable position, string prefab_name, double angle = 0)
@@ -75,7 +75,18 @@ namespace SkylinesRemotePython.API
                 Angle = angle
             };
 
-            return new Prop(client.RemoteCall<PropMessage>(Contracts.CreateProp, msg), this);
+            Prop shell = ObjectStorage.Instance.Props.CreateShell();
+            long handle = client.RemoteCall(Contracts.CreateProp, msg, (ret, error) => {
+                if(error != null) {
+                    shell.AssignData(null, error);
+                    return null;
+                }
+                shell.AssignData((PropData)ret);
+                ObjectStorage.Instance.Props.AddShellToDictionary(shell.id, shell);
+                return null;
+            });
+            shell.initHandle = handle;
+            return shell;
         }
 
         [Doc("Creates tree")]
@@ -86,7 +97,18 @@ namespace SkylinesRemotePython.API
                 prefab_name = prefab_name
             };
 
-            return new Tree(client.RemoteCall<TreeMessage>(Contracts.CreateTree, msg), this);
+            Tree shell = ObjectStorage.Instance.Trees.CreateShell();
+            long handle = client.RemoteCall(Contracts.CreateTree, msg, (ret, error) => {
+                if (error != null) {
+                    shell.AssignData(null, error);
+                    return null;
+                }
+                shell.AssignData((PropData)ret);
+                ObjectStorage.Instance.Trees.AddShellToDictionary(shell.id, shell);
+                return null;
+            });
+            shell.initHandle = handle;
+            return shell;
         }
 
         [Doc("Creates building")]
@@ -98,7 +120,18 @@ namespace SkylinesRemotePython.API
                 Angle = angle
             };
 
-            return new Building(client.RemoteCall<BuildingMessage>(Contracts.CreateBuilding, msg), this);
+            Building shell = ObjectStorage.Instance.Buildings.CreateShell();
+            long handle = client.RemoteCall(Contracts.CreateBuilding, msg, (ret, error) => {
+                if (error != null) {
+                    shell.AssignData(null, error);
+                    return null;
+                }
+                shell.AssignData((PropData)ret);
+                ObjectStorage.Instance.Buildings.AddShellToDictionary(shell.id, shell);
+                return null;
+            });
+            shell.initHandle = handle;
+            return shell;
         }
 
         [Doc("Creates node (eg. segment junction)")]
@@ -112,7 +145,18 @@ namespace SkylinesRemotePython.API
                 Type = prefab is NetPrefab ? ((NetPrefab)prefab).name : (string)prefab
             };
 
-            return new Node(client.RemoteCall<NetNodeMessage>(Contracts.CreateNode, msg), this);
+            Node shell = ObjectStorage.Instance.Nodes.CreateShell();
+            long handle = client.RemoteCall(Contracts.CreateNode, msg, (ret, error) => {
+                if (error != null) {
+                    shell.AssignData(null, error);
+                    return null;
+                }
+                shell.AssignData((PropData)ret);
+                ObjectStorage.Instance.Nodes.AddShellToDictionary(shell.id, shell);
+                return null;
+            });
+            shell.initHandle = handle;
+            return shell;
         }
 
         [Doc("Creates straight segment (road). Don't use this method, but CreateSegments(..)")]

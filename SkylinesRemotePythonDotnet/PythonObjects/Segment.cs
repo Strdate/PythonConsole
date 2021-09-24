@@ -7,33 +7,29 @@ using System.Text;
 namespace SkylinesRemotePython.API
 {
     [Doc("Network object (road, pipe, power line etc.)")]
-    public class Segment : CitiesObject
+    public class Segment : CitiesObject<NetSegmentData>
     {
         public override string type => "segment";
-
-        [ToStringIgnore]
-        [Doc("Network asset name (eg. 'Highway')")]
-        public string prefab_name { get; private set; }
 
         [Doc("Network asset")]
         public NetPrefab prefab => NetPrefab.GetNetPrefab(prefab_name, api);
 
         [ToStringIgnore]
         [Doc("ID of start node (junction)")]
-        public int start_node_id { get; private set; }
+        public int start_node_id => _.start_node_id;
 
         [ToStringIgnore]
         [Doc("ID of end node (junction)")]
-        public int end_node_id { get; private set; }
+        public int end_node_id => _.end_node_id;
 
         [Doc("Road direction at start node")]
-        public Vector start_dir { get; private set; }
+        public Vector start_dir => _.start_dir;
 
         [Doc("Road direction at end node")]
-        public Vector end_dir { get; private set; }
+        public Vector end_dir => _.end_dir;
 
         [Doc("Underlying bezier shape")]
-        public Bezier bezier { get; private set; }
+        public Bezier bezier => _.bezier;
 
         [Doc("Road middle position")]
         public Vector middle_pos {
@@ -45,19 +41,19 @@ namespace SkylinesRemotePython.API
         public void move(IPositionable pos) => MoveImpl(pos.position, null);
 
         [Doc("Road length")]
-        public float length { get; private set; }
+        public float length => _.length;
 
         [Doc("Is segment straight")]
-        public bool is_straight { get; private set; }
+        public bool is_straight => _.is_straight;
 
         [Doc("Road start node (junction)")]
         public Node start_node {
-            get => Node.GetNetNode((uint)start_node_id, api);
+            get => ObjectStorage.Instance.Nodes.Get((uint)start_node_id);
         }
 
         [Doc("Road end node (junction)")]
         public Node end_node {
-            get => Node.GetNetNode((uint)end_node_id, api);
+            get => ObjectStorage.Instance.Nodes.Get((uint)end_node_id);
         }
 
         [Doc("Returns the other junction given the first one")]
@@ -96,31 +92,14 @@ namespace SkylinesRemotePython.API
 
         public override void refresh()
         {
-            AssignData(api.client.RemoteCall<NetSegmentMessage>(Contracts.GetSegmentFromId, id));
+            ObjectStorage.Instance.Segments.RefreshInstance(this);
         }
 
-        internal override void AssignData(InstanceMessage data)
+        public Segment()
         {
-            NetSegmentMessage msg = data as NetSegmentMessage;
-            if(msg == null) {
-                deleted = true;
-                return;
+            if (!CitiesObjectController.AllowInstantiation) {
+                throw new Exception("Instantiation is not allowed!");
             }
-            id = msg.id;
-            prefab_name = msg.prefab_name;
-            start_node_id = msg.start_node_id;
-            end_node_id = msg.end_node_id;
-            start_dir = msg.start_dir;
-            end_dir = msg.end_dir;
-            length = msg.length;
-            _position = msg.middle_pos;
-            bezier = msg.bezier;
-            is_straight = msg.is_straight;
-        }
-
-        internal Segment(NetSegmentMessage obj, GameAPI api) : base(api)
-        {
-            AssignData(obj);
         }
     }
 }

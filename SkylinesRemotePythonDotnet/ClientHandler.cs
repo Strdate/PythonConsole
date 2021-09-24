@@ -13,6 +13,9 @@ namespace SkylinesRemotePython
     {
         private PythonEngine engine;
 
+        private Dictionary<long, Func<object, string, object>> callbackDict = new Dictionary<long, Func<object, string, object>>();
+
+        private long counter = 1;
         public bool AsynchronousMode { get; set; }
 
         [ThreadStatic]
@@ -34,7 +37,7 @@ namespace SkylinesRemotePython
                 engine = new PythonEngine(this);
                 while (true) {
                     try {
-                        HandleGeneralMessage(GetMessage());
+                        GetMessage(out long _1, out object _2);
                     }
                     catch (AbortScriptException) {
                         SendMessage(null, "c_ready");
@@ -47,65 +50,71 @@ namespace SkylinesRemotePython
             }
         }
 
-        public MessageHeader GetMessage(string assertedType = null, bool waitingForBackgroundCallback = false)
+        private void GetMessage(out long requestId, out object result)
         {
-            while(true) {
-                MessageHeader msg = AwaitMessage();
+            requestId = 0;
+            result = null;
+
+            MessageHeader msg = AwaitMessage();
 #if DEBUG
             Console.WriteLine("In: " + msg.messageType);
 #endif
-                if (msg.messageType == "async_callback") {
-                    engine._asyncCallbackHandler.HandleAsyncCallback(msg);
-                    if(waitingForBackgroundCallback) {
-                        return msg;
-                    }
-                    continue;
-                }
+            if (msg.messageType == "s_script_run") {
+                engine.RunScript(msg.payload);
+                return;
+            }
 
-                if (msg.messageType == "s_script_abort") {
-                    Console.WriteLine("Abort script");
-                    throw new AbortScriptException();
-                }
+            if (msg.messageType == "s_script_abort") {
+                Console.WriteLine("Abort script");
+                throw new AbortScriptException();
+            }
 
-                if (msg.messageType == "s_exception") {
-                    string text = (string)msg.payload;
-                    Console.WriteLine("Exception: " + text);
-                    throw new Exception(text);
-                }
+            if (msg.messageType == "s_exception") {
+                string text = (string)msg.payload;
+                Console.WriteLine("Exception: " + text);
+                throw new Exception(text);
+            }
 
-                if (assertedType != null && assertedType != msg.messageType) {
-                    throw new Exception("Invalid return message: expected '" + assertedType + "' but received '" + msg.messageType + "'");
-                }
+            if(msg.requestId != 0) {
+                var callback = callbackDict[msg.requestId];
+                callbackDict.Remove(msg.requestId);
+                requestId = msg.requestId;
+                result = callback.Invoke(msg.payload, null);
+            }
 
-                return msg;
+            throw new Exception("Received unknown message: '" + msg.messageType + "'");
+        }
+
+        public long RemoteCall(Contract contract, object param, Func<object, string, object> callback)
+        {
+            long requestId = counter;
+            counter++;
+            callbackDict.Add(requestId, callback);
+            SendMessage(param, "c_callfunc_" + contract.FuncName);
+            return requestId;
+        }
+
+        public object WaitOnHandle(long handle)
+        {
+            if (!callbackDict.ContainsKey(handle)) {
+                throw new Exception("Engine error (report to developers). Cannot wait on invalid handle");
+            }
+            while (true) {
+                GetMessage(out long requestId, out object result);
+                if(requestId == handle) {
+                    return result;
+                }
+                // feature - add infinite loop check
             }
         }
 
-        public T RemoteCall<T>(Contract contract, object parameters)
+        public override void SendMessage(object obj, string type, long requestId = 0, bool ignoreReturnValue = false)
         {
-            bool isAsync = AsynchronousMode && contract.CanRunAsync;
-            SendMessage(parameters, "c_callfunc_" + contract.FuncName, isAsync);
-            if(isAsync || contract.RetType == null || contract.IsBackgroundAsync) {
-                return default(T);
-            }
-            MessageHeader retMsg = GetMessage("s_ret_" + contract.RetType);
-            return (T)retMsg.payload;
-        }
-
-        public override void SendMessage(object obj, string type, bool ignoreReturnValue = false)
-        {
-            base.SendMessage(obj, type, ignoreReturnValue);
+            // todo - make inaccessible
+            base.SendMessage(obj, type, requestId, ignoreReturnValue);
 #if DEBUG
             Console.WriteLine("Out: " + type);
 #endif
-        }
-
-        private void HandleGeneralMessage(MessageHeader msg)
-        {
-            switch(msg.messageType)
-            {
-                case "s_script_run": engine.RunScript(msg.payload); break;
-            }
         }
     }
 
