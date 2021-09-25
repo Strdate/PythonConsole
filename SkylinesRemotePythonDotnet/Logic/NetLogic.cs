@@ -43,11 +43,11 @@ namespace SkylinesRemotePython
                     shell.AssignData(null, error);
                     return null;
                 }
-                shell.AssignData((PropData)ret);
-                ObjectStorage.Instance.Segments.AddShellToDictionary(shell.id, shell);
+                NetSegmentData data = (NetSegmentData)ret;
+                shell.AssignData(data);
+                ObjectStorage.Instance.Segments.AddDataToDictionary(shell.id, data);
                 return null;
             });
-            shell.initHandle = handle;
             return shell;
         }
 

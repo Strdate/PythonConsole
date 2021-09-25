@@ -13,5 +13,7 @@ namespace SkylinesPythonShared
         public Vector position { get; set; }
 
         public string prefab_name { get; set; }
+
+        public bool deleted { get; set; }
     }
 }

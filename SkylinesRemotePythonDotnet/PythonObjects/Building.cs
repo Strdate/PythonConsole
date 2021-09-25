@@ -7,9 +7,14 @@ using System.Text;
 namespace SkylinesRemotePython.API
 {
     [Doc("Structure for building objects (eg. 'Water Tower')")]
-    public class Building : CitiesObject<BuildingData>
+    public class Building : CitiesObject<BuildingData,Building>
     {
         public override string type => "building";
+
+        private protected override ObjectInstanceStorage<BuildingData, Building> GetStorage()
+        {
+            return ObjectStorage.Instance.Buildings;
+        }
 
         [Doc("Building roation in rad")]
         public double angle {
@@ -22,7 +27,7 @@ namespace SkylinesRemotePython.API
 
         public override void refresh()
         {
-            ObjectStorage.Instance.Buildings.RefreshInstance(this);
+            ObjectStorage.Instance.Buildings.RefreshInstance(id);
         }
 
         public Building()

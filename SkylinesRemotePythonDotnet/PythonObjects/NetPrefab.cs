@@ -5,8 +5,9 @@ using System.Text;
 
 namespace SkylinesRemotePython.API
 {
+    // todo - rewrite to shell object
     [Doc("Structure holding type of road/network (eg. 'Basic Road' or 'Power Line')")]
-    public class NetPrefab : ApiRefObject, ISimpleToString
+    public class NetPrefab : ISimpleToString
     {
         [Doc("Network name")]
         public string name { get; private set; }
@@ -36,14 +37,14 @@ namespace SkylinesRemotePython.API
             bw_vehicle_lane_count = msg.bw_vehicle_lane_count;
         }
 
-        protected NetPrefab(NetPrefabMessage obj, GameAPI api) : base(api)
+        protected NetPrefab(NetPrefabMessage obj)
         {
             AssignData(obj);
         }
 
-        internal static NetPrefab GetNetPrefab(string name, GameAPI api)
+        internal static NetPrefab GetNetPrefab(string name)
         {
-            return new NetPrefab(api.client.RemoteCall<NetPrefabMessage>(Contracts.GetNetPrefabFromName, name), api);
+            return new NetPrefab(ClientHandler.Instance.SynchronousCall<NetPrefabMessage>(Contracts.GetNetPrefabFromName, name));
         }
 
         public override string ToString()

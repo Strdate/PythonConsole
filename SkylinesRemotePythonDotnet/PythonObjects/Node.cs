@@ -8,12 +8,17 @@ using System.Text;
 namespace SkylinesRemotePython.API
 {
     [Doc("Node structure - junction of Segments (roads/power lines etc.)")]
-    public class Node : CitiesObject<NetNodeData>
+    public class Node : CitiesObject<NetNodeData,Node>
     {
         public override string type => "node";
 
+        private protected override ObjectInstanceStorage<NetNodeData,Node> GetStorage()
+        {
+            return ObjectStorage.Instance.Nodes;
+        }
+
         [Doc("Node asset object (eg. 'Basic Road')")]
-        public NetPrefab prefab => NetPrefab.GetNetPrefab(prefab_name, api);
+        public NetPrefab prefab => NetPrefab.GetNetPrefab(prefab_name);
 
         [Doc("Elevation over terrain or water level")]
         public double terrain_offset => _.terrain_offset;
@@ -22,7 +27,7 @@ namespace SkylinesRemotePython.API
         public int building_id => _.building_id;
 
         [Doc("Node building (usually pillar)")]
-        public Building building => building_id == 0 ? null : new Building(api.client.RemoteCall<BuildingData>(Contracts.GetBuildingFromId, (uint)building_id), api);
+        public Building building => building_id == 0 ? null : ObjectStorage.Instance.Buildings.GetById((uint)building_id);
 
         [Doc("Count of adjacent segments")]
         public int seg_count => _.seg_count;
@@ -30,20 +35,24 @@ namespace SkylinesRemotePython.API
         [Doc("Move to new position")]
         public void move(IPositionable pos) => MoveImpl(pos.position, null);
 
-        private CachedObj<List<Segment>> _cachedSegments;
-
         [Doc("List of adjacent segments")]
-        public List<Segment> segments => _cachedSegments.Get;
+        public List<Segment> segments => ((CachedObj<List<Segment>>)_._cachedSegments).Get;
 
         public override void refresh()
         {
-            ObjectStorage.Instance.Nodes.RefreshInstance(this);
+            ObjectStorage.Instance.Nodes.RefreshInstance(id);
         }
 
         internal override void AssignData(InstanceData data, string initializationErrorMsg = null)
         {
             base.AssignData(data, initializationErrorMsg);
-            _cachedSegments = new CachedObj<List<Segment>>(() => api.client.RemoteCall<List<NetSegmentData>>(Contracts.GetSegmentsForNodeId, id).Select((obj) => new Segment(obj, api)).ToList());
+            if(initializationErrorMsg == null) {
+                _._cachedSegments = new CachedObj<List<Segment>>(() =>
+                    ClientHandler.Instance.SynchronousCall<List<NetSegmentData>>(Contracts.GetSegmentsForNodeId, id).Select((obj) =>
+                            ObjectStorage.Instance.Segments.SaveData(obj)
+                        ).ToList()
+                    );
+            }
         }
 
         public Node()

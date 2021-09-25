@@ -7,12 +7,17 @@ using System.Text;
 namespace SkylinesRemotePython.API
 {
     [Doc("Network object (road, pipe, power line etc.)")]
-    public class Segment : CitiesObject<NetSegmentData>
+    public class Segment : CitiesObject<NetSegmentData, Segment>
     {
         public override string type => "segment";
 
+        private protected override ObjectInstanceStorage<NetSegmentData, Segment> GetStorage()
+        {
+            return ObjectStorage.Instance.Segments;
+        }
+
         [Doc("Network asset")]
-        public NetPrefab prefab => NetPrefab.GetNetPrefab(prefab_name, api);
+        public NetPrefab prefab => NetPrefab.GetNetPrefab(prefab_name);
 
         [ToStringIgnore]
         [Doc("ID of start node (junction)")]
@@ -48,12 +53,12 @@ namespace SkylinesRemotePython.API
 
         [Doc("Road start node (junction)")]
         public Node start_node {
-            get => ObjectStorage.Instance.Nodes.Get((uint)start_node_id);
+            get => ObjectStorage.Instance.Nodes.GetById((uint)start_node_id);
         }
 
         [Doc("Road end node (junction)")]
         public Node end_node {
-            get => ObjectStorage.Instance.Nodes.Get((uint)end_node_id);
+            get => ObjectStorage.Instance.Nodes.GetById((uint)end_node_id);
         }
 
         [Doc("Returns the other junction given the first one")]
@@ -92,7 +97,7 @@ namespace SkylinesRemotePython.API
 
         public override void refresh()
         {
-            ObjectStorage.Instance.Segments.RefreshInstance(this);
+            ObjectStorage.Instance.Segments.RefreshInstance(id);
         }
 
         public Segment()

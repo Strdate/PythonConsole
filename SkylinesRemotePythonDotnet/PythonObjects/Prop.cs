@@ -7,9 +7,14 @@ using System.Text;
 namespace SkylinesRemotePython.API
 {
     [Doc("Free standing prop object")]
-    public class Prop : CitiesObject<PropData>
+    public class Prop : CitiesObject<PropData, Prop>
     {
         public override string type => "prop";
+
+        private protected override ObjectInstanceStorage<PropData, Prop> GetStorage()
+        {
+            return ObjectStorage.Instance.Props;
+        }
 
         [Doc("Prop rotation in rad")]
         public double angle {
@@ -22,7 +27,7 @@ namespace SkylinesRemotePython.API
 
         public override void refresh()
         {
-            ObjectStorage.Instance.Props.RefreshInstance(this);
+            ObjectStorage.Instance.Props.RefreshInstance(id);
         }
 
         public Prop()

@@ -77,7 +77,6 @@
     <Compile Include="NaturalResourcesManager.cs" />
     <Compile Include="PythonAPI\GameAPI.cs" />
     <Compile Include="PythonEngine.cs" />
-    <Compile Include="PythonObjects\ApiRefObject.cs" />
     <Compile Include="PythonObjects\Building.cs" />
     <Compile Include="PythonObjects\CitiesObject.cs" />
     <Compile Include="PythonObjects\NaturalResourceCell.cs" />

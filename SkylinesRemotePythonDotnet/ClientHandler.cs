@@ -75,6 +75,7 @@ namespace SkylinesRemotePython
                 throw new Exception(text);
             }
 
+            // todo handle exception !!
             if(msg.requestId != 0) {
                 var callback = callbackDict[msg.requestId];
                 callbackDict.Remove(msg.requestId);
@@ -87,11 +88,20 @@ namespace SkylinesRemotePython
 
         public long RemoteCall(Contract contract, object param, Func<object, string, object> callback)
         {
+            // todo synchronous by default - wait for the answer
             long requestId = counter;
             counter++;
             callbackDict.Add(requestId, callback);
             SendMessage(param, "c_callfunc_" + contract.FuncName);
             return requestId;
+        }
+
+        public T SynchronousCall<T>(Contract contract, object param)
+        {
+            long handle = RemoteCall(contract, param, (ret, error) => {
+                return ret;
+            });
+            return (T)WaitOnHandle(handle);
         }
 
         public object WaitOnHandle(long handle)
@@ -106,6 +116,11 @@ namespace SkylinesRemotePython
                 }
                 // feature - add infinite loop check
             }
+        }
+
+        public void WaitForNextMessage()
+        {
+            GetMessage(out long requestId, out object result);
         }
 
         public override void SendMessage(object obj, string type, long requestId = 0, bool ignoreReturnValue = false)

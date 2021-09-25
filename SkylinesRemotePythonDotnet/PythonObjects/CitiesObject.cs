@@ -5,35 +5,49 @@ using System.Collections.Generic;
 using System.Text;
 
 namespace SkylinesRemotePython.API {
-    public abstract class CitiesObject<T> : IPositionable, ISimpleToString where T : InstanceData
+    public abstract class CitiesObject<T,U> : IPositionable, ISimpleToString 
+        where T : InstanceData
+        where U : CitiesObject<T,U>, new()
     {
-        private T _instanceData;
-
-        internal long initHandle;
+        private uint _internalId { get; set; }
 
         public string initialization_error_msg { get; private set; }
 
         protected T _ {
             get {
-                if (_instanceData != null) {
-                    return _instanceData;
+                if(IsInitialized()) {
+                    return GetStorage().GetData(_internalId);
                 }
-                if (initialization_error_msg != null) {
-                    throw new Exception(initialization_error_msg);
+                while(true) {
+                    ClientHandler.Instance.WaitForNextMessage();
+                    if(IsInitialized()) {
+                        return GetStorage().GetData(_internalId);
+                    }
                 }
-                ClientHandler.Instance.WaitOnHandle(initHandle);
-                return _instanceData;
             }
         }
+
+        private bool IsInitialized()
+        {
+            if (_internalId > 0) {
+                return true;
+            }
+            if (initialization_error_msg != null) {
+                throw new Exception(initialization_error_msg);
+            }
+            return false;
+        }
+
+        private protected abstract ObjectInstanceStorage<T,U> GetStorage();
 
         [Doc("Game ID")]
         public uint id => _.id;
 
         [Doc("Object type (node, buidling, prop etc.)")]
-        public virtual string type => "";
+        public abstract string type { get; }
 
         [Doc("Returns if object exists")]
-        public bool deleted { get; protected set; }
+        public bool deleted => _.deleted;
 
 
         [Doc("Object position. Can be assigned to to move the object")]
@@ -61,21 +75,22 @@ namespace SkylinesRemotePython.API {
                 initialization_error_msg = initializationErrorMsg;
                 return;
             }
-            if (msg == null) {
-                deleted = true;
-            }
-            _instanceData = (T)msg;
+            _internalId = ((T)msg).id;
         }
 
         protected void MoveImpl(Vector position, float? angle)
         {
-            AssignData(api.client.RemoteCall<InstanceData>(Contracts.MoveObject, new MoveMessage() {
+            ClientHandler.Instance.RemoteCall(Contracts.MoveObject, new MoveMessage() {
                 id = id,
                 type = type,
                 position = position,
                 angle = angle.HasValue ? angle.Value : 0f,
                 is_angle_defined = angle.HasValue
-            }));
+            },
+            (ret, error) => {
+                GetStorage().SaveData((T)ret);
+                return null;
+            });
         }
 
         [Doc("Delete object")]
@@ -96,12 +111,12 @@ namespace SkylinesRemotePython.API {
 
         public override bool Equals(object obj)
         {
-            CitiesObject<T> other = (CitiesObject<T>)obj;
+            CitiesObject<T,U> other = (CitiesObject<T,U>)obj;
             return this.type == other.type &&
                    id == other.id;
         }
 
-        public static bool operator ==(CitiesObject<T> lhs, CitiesObject<T> rhs)
+        public static bool operator ==(CitiesObject<T,U> lhs, CitiesObject<T,U> rhs)
         {
             if (System.Object.ReferenceEquals(lhs, null)) {
                 if (System.Object.ReferenceEquals(rhs, null)) {
@@ -113,7 +128,7 @@ namespace SkylinesRemotePython.API {
             return lhs.id == rhs.id && lhs.type == rhs.type;
         }
 
-        public static bool operator !=(CitiesObject<T> lhs, CitiesObject<T> rhs)
+        public static bool operator !=(CitiesObject<T,U> lhs, CitiesObject<T,U> rhs)
         {
             return !(lhs == rhs);
         }

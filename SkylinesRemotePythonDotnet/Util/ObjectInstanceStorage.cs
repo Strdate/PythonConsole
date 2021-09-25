@@ -10,9 +10,9 @@ namespace SkylinesRemotePython
 {
     public class ObjectInstanceStorage<T, U>  
         where T : InstanceData
-        where U : CitiesObject<T>, new()
+        where U : CitiesObject<T,U>, new()
     {
-        private Dictionary<uint, U> _dict = new Dictionary<uint, U>();
+        private Dictionary<uint, T> _dict = new Dictionary<uint, T>();
 
         private string _type;
 
@@ -21,49 +21,46 @@ namespace SkylinesRemotePython
             _type = type;
         }
 
-        public U Get(uint id, bool forceRefresh = false)
+        public U GetById(uint id, bool forceRefresh = false)
         {
-            U val = GetShell(id, out bool needsRefresh);
-            if(forceRefresh || needsRefresh) {
-                T data = (T)ClientHandler.Instance.RemoteCall<InstanceData>(
+            U val = CreateShell();
+            // issue - make accelerated
+            T data = GetData(id);
+            val.AssignData(data);
+            return val;
+        }
+
+        public void RefreshInstance(uint id)
+        {
+            // issue - make accelerated
+            T data = (T)ClientHandler.Instance.SynchronousCall<InstanceData>(
                     Contracts.GetObjectFromId,
                     new GetObjectMessage() {
                         id = id,
                         type = _type
                     });
-                val.AssignData(data);
-            }
-            return val;
-        }
-
-        public void RefreshInstance(U instance)
-        {
-            // issue - make accelerated
-            T data = (T)ClientHandler.Instance.RemoteCall<InstanceData>(
-                    Contracts.GetObjectFromId,
-                    new GetObjectMessage() {
-                        id = instance.id,
-                        type = _type
-                    });
-            instance.AssignData(data);
+            _dict[id] = data;
         }
 
         public U SaveData(T data)
         {
-            U val = GetShell(data.id, out bool needsRefresh);
+            U val = CreateShell();
             val.AssignData(data);
+            _dict[data.id] = data;
             return val;
         }
 
-        private U GetShell(uint id, out bool needsRefresh)
+        public T GetData(uint id)
         {
-            U val;
-            if (!_dict.TryGetValue(id, out val)) {
-                CreateShell();
-                AddShellToDictionary(id, val);
-                needsRefresh = true;
-            } else {
-                needsRefresh = false;
+            T val;
+            if(!_dict.TryGetValue(id, out val)) {
+                val = (T)ClientHandler.Instance.SynchronousCall<InstanceData>(
+                    Contracts.GetObjectFromId,
+                    new GetObjectMessage() {
+                        id = id,
+                        type = _type
+                    });
+                _dict[id] = val;
             }
             return val;
         }
@@ -79,9 +76,9 @@ namespace SkylinesRemotePython
             }
         }
 
-        public void AddShellToDictionary(uint id, U shell)
+        public void AddDataToDictionary(uint id, T data)
         {
-            _dict.Add(id, shell);
+            _dict[id] = data;
         }
     }
 }

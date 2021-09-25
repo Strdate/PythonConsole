@@ -26,7 +26,7 @@ namespace SkylinesRemotePython.API
         [Doc("Returns prop object from its id")]
         public Prop get_prop(int id)
         {
-            return ObjectStorage.Instance.Props.Get((uint)id, true);
+            return ObjectStorage.Instance.Props.GetById((uint)id, true);
         }
 
         [Doc("Returns prop iterator (can be used only in for loop)")]
@@ -35,7 +35,7 @@ namespace SkylinesRemotePython.API
         [Doc("Returns tree object from its id")]
         public Tree get_tree(long id)
         {
-            return ObjectStorage.Instance.Trees.Get((uint)id, true);
+            return ObjectStorage.Instance.Trees.GetById((uint)id, true);
         }
 
         [Doc("Returns tree iterator (can be used only in for loop)")]
@@ -44,14 +44,14 @@ namespace SkylinesRemotePython.API
         [Doc("Returns building object from its id")]
         public Building get_building(int id)
         {
-            return ObjectStorage.Instance.Buildings.Get((uint)id, true);
+            return ObjectStorage.Instance.Buildings.GetById((uint)id, true);
         }
 
         [Doc("Returns building iterator (can be used only in for loop)")]
         public CitiesObjectEnumerable<Building, BuildingData> buildings => new CitiesObjectEnumerable<Building, BuildingData>();
 
         [Doc("Returns node object from its id")]
-        public Node get_node(int id) => ObjectStorage.Instance.Nodes.Get((uint)id, true);
+        public Node get_node(int id) => ObjectStorage.Instance.Nodes.GetById((uint)id, true);
 
         [Doc("Returns node iterator (can be used only in for loop)")]
         public CitiesObjectEnumerable<Node, NetNodeData> nodes => new CitiesObjectEnumerable<Node, NetNodeData>();
@@ -59,7 +59,7 @@ namespace SkylinesRemotePython.API
         [Doc("Returns segment object from its id")]
         public Segment get_segment(int id)
         {
-            return ObjectStorage.Instance.Segments.Get((uint)id, true);
+            return ObjectStorage.Instance.Segments.GetById((uint)id, true);
         }
 
         [Doc("Returns segment iterator (can be used only in for loop)")]
@@ -76,16 +76,16 @@ namespace SkylinesRemotePython.API
             };
 
             Prop shell = ObjectStorage.Instance.Props.CreateShell();
-            long handle = client.RemoteCall(Contracts.CreateProp, msg, (ret, error) => {
+            client.RemoteCall(Contracts.CreateProp, msg, (ret, error) => {
                 if(error != null) {
                     shell.AssignData(null, error);
                     return null;
                 }
-                shell.AssignData((PropData)ret);
-                ObjectStorage.Instance.Props.AddShellToDictionary(shell.id, shell);
+                PropData data = (PropData)ret;
+                shell.AssignData(data);
+                ObjectStorage.Instance.Props.AddDataToDictionary(shell.id, data);
                 return null;
             });
-            shell.initHandle = handle;
             return shell;
         }
 
@@ -103,11 +103,11 @@ namespace SkylinesRemotePython.API
                     shell.AssignData(null, error);
                     return null;
                 }
-                shell.AssignData((PropData)ret);
-                ObjectStorage.Instance.Trees.AddShellToDictionary(shell.id, shell);
+                TreeData data = (TreeData)ret;
+                shell.AssignData(data);
+                ObjectStorage.Instance.Trees.AddDataToDictionary(shell.id, data);
                 return null;
             });
-            shell.initHandle = handle;
             return shell;
         }
 
@@ -126,11 +126,11 @@ namespace SkylinesRemotePython.API
                     shell.AssignData(null, error);
                     return null;
                 }
-                shell.AssignData((PropData)ret);
-                ObjectStorage.Instance.Buildings.AddShellToDictionary(shell.id, shell);
+                BuildingData data = (BuildingData)ret;
+                shell.AssignData(data);
+                ObjectStorage.Instance.Buildings.AddDataToDictionary(shell.id, data);
                 return null;
             });
-            shell.initHandle = handle;
             return shell;
         }
 
@@ -151,11 +151,11 @@ namespace SkylinesRemotePython.API
                     shell.AssignData(null, error);
                     return null;
                 }
-                shell.AssignData((PropData)ret);
-                ObjectStorage.Instance.Nodes.AddShellToDictionary(shell.id, shell);
+                NetNodeData data = (NetNodeData)ret;
+                shell.AssignData(data);
+                ObjectStorage.Instance.Nodes.AddDataToDictionary(shell.id, data);
                 return null;
             });
-            shell.initHandle = handle;
             return shell;
         }
 
@@ -204,31 +204,31 @@ namespace SkylinesRemotePython.API
         [Doc("Returns network prefab (used to build nodes and segments). Eg. 'Basic road'")]
         public NetPrefab get_net_prefab(string name)
         {
-            return NetPrefab.GetNetPrefab(name, this);
+            return NetPrefab.GetNetPrefab(name);
         }
 
         [Doc("Returns if name is a valid prefab (network, building, tree etc.)")]
         public bool is_prefab(string name)
         {
-            return client.RemoteCall<bool>(Contracts.ExistsPrefab, name);
+            return client.SynchronousCall<bool>(Contracts.ExistsPrefab, name);
         }
 
         [Doc("Returns terrain height at a given point (height is Y coord)")]
         public float terrain_height(IPositionable pos)
         {
-            return client.RemoteCall<float>(Contracts.GetTerrainHeight, pos.position);
+            return client.SynchronousCall<float>(Contracts.GetTerrainHeight, pos.position);
         }
 
         [Doc("Returns terrain height inlucing water level at a given point")]
         public float surface_level(IPositionable pos)
         {
-            return client.RemoteCall<float>(Contracts.GetWaterLevel, pos.position);
+            return client.SynchronousCall<float>(Contracts.GetWaterLevel, pos.position);
         }
 
         [Doc("Draws line on map. Returns handle which can be used to delete the line. Use clear() to delete all lines")]
         public RenderableObjectHandle draw_vector(IPositionable vector, IPositionable origin, string color = "red", double length = 20, double size = 0.1)
         {
-            return new RenderableObjectHandle(client.RemoteCall<int>(Contracts.RenderVector, new RenderVectorMessage() {
+            return new RenderableObjectHandle(client.SynchronousCall<int>(Contracts.RenderVector, new RenderVectorMessage() {
                 vector = vector.position,
                 origin = origin.position,
                 color = color,
@@ -240,7 +240,7 @@ namespace SkylinesRemotePython.API
         [Doc("Draws circle on map. Returns handle which can be used to delete the circle")]
         public RenderableObjectHandle draw_circle(IPositionable position, double radius = 5, string color = "red")
         {
-            return new RenderableObjectHandle(client.RemoteCall<int>(Contracts.RenderCircle, new RenderCircleMessage() {
+            return new RenderableObjectHandle(client.SynchronousCall<int>(Contracts.RenderCircle, new RenderCircleMessage() {
                 position = position.position,
                 radius = (float)radius,
                 color = color
@@ -250,7 +250,8 @@ namespace SkylinesRemotePython.API
         [Doc("Clears all lines drawn on map")]
         public void clear()
         {
-            client.RemoteCall<object>(Contracts.RemoveRenderedObject, 0);
+            // todo don't wait for answer, check contract type
+            client.SynchronousCall<object>(Contracts.RemoveRenderedObject, 0);
         }
 
         [Doc("Prints collection content")]

@@ -28,15 +28,6 @@ namespace SkylinesRemotePython
             NaturalResources = new NaturalResourcesManager(client);
         }
 
-        /*public object GetObjectFromId(uint id, string type, bool refresh)
-        {
-            switch(type) {
-                case "node":
-                    return Nodes.Get(id, refresh);
-                default: throw new Exception("Internal error: unknown object type");
-            }
-        }*/
-
         public ObjectInstanceStorage<NetNodeData, Node> Nodes;
 
         public ObjectInstanceStorage<BuildingData, Building> Buildings;

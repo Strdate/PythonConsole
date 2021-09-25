@@ -14,5 +14,8 @@ namespace SkylinesPythonShared
         public int seg_count { get; set; }
 
         public float terrain_offset { get; set; }
+
+        // hack - not needed during transfer
+        public object _cachedSegments { get; set; }
     }
 }
