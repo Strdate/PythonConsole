@@ -83,7 +83,7 @@ namespace SkylinesRemotePython.API
                 }
                 PropData data = (PropData)ret;
                 shell.AssignData(data);
-                ObjectStorage.Instance.Props.AddDataToDictionary(shell.id, data);
+                ObjectStorage.Instance.Props.AddDataToDictionary(data);
                 return null;
             });
             return shell;
@@ -105,7 +105,7 @@ namespace SkylinesRemotePython.API
                 }
                 TreeData data = (TreeData)ret;
                 shell.AssignData(data);
-                ObjectStorage.Instance.Trees.AddDataToDictionary(shell.id, data);
+                ObjectStorage.Instance.Trees.AddDataToDictionary(data);
                 return null;
             });
             return shell;
@@ -128,7 +128,7 @@ namespace SkylinesRemotePython.API
                 }
                 BuildingData data = (BuildingData)ret;
                 shell.AssignData(data);
-                ObjectStorage.Instance.Buildings.AddDataToDictionary(shell.id, data);
+                ObjectStorage.Instance.Buildings.AddDataToDictionary(data);
                 return null;
             });
             return shell;
@@ -153,7 +153,7 @@ namespace SkylinesRemotePython.API
                 }
                 NetNodeData data = (NetNodeData)ret;
                 shell.AssignData(data);
-                ObjectStorage.Instance.Nodes.AddDataToDictionary(shell.id, data);
+                ObjectStorage.Instance.Nodes.AddDataToDictionary(data);
                 return null;
             });
             return shell;
@@ -204,7 +204,7 @@ namespace SkylinesRemotePython.API
         [Doc("Returns network prefab (used to build nodes and segments). Eg. 'Basic road'")]
         public NetPrefab get_net_prefab(string name)
         {
-            return NetPrefab.GetNetPrefab(name);
+            return ObjectStorage.Instance.NetPrefabs.GetById(name, true);
         }
 
         [Doc("Returns if name is a valid prefab (network, building, tree etc.)")]

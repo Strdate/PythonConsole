@@ -11,7 +11,7 @@ namespace SkylinesRemotePython.API
     {
         public override string type => "tree";
 
-        private protected override ObjectInstanceStorage<TreeData, Tree> GetStorage()
+        private protected override CitiesObjectStorage<TreeData, Tree, uint> GetStorage()
         {
             return ObjectStorage.Instance.Trees;
         }

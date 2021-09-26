@@ -6,10 +6,8 @@ using System.Text;
 namespace SkylinesPythonShared
 {
     [Serializable]
-    public class NetPrefabMessage
+    public class NetPrefabData : InstanceDataBase<string>
     {
-        public string name { get; set; }
-
         public float width { get; set; }
 
         public bool is_overground { get; set; }

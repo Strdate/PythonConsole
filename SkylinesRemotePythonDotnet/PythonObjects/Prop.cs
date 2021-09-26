@@ -11,7 +11,7 @@ namespace SkylinesRemotePython.API
     {
         public override string type => "prop";
 
-        private protected override ObjectInstanceStorage<PropData, Prop> GetStorage()
+        private protected override CitiesObjectStorage<PropData, Prop, uint> GetStorage()
         {
             return ObjectStorage.Instance.Props;
         }

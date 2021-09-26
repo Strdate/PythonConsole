@@ -12,13 +12,13 @@ namespace SkylinesRemotePython.API
     {
         public override string type => "node";
 
-        private protected override ObjectInstanceStorage<NetNodeData,Node> GetStorage()
+        private protected override CitiesObjectStorage<NetNodeData,Node, uint> GetStorage()
         {
             return ObjectStorage.Instance.Nodes;
         }
 
         [Doc("Node asset object (eg. 'Basic Road')")]
-        public NetPrefab prefab => NetPrefab.GetNetPrefab(prefab_name);
+        public NetPrefab prefab => ObjectStorage.Instance.NetPrefabs.GetById(prefab_name);
 
         [Doc("Elevation over terrain or water level")]
         public double terrain_offset => _.terrain_offset;
@@ -43,7 +43,7 @@ namespace SkylinesRemotePython.API
             ObjectStorage.Instance.Nodes.RefreshInstance(id);
         }
 
-        internal override void AssignData(InstanceData data, string initializationErrorMsg = null)
+        internal override void AssignData(InstanceDataBase<uint> data, string initializationErrorMsg = null)
         {
             base.AssignData(data, initializationErrorMsg);
             if(initializationErrorMsg == null) {

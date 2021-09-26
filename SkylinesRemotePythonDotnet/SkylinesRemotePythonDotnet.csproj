@@ -67,7 +67,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="PythonAPI\EngineAPI.cs" />
-    <Compile Include="PythonObjects\CitiesObjectEnumerator.cs" />
+    <Compile Include="PythonObjectAbstractions\CitiesObjectBase.cs" />
+    <Compile Include="PythonObjectAbstractions\CitiesObjectEnumerator.cs" />
+    <Compile Include="PythonObjectAbstractions\PythonList.cs" />
+    <Compile Include="PythonObjectAbstractions\ShellObject.cs" />
     <Compile Include="Util\CachedObj.cs" />
     <Compile Include="ObjectStorage.cs" />
     <Compile Include="ClientHandler.cs" />
@@ -78,7 +81,7 @@
     <Compile Include="PythonAPI\GameAPI.cs" />
     <Compile Include="PythonEngine.cs" />
     <Compile Include="PythonObjects\Building.cs" />
-    <Compile Include="PythonObjects\CitiesObject.cs" />
+    <Compile Include="PythonObjectAbstractions\CitiesObject.cs" />
     <Compile Include="PythonObjects\NaturalResourceCell.cs" />
     <Compile Include="PythonObjects\NetPrefab.cs" />
     <Compile Include="PythonObjects\Node.cs" />
@@ -90,7 +93,7 @@
     <Compile Include="PythonObjects\Tree.cs" />
     <Compile Include="SkylinesRemotePythonDotnet.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Util\ObjectInstanceStorage.cs" />
+    <Compile Include="Util\CitiesObjectStorage.cs" />
     <Compile Include="Util\TcpStreamWriter.cs" />
   </ItemGroup>
   <ItemGroup>

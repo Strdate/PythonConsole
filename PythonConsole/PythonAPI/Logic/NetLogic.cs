@@ -210,10 +210,10 @@ namespace PythonConsole
             };
         }
 
-        public static NetPrefabMessage PrepareNetInfo(string name)
+        public static NetPrefabData PrepareNetInfo(string name)
         {
             NetInfo info = PrefabCollection<NetInfo>.FindLoaded(name);
-            return new NetPrefabMessage() {
+            return new NetPrefabData() {
                 name = info.name,
                 width = info.m_halfWidth * 2,
                 is_overground = info.m_netAI.IsOverground(),

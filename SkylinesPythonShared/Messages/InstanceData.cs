@@ -6,10 +6,8 @@ using System.Text;
 
 namespace SkylinesPythonShared
 {
-    public abstract class InstanceData
+    public abstract class InstanceData : InstanceDataBase<uint>
     {
-        public uint id { get; set; }
-
         public Vector position { get; set; }
 
         public string prefab_name { get; set; }

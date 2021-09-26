@@ -11,13 +11,13 @@ namespace SkylinesRemotePython.API
     {
         public override string type => "segment";
 
-        private protected override ObjectInstanceStorage<NetSegmentData, Segment> GetStorage()
+        private protected override CitiesObjectStorage<NetSegmentData, Segment, uint> GetStorage()
         {
             return ObjectStorage.Instance.Segments;
         }
 
         [Doc("Network asset")]
-        public NetPrefab prefab => NetPrefab.GetNetPrefab(prefab_name);
+        public NetPrefab prefab => ObjectStorage.Instance.NetPrefabs.GetById(prefab_name);
 
         [ToStringIgnore]
         [Doc("ID of start node (junction)")]
@@ -79,20 +79,12 @@ namespace SkylinesRemotePython.API
         }
 
         [Doc("Deletes the road. keep_nodes param specifies if the nodes should be deleted too if there are no roads left that connect to them")]
-        public bool delete(bool keep_nodes)
+        public void delete(bool keep_nodes = false)
         {
             if (deleted) {
-                return true;
+                return;
             }
-            api.client.RemoteCall<bool>(Contracts.DeleteObject, new DeleteObjectMessage() {
-                id = id,
-                type = type,
-                keep_nodes = keep_nodes
-            });
-            if (!api.client.AsynchronousMode) {
-                refresh();
-            }
-            return deleted;
+            GetStorage().Delete(id, keep_nodes);
         }
 
         public override void refresh()

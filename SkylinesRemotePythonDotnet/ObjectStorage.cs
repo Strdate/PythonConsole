@@ -19,24 +19,27 @@ namespace SkylinesRemotePython
             _client = client;
             Instance = this;
 
-            Nodes = new ObjectInstanceStorage<NetNodeData, Node>("node");
-            Buildings = new ObjectInstanceStorage<BuildingData, Building>("building");
-            Segments = new ObjectInstanceStorage<NetSegmentData, Segment>("Segments");
-            Props = new ObjectInstanceStorage<PropData, Prop>("prop");
-            Trees = new ObjectInstanceStorage<TreeData, Tree>("tree");
+            Nodes = new CitiesObjectStorage<NetNodeData, Node, uint>("node");
+            Buildings = new CitiesObjectStorage<BuildingData, Building, uint>("building");
+            Segments = new CitiesObjectStorage<NetSegmentData, Segment, uint>("Segments");
+            Props = new CitiesObjectStorage<PropData, Prop, uint>("prop");
+            Trees = new CitiesObjectStorage<TreeData, Tree, uint>("tree");
+            NetPrefabs = new CitiesObjectStorage<NetPrefabData, NetPrefab, string>("net prefab");
 
             NaturalResources = new NaturalResourcesManager(client);
         }
 
-        public ObjectInstanceStorage<NetNodeData, Node> Nodes;
+        public CitiesObjectStorage<NetNodeData, Node, uint> Nodes;
 
-        public ObjectInstanceStorage<BuildingData, Building> Buildings;
+        public CitiesObjectStorage<BuildingData, Building, uint> Buildings;
 
-        public ObjectInstanceStorage<NetSegmentData, Segment> Segments;
+        public CitiesObjectStorage<NetSegmentData, Segment, uint> Segments;
 
-        public ObjectInstanceStorage<PropData, Prop> Props;
+        public CitiesObjectStorage<PropData, Prop, uint> Props;
 
-        public ObjectInstanceStorage<TreeData, Tree> Trees;
+        public CitiesObjectStorage<TreeData, Tree, uint> Trees;
+
+        public CitiesObjectStorage<NetPrefabData, NetPrefab, string> NetPrefabs;
 
         public NaturalResourcesManager NaturalResources;
     }

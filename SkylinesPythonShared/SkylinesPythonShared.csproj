@@ -51,10 +51,11 @@
     <Compile Include="MessagesIn\DeleteObjectMessage.cs" />
     <Compile Include="Messages\AsyncCallbackMessage.cs" />
     <Compile Include="Messages\InstanceData.cs" />
+    <Compile Include="Messages\InstanceDataBase.cs" />
     <Compile Include="Messages\MessageHeader.cs" />
     <Compile Include="MessagesIn\MoveMessage.cs" />
     <Compile Include="MessagesOut\NetNodeData.cs" />
-    <Compile Include="MessagesOut\NetPrefabMessage.cs" />
+    <Compile Include="MessagesOut\NetPrefabData.cs" />
     <Compile Include="MessagesOut\NetSegmentListMessage.cs" />
     <Compile Include="MessagesOut\NetSegmentData.cs" />
     <Compile Include="MessagesOut\PropData.cs" />

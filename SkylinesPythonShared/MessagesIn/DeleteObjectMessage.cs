@@ -7,9 +7,9 @@ using System.Text;
 namespace SkylinesPythonShared
 {
     [Serializable]
-    public class DeleteObjectMessage
+    public class DeleteObjectMessage<V>
     {
-        public uint id { get; set; }
+        public V id { get; set; }
 
         public bool keep_nodes { get; set; }
 

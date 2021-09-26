@@ -10,19 +10,6 @@ namespace SkylinesRemotePython
 {
     public class NetLogic
     {
-        private GameAPI api;
-
-        public NetLogic(GameAPI api)
-        {
-            this.api = api;
-        }
-
-        public static List<Segment> PrepareSegmentList(object obj, GameAPI api)
-        {
-            List<NetSegmentData> list = (List<NetSegmentData>)obj;
-            return list.Select(e => new Segment(e, api)).ToList();
-        }
-
         internal Segment CreateSegmentImpl(IPositionable startNode, IPositionable endNode, object type, Vector start_dir, Vector end_dir, IPositionable middle_pos)
         {
             NetOptions options = NetOptionsUtil.Ensure(type);
@@ -38,14 +25,14 @@ namespace SkylinesRemotePython
             };
 
             Segment shell = ObjectStorage.Instance.Segments.CreateShell();
-            long handle = api.client.RemoteCall(Contracts.CreateSegment, msg, (ret, error) => {
+            ClientHandler.Instance.RemoteCall(Contracts.CreateSegment, msg, (ret, error) => {
                 if (error != null) {
                     shell.AssignData(null, error);
                     return null;
                 }
                 NetSegmentData data = (NetSegmentData)ret;
                 shell.AssignData(data);
-                ObjectStorage.Instance.Segments.AddDataToDictionary(shell.id, data);
+                ObjectStorage.Instance.Segments.AddDataToDictionary(data);
                 return null;
             });
             return shell;
@@ -65,7 +52,18 @@ namespace SkylinesRemotePython
                 control_point = middle_pos?.position,
                 auto_split = true
             };
-            return NetLogic.PrepareSegmentList(api.client.RemoteCall<NetSegmentListMessage>(Contracts.CreateSegments, msg).list, api);
+
+            PythonList<Segment> shell = new PythonList<Segment>();
+            ClientHandler.Instance.RemoteCall(Contracts.CreateSegments, msg, (ret, error) => {
+                if(error != null) {
+                    shell.AssignData(null, error);
+                    return null;
+                }
+                NetSegmentListMessage raw = ret as NetSegmentListMessage;
+                shell.AssignData(raw.list.Select((item) => ObjectStorage.Instance.Segments.SaveData(item)).ToList());
+                return null;
+            });
+            return shell;
         }
     }
 }
