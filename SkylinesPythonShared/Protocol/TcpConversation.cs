@@ -60,13 +60,12 @@ namespace SkylinesPythonShared
             }
         }
 
-        public virtual void SendMessage(object obj, string type, long requestId = 0, bool ignoreReturnValue = false)
+        protected virtual void SendMessage(object obj, string type, long requestId = 0, bool ignoreReturnValue = false)
         {
             MessageHeader msg = new MessageHeader();
             msg.requestId = requestId;
             msg.payload = obj;
             msg.messageType = type;
-            msg.ignoreReturnValue = ignoreReturnValue;
             _client.Send(Serialize(msg));
         }
 

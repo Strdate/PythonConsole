@@ -1,5 +1,4 @@
-﻿using SkylinesPythonShared.API;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,11 +6,9 @@ using System.Text;
 namespace SkylinesPythonShared
 {
     [Serializable]
-    public class GetObjectMessage
+    public class GetObjectsFromIndexMessage
     {
-        public uint? id { get; set; }
-
-        public string idString { get; set; }
+        public uint index { get; set; }
 
         public string type { get; set; }
     }

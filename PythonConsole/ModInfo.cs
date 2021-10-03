@@ -15,7 +15,7 @@ namespace PythonConsole
     {
         public string Name => "Python Console";
 
-        public string Description => "Press ALT+S to open the console [BETA 0.1.8]";
+        public string Description => "Press ALT+S to open the console [BETA 0.2.0]";
 
         public const string settingsFileName = "PythonConsole";
 
@@ -26,7 +26,7 @@ namespace PythonConsole
         public static readonly SettingsBool F5toExec = new SettingsBool("Use F5 to execute scipts", "Pressing F5 shortcut will execute current script", "F5toExec", true);
         public static readonly SettingsBool SyncExecution = new SettingsBool("Execute scripts synchronously (requires engine restart)", "Script execution will freeze simulation, but it may take less time", "SyncExecution", false);
         public static readonly SettingsBool ShowRemoteConsole = new SettingsBool("Debug: Show remote python console", "The external python program will run in a visible console window (requires engine restart)", "ShowRemoteConsole", false);
-        public static readonly SettingsBool DoNotLaunchRemoteConsole = new SettingsBool("Debug: Do not launch remote python console", "The external python program won't launch automatically (you need to start it yourself)", "DoNotLaunchRemoteConsole", false);
+        public static readonly SettingsBool DoNotLaunchRemoteConsole = new SettingsBool("Debug: Do not launch remote python console server", "The external python program won't launch automatically (you need to start it yourself)", "DoNotLaunchRemoteConsole", false);
 
         public static readonly string RemotePythonFolder = Path.Combine(DataLocation.executableDirectory, "SkylinesRemotePython");
         public static readonly int DEF_PORT = 6672;

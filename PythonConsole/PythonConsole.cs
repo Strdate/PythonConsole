@@ -50,6 +50,9 @@ namespace PythonConsole
 
         private void RemotePythonThread()
         {
+            if(ModInfo.DoNotLaunchRemoteConsole.value) {
+                PrintAsync("Warning: Option 'Do not launch remote python console server' is enabled in settings. Turn it off if you don't know what you are doing.\n");
+            }
             TcpClient.StartUpServer();
             while(_startUpTrials < 10) {
                 try {
@@ -97,7 +100,7 @@ namespace PythonConsole
                     }
 
                     if(State == ConsoleState.ScriptAborting) {
-                        _client.SendMessage(null, "s_script_abort");
+                        _client.SendMsg(null, "s_script_abort");
                         continue;
                     }
 
@@ -153,23 +156,23 @@ namespace PythonConsole
                     };
                     _stopWatch = new Stopwatch();
                     _stopWatch.Start();
-                    _client.SendMessage(msg, "s_script_run");
+                    _client.SendMsg(msg, "s_script_run");
                     State = ConsoleState.ScriptRunning;
                 }
             }
-            catch {
+            catch(Exception e) {
                 State = ConsoleState.Dead;
-                throw;
+                UnityPythonObject.Instance.PrintError(e.ToString());
             }
         }
 
         public void AbortScript()
         {
             State = ConsoleState.ScriptAborting;
-            _client.SendMessage(null, "s_script_abort");
+            _client.SendMsg(null, "s_script_abort");
         }
 
-        private SkylinesPythonShared.InstanceData[] GetClipboardObjects()
+        private object[] GetClipboardObjects()
         {
             return SelectionTool.Instance.Clipboard.Where((obj) => obj.Exists).Select((obj) => obj.ToMessage()).ToArray();
         }
@@ -190,7 +193,7 @@ namespace PythonConsole
                 if (State == ConsoleState.ScriptRunning || State == ConsoleState.Ready) {
                     while (_simulationQueue.Count > 0) {
                         MessageHeader header = (MessageHeader)_simulationQueue.Dequeue();
-                        _remoteFuncManager.HandleAPICall(header.payload, header.messageType, header.ignoreReturnValue);
+                        _remoteFuncManager.HandleAPICall(header.payload, header.messageType, header.requestId);
                     }
                     if(ExecuteSynchronously) {
                         Thread.Sleep(1);

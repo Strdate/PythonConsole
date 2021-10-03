@@ -81,7 +81,7 @@ namespace SkylinesRemotePython.API
         [Doc("Deletes the road. keep_nodes param specifies if the nodes should be deleted too if there are no roads left that connect to them")]
         public void delete(bool keep_nodes = false)
         {
-            if (deleted) {
+            if (!exists) {
                 return;
             }
             GetStorage().Delete(id, keep_nodes);

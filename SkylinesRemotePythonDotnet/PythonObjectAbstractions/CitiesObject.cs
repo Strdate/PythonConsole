@@ -13,7 +13,9 @@ namespace SkylinesRemotePython.API {
         public uint id => _.id;
 
         [Doc("Returns if object exists")]
-        public bool deleted => _.deleted;
+        public bool exists => _.exists;
+
+        public bool deleted => !_.exists;
 
 
         [Doc("Object position. Can be assigned to to move the object")]
@@ -57,7 +59,7 @@ namespace SkylinesRemotePython.API {
         [Doc("Delete object")]
         public virtual void delete()
         {
-            if(deleted) {
+            if(!exists) {
                 return;
             }
             GetStorage().Delete(id);
@@ -77,6 +79,9 @@ namespace SkylinesRemotePython.API {
                     return true;
                 }
 
+                return false;
+            }
+            if (System.Object.ReferenceEquals(rhs, null)) {
                 return false;
             }
             return lhs.id == rhs.id && lhs.type == rhs.type;

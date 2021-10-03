@@ -8,13 +8,13 @@ using System.Threading.Tasks;
 
 namespace SkylinesRemotePython.API
 {
-    public class CitiesObjectEnumerable<T,U> : IEnumerable
+    public class CitiesObjectEnumerable<U, T> : IEnumerable
         where T : InstanceData
         where U : CitiesObject<T, U>, new()
     {
         public IEnumerator GetEnumerator()
         {
-            return new CitiesObjectEnumerator<T,U>();
+            return new CitiesObjectEnumerator<T, U>();
         }
     }
 
@@ -32,7 +32,7 @@ namespace SkylinesRemotePython.API
         private uint pointer;
         private uint gamePointer;
         private bool endOfStream;
-        private long handle = -1;
+        private CallbackHandle handle;
         private string error;
 
         private Func<object, string, object> GetCallbackMethod()
@@ -42,13 +42,12 @@ namespace SkylinesRemotePython.API
                     this.error = error;
                     return null;
                 }
-                handle = -1;
+                handle = null;
                 var batch = (BatchObjectMessage)ret;
-
-                batch.array.Select((item) => {
+                foreach(var item in batch.array) {
                     T data = (T)item;
-                    return storage.SaveData(data);
-                });
+                    storage.SaveData(data);
+                }
 
                 gamePointer = batch.lastVisitedIndex;
                 endOfStream = batch.endOfStream;
@@ -73,32 +72,46 @@ namespace SkylinesRemotePython.API
             throw new Exception("Engine error (report to developers). Cannot convert unknown type to CitiesObject");
         }
 
-        public object Current => {
-
+        public object Current {
+            get {
+                U obj = storage.GetCached(pointer);
+                if(obj == null) {
+                    throw new Exception("Internal error: null data in Current"); // feature - detect wiped cache and ask for new data
+                }
+                return obj;
             }
+        }
+
 
         public bool MoveNext()
         {
-
-            
-          /*if(error != null) {
+            if(error != null) {
                 throw new Exception(error);
             }
-            pointer++;
-            if(pointer >= buffer.Length) {
-                if(endOfStream) {
-                    return false;
-                } else {
-                    if(handle == -1) {
-                        handle = ClientHandler.Instance.RemoteCall(GetContract(), gamePointer, GetCallbackMethod());
-                    }
-                    ClientHandler.Instance.WaitOnHandle(handle);
-                }
+            if(pointer == gamePointer && endOfStream) {
+                return false;
             }
-            if(buffer.Length - pointer < 100 && handle == -1 && !endOfStream) {
-                handle = ClientHandler.Instance.RemoteCall(GetContract(), gamePointer, GetCallbackMethod());
+            if(gamePointer - pointer < 100 && handle == null && !endOfStream) {
+                AskForData();
             }
-            return true;*/
+            if(pointer == gamePointer) {
+                ClientHandler.Instance.WaitOnHandle(handle);
+            }
+            while(pointer < gamePointer && storage.GetCached(pointer) == null) {
+                pointer++;
+            }
+            return true;
+        }
+
+        public void Dispose()
+        {
+            storage.Clear();
+        }
+
+        private void AskForData()
+        {
+            var param = new GetObjectsFromIndexMessage() { index = gamePointer, type = storage.Type };
+            handle = ClientHandler.Instance.RemoteCall(Contracts.GetObjectsStartingFromIndex, param, GetCallbackMethod());
         }
 
         public void Reset()

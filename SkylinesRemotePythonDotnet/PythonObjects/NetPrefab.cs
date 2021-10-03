@@ -5,7 +5,6 @@ using System.Text;
 
 namespace SkylinesRemotePython.API
 {
-    // todo - rewrite to shell object
     [Doc("Structure holding type of road/network (eg. 'Basic Road' or 'Power Line')")]
     public class NetPrefab : CitiesObjectBase<NetPrefabData, NetPrefab, string>, ISimpleToString
     {

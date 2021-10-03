@@ -8,24 +8,25 @@ using System.Threading.Tasks;
 
 namespace SkylinesRemotePython
 {
-    public class CitiesObjectStorage<T, U, V>  
-        where T : InstanceDataBase<V>
-        where U : CitiesObjectBase<T,U,V>, new()
+    public class CitiesObjectStorage<T, U, V> where T : InstanceDataBase<V>
+        where U : CitiesObjectBase<T, U, V>, new()
     {
-        private Dictionary<V, T> _dict = new Dictionary<V, T>();
+        private IStorageStructure<V, T> _storage;
 
         private string _type;
 
-        public CitiesObjectStorage(string type)
+        public string Type => _type;
+        public CitiesObjectStorage(string type, IStorageStructure<V, T> structure)
         {
             _type = type;
+            _storage = structure;
         }
 
         public U GetById(V id, bool forceRefresh = false)
         {
             U shell = CreateShell();
             T data;
-            if (!_dict.TryGetValue(id, out data) || forceRefresh) {
+            if (!_storage.TryGetValue(id, out data) || forceRefresh) {
                 RefreshInstance(id, shell);
             } else {
                 shell.AssignData(data);
@@ -36,7 +37,7 @@ namespace SkylinesRemotePython
         public U GetCached(V id)
         {
             T data;
-            if (_dict.TryGetValue(id, out data)) {
+            if (_storage.TryGetValue(id, out data)) {
                 U shell = CreateShell();
                 shell.AssignData(data);
                 return shell;
@@ -49,8 +50,9 @@ namespace SkylinesRemotePython
             WipeFromCache(id);
             ClientHandler.Instance.RemoteCall(
                 Contracts.GetObjectFromId,
-                new GetObjectMessage<V>() {
-                    id = id,
+                new GetObjectMessage() {
+                    id = id as uint?,
+                    idString = id as string,
                     type = _type
                 }, (ret, err) => {
                     T retData = (T)ret;
@@ -64,26 +66,27 @@ namespace SkylinesRemotePython
 
         public U SaveData(T data)
         {
-            if(data == null) {
+            if (data == null) {
                 throw new Exception("Data cannot be null");
             }
             U val = CreateShell();
             val.AssignData(data);
-            _dict[data.id] = data;
+            _storage[data.id] = data;
             return val;
         }
 
         public T GetData(V id)
         {
             T val;
-            if(!_dict.TryGetValue(id, out val)) {
+            if (!_storage.TryGetValue(id, out val)) {
                 val = (T)ClientHandler.Instance.SynchronousCall<InstanceDataBase<V>>(
                     Contracts.GetObjectFromId,
-                    new GetObjectMessage<V>() {
-                        id = id,
+                    new GetObjectMessage() {
+                        id = id as uint?,
+                        idString = id as string,
                         type = _type
                     });
-                _dict[id] = val;
+                _storage[id] = val;
             }
             return val;
         }
@@ -101,28 +104,33 @@ namespace SkylinesRemotePython
 
         public void AddDataToDictionary(T data)
         {
-            _dict[data.id] = data;
+            _storage[data.id] = data;
         }
 
         public void WipeFromCache(V id)
         {
-            _dict.Remove(id);
+            _storage.Remove(id);
         }
 
-        public void Delete(V id, bool keep_nodes = false)
+        public void Delete(uint id, bool keep_nodes = false)
         {
-            WipeFromCache(id);
+            WipeFromCache((V)((object)id));
             ClientHandler.Instance.RemoteCall(
                 Contracts.DeleteObject,
-                    new DeleteObjectMessage<V>() {
+                    new DeleteObjectMessage() {
                         id = id,
                         type = _type,
                         keep_nodes = keep_nodes
                     }, (ret, err) => {
-                    T retData = (T)ret;
-                    AddDataToDictionary(retData);
-                    return null;
-           });
+                        T retData = (T)ret;
+                        AddDataToDictionary(retData);
+                        return null;
+                    });
+        }
+
+        public void Clear()
+        {
+            _storage.Clear();
         }
     }
 }

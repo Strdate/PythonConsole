@@ -36,7 +36,7 @@ namespace SkylinesRemotePython.API
             get => _base.ore;
             set {
                 _base.ore = value;
-                ClientHandler.Instance.RemoteCall<object>(Contracts.SetNaturalResource, new SetNaturalResourceMessage {
+                ClientHandler.Instance.SynchronousCall<object>(Contracts.SetNaturalResource, new SetNaturalResourceMessage {
                     cell_id = natural_resources_cell_id,
                     type = "ore",
                     value = value
@@ -49,7 +49,7 @@ namespace SkylinesRemotePython.API
             get => _base.oil;
             set {
                 _base.oil = value;
-                ClientHandler.Instance.RemoteCall<object>(Contracts.SetNaturalResource, new SetNaturalResourceMessage {
+                ClientHandler.Instance.SynchronousCall<object>(Contracts.SetNaturalResource, new SetNaturalResourceMessage {
                     cell_id = natural_resources_cell_id,
                     type = "oil",
                     value = value
@@ -65,7 +65,7 @@ namespace SkylinesRemotePython.API
             get => _base.fertility;
             set {
                 _base.fertility = value;
-                ClientHandler.Instance.RemoteCall<object>(Contracts.SetNaturalResource, new SetNaturalResourceMessage {
+                ClientHandler.Instance.SynchronousCall<object>(Contracts.SetNaturalResource, new SetNaturalResourceMessage {
                     cell_id = natural_resources_cell_id,
                     type = "fertility",
                     value = value
@@ -78,7 +78,7 @@ namespace SkylinesRemotePython.API
             get => _base.pollution;
             set {
                 _base.pollution = value;
-                ClientHandler.Instance.RemoteCall<object>(Contracts.SetNaturalResource, new SetNaturalResourceMessage {
+                ClientHandler.Instance.SynchronousCall<object>(Contracts.SetNaturalResource, new SetNaturalResourceMessage {
                     cell_id = natural_resources_cell_id,
                     type = "pollution",
                     value = value

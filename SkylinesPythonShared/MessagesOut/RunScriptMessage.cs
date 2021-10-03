@@ -10,7 +10,7 @@ namespace SkylinesPythonShared
     {
         public string script { get; set; }
 
-        public InstanceData[] clipboard { get; set; }
+        public object[] clipboard { get; set; }
 
         public string[] searchPaths { get; set; }
     }

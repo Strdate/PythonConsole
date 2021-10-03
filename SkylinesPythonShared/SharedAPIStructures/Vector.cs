@@ -7,7 +7,7 @@ namespace SkylinesPythonShared.API
 {
     [Serializable]
     [Doc("3D Vector class")]
-    public class Vector : InstanceData, IPositionable, ISimpleToString
+    public class Vector : IPositionable, ISimpleToString
     {
         [Doc("X cooord")]
         public double x { get; private set; }

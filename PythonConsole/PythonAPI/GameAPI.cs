@@ -11,53 +11,58 @@ namespace PythonConsole
 {
     public class GameAPI
     {
-        public static object GetPropFromId(object msg)
+        public static object GetObjectFromId(object msg)
         {
-            return ManagersLogic.PrepareProp((ushort)((uint)msg));
+            GetObjectMessage data = (GetObjectMessage)msg;
+            return GetObjectFromIdInternal(data.id, data.idString, data.type);
+            
         }
 
-        public static object GetTreeFromId(object msg)
+        private static object GetObjectFromIdInternal(uint? id, string idString, string type)
         {
-            return ManagersLogic.PrepareTree((uint)((uint)msg));
+            object ret;
+            switch (type) {
+                case "node":
+                    ret = NetLogic.PrepareNode((ushort)(id));
+                    break;
+                case "segment":
+                    ret = NetLogic.PrepareSegment((ushort)(id));
+                    break;
+                case "building":
+                    ret = ManagersLogic.PrepareBuilding((ushort)(id));
+                    break;
+                case "prop":
+                    ret = ManagersLogic.PrepareProp((ushort)(id));
+                    break;
+                case "tree":
+                    ret = ManagersLogic.PrepareTree((uint)(id));
+                    break;
+                case "net prefab":
+                    ret = NetLogic.PrepareNetInfo(idString);
+                    break;
+                default:
+                    throw new Exception($"Unknown type '{type}'");
+            }
+            return ret;
         }
 
-        public static object GetBuildingFromId(object msg)
+        public static object GetObjectsStartingFromIndex(object msg)
         {
-            return ManagersLogic.PrepareBuilding((ushort)((uint)msg));
-        }
-        public static object GetNodeFromId(object msg)
-        {
-            return NetLogic.PrepareNode((ushort)((uint)msg));
-        }
-
-        public static object GetSegmentFromId(object msg)
-        {
-            return NetLogic.PrepareSegment((ushort)((uint)msg));
-        }
-
-        public static object GetTreesStartingFromIndex(object msg)
-        {
-            return ManagersLogic.PrepareTreesStartingFromIndex((uint)((uint)msg));
-        }
-
-        public static object GetPropsStartingFromIndex(object msg)
-        {
-            return ManagersLogic.PreparePropsStartingFromIndex((ushort)((uint)msg));
-        }
-
-        public static object GetBuildingsStartingFromIndex(object msg)
-        {
-            return ManagersLogic.PrepareBuildingsStartingFromIndex((ushort)((uint)msg));
-        }
-
-        public static object GetNodesStartingFromIndex(object msg)
-        {
-            return NetLogic.PrepareNodesStartingFromIndex((ushort)((uint)msg));
-        }
-
-        public static object GetSegmentsStartingFromIndex(object msg)
-        {
-            return NetLogic.PrepareSegmentsStartingFromIndex((ushort)((uint)msg));
+            GetObjectsFromIndexMessage data = (GetObjectsFromIndexMessage)msg;
+            switch (data.type) {
+                case "node":
+                    return NetLogic.PrepareNodesStartingFromIndex((ushort)data.index);
+                case "segment":
+                    return NetLogic.PrepareSegmentsStartingFromIndex((ushort)data.index);
+                case "building":
+                    return ManagersLogic.PrepareBuildingsStartingFromIndex((ushort)data.index);
+                case "prop":
+                    return ManagersLogic.PreparePropsStartingFromIndex((ushort)data.index);
+                case "tree":
+                    return ManagersLogic.PrepareTreesStartingFromIndex((uint)data.index);
+                default:
+                    throw new Exception($"Unknown type '{data.type}'");
+            }
         }
 
         public static object CreateProp(object msg)
@@ -71,11 +76,6 @@ namespace PythonConsole
         public static object GetSegmentsForNodeId(object msg)
         {
             return NetUtil.GetSegmentsFromNode((ushort)(uint)msg).Select((seg) => NetLogic.PrepareSegment(seg)).ToList();
-        }
-
-        public static object GetNetPrefabFromName(object msg)
-        {
-            return NetLogic.PrepareNetInfo((string)msg);
         }
 
         public static object CreateTree(object msg)
@@ -123,27 +123,26 @@ namespace PythonConsole
         public static object DeleteObject(object msg)
         {
             DeleteObjectMessage data = (DeleteObjectMessage)msg;
-            bool ret;
             switch(data.type) {
                 case "node":
-                    ret = NetUtil.ReleaseNode((ushort)data.id);
+                    NetUtil.ReleaseNode((ushort)data.id);
                     break;
                 case "segment":
-                    ret = NetUtil.ReleaseSegment((ushort)data.id, !data.keep_nodes);
+                    NetUtil.ReleaseSegment((ushort)data.id, !data.keep_nodes);
                     break;
                 case "building":
-                    ret = ManagersUtil.ReleaseBuilding((ushort)data.id);
+                    ManagersUtil.ReleaseBuilding((ushort)data.id);
                     break;
                 case "prop":
-                    ret = ManagersUtil.ReleaseProp((ushort)data.id);
+                    ManagersUtil.ReleaseProp((ushort)data.id);
                     break;
                 case "tree":
-                    ret = ManagersUtil.ReleaseTree(data.id);
+                    ManagersUtil.ReleaseTree(data.id);
                     break;
                 default:
                     throw new Exception("Unknown type '" + data.type + "'");
             }
-            return ret;
+            return GetObjectFromIdInternal(data.id, null, data.type);
         }
 
         public static object ExistsPrefab(object msg)

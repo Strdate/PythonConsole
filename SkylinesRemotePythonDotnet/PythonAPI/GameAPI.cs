@@ -19,7 +19,7 @@ namespace SkylinesRemotePython.API
         internal GameAPI(ClientHandler client, ScriptScope scope)
         {
             this.client = client;
-            _netLogic = new NetLogic(this);
+            _netLogic = new NetLogic();
             _scope = scope;
         }
 
@@ -98,7 +98,7 @@ namespace SkylinesRemotePython.API
             };
 
             Tree shell = ObjectStorage.Instance.Trees.CreateShell();
-            long handle = client.RemoteCall(Contracts.CreateTree, msg, (ret, error) => {
+            client.RemoteCall(Contracts.CreateTree, msg, (ret, error) => {
                 if (error != null) {
                     shell.AssignData(null, error);
                     return null;
@@ -121,7 +121,7 @@ namespace SkylinesRemotePython.API
             };
 
             Building shell = ObjectStorage.Instance.Buildings.CreateShell();
-            long handle = client.RemoteCall(Contracts.CreateBuilding, msg, (ret, error) => {
+            client.RemoteCall(Contracts.CreateBuilding, msg, (ret, error) => {
                 if (error != null) {
                     shell.AssignData(null, error);
                     return null;
@@ -146,14 +146,14 @@ namespace SkylinesRemotePython.API
             };
 
             Node shell = ObjectStorage.Instance.Nodes.CreateShell();
-            long handle = client.RemoteCall(Contracts.CreateNode, msg, (ret, error) => {
+            client.RemoteCall(Contracts.CreateNode, msg, (ret, error) => {
                 if (error != null) {
                     shell.AssignData(null, error);
                     return null;
                 }
                 NetNodeData data = (NetNodeData)ret;
-                shell.AssignData(data);
                 ObjectStorage.Instance.Nodes.AddDataToDictionary(data);
+                shell.AssignData(data);
                 return null;
             });
             return shell;
@@ -234,7 +234,7 @@ namespace SkylinesRemotePython.API
                 color = color,
                 length = (float)length,
                 size = (float)size
-            }), this);
+            }));
         }
 
         [Doc("Draws circle on map. Returns handle which can be used to delete the circle")]
@@ -244,20 +244,19 @@ namespace SkylinesRemotePython.API
                 position = position.position,
                 radius = (float)radius,
                 color = color
-            }), this);
+            }));
         }
 
         [Doc("Clears all lines drawn on map")]
         public void clear()
         {
-            // todo don't wait for answer, check contract type
             client.SynchronousCall<object>(Contracts.RemoveRenderedObject, 0);
         }
 
         [Doc("Prints collection content")]
         public void print_list(IEnumerable collection)
         {
-            client.SendMessage(PythonHelp.PrintList(collection), "c_output_message");
+            client.Print(PythonHelp.PrintList(collection));
         }
 
         public delegate void __HelpDeleg(object obj = null);
@@ -267,27 +266,27 @@ namespace SkylinesRemotePython.API
         {
             obj = obj ?? this;
             string text = PythonHelp.GetHelp(obj);
-            client.SendMessage(text, "c_output_message");
+            client.Print(text);
         }
 
         [Doc("Dumps all available documentation in the output")]
         public void help_all()
         {
             string text = PythonHelp.DumpDoc();
-            client.SendMessage(text, "c_output_message");
+            client.Print(text);
         }
 
         public void help_markdown()
         {
             string text = PythonHelp.DumpDoc(true);
-            client.SendMessage(text, "c_output_message");
+            client.Print(text);
         }
 
         [Doc("Prints all variables available in the global scope")]
         public void list_globals()
         {
             string vars = string.Join(", ",_scope.GetVariableNames());
-            client.SendMessage("Variables in global scope: " + vars + "\n", "c_output_message");
+            client.Print("Variables in global scope: " + vars + "\n");
         }
 
         public override string ToString()

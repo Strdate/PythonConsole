@@ -15,8 +15,8 @@ namespace SkylinesPythonShared
         public static Contract CreateSegment = new Contract() { FuncName = "CreateSegment", RetType = "Segment", CanRunAsync = true };
         public static Contract CreateSegments = new Contract() { FuncName = "CreateSegments", RetType = "SegmentList", CanRunAsync = true };
         public static Contract MoveObject = new Contract() { FuncName = "MoveObject", RetType = "AnyObject", CanRunAsync = true };
-        public static Contract DeleteObject = new Contract() { FuncName = "DeleteObject", RetType = "bool", CanRunAsync = true }; // todo make return object instance
-        public static Contract GetObjectFromId = new Contract() { FuncName = "DeleteObject", RetType = "any" };
+        public static Contract DeleteObject = new Contract() { FuncName = "DeleteObject", RetType = "bool", CanRunAsync = true };
+        public static Contract GetObjectFromId = new Contract() { FuncName = "GetObjectFromId", RetType = "any" };
         public static Contract ExistsPrefab = new Contract() { FuncName = "ExistsPrefab", RetType = "bool" };
         public static Contract GetTerrainHeight = new Contract() { FuncName = "GetTerrainHeight", RetType = "float" };
         public static Contract GetWaterLevel = new Contract() { FuncName = "GetWaterLevel", RetType = "float" };
@@ -26,11 +26,7 @@ namespace SkylinesPythonShared
         public static Contract GetNaturalResourceCellSingle = new Contract() { FuncName = "GetNaturalResourceCellSingle", RetType = "NaturalResourceCellBase" };
         public static Contract RemoveRenderedObject = new Contract() { FuncName = "RemoveRenderedObject", RetType = null };
         public static Contract SetNaturalResource = new Contract() { FuncName = "SetNaturalResource", RetType = null };
-        public static Contract GetTreesStartingFromIndex = new Contract() { FuncName = "GetTreesStartingFromIndex", RetType = "BatchTreeMessage", IsBackgroundAsync = true };
-        public static Contract GetPropsStartingFromIndex = new Contract() { FuncName = "GetPropsStartingFromIndex", RetType = "BatchPropMessage", IsBackgroundAsync = true };
-        public static Contract GetBuildingsStartingFromIndex = new Contract() { FuncName = "GetBuildingsStartingFromIndex", RetType = "BatchBuildingsMessage", IsBackgroundAsync = true };
-        public static Contract GetNodesStartingFromIndex = new Contract() { FuncName = "GetNodesStartingFromIndex", RetType = "BatchNodeMessage", IsBackgroundAsync = true };
-        public static Contract GetSegmentsStartingFromIndex = new Contract() { FuncName = "GetSegmentsStartingFromIndex", RetType = "BatchSegmentMessage", IsBackgroundAsync = true };
+        public static Contract GetObjectsStartingFromIndex = new Contract() { FuncName = "GetObjectsStartingFromIndex", RetType = "any" };
     }
 
     public class Contract
@@ -40,7 +36,5 @@ namespace SkylinesPythonShared
         public string RetType { get; internal set; }
 
         public bool CanRunAsync { get; internal set; }
-
-        public bool IsBackgroundAsync { get; internal set; }
     }
 }

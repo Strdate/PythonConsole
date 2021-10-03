@@ -19,9 +19,14 @@ namespace SkylinesRemotePython.API
                 if (IsInitialized()) {
                     return Retrieve();
                 }
+#if DEBUG
+                int counter = 0;
+#endif
+                // might get stuck in infinite loop if the object is wiped from cache before is read
                 while (true) {
 #if DEBUG
-                    Console.WriteLine($"Waiting for initialization of {this.GetType().Name}...");
+                    counter++;
+                    Console.WriteLine($"Waiting for initialization of {this.GetType().Name} ({counter})...");
 #endif
                     ClientHandler.Instance.WaitForNextMessage();
                     if (IsInitialized()) {

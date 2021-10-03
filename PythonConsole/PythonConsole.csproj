@@ -72,7 +72,7 @@
     <Compile Include="PythonAPI\GameAPI.cs" />
     <Compile Include="PythonAPI\Logic\ManagersLogic.cs" />
     <Compile Include="PythonAPI\Logic\NetLogic.cs" />
-    <Compile Include="RemoteFuncManager.cs" />
+    <Compile Include="PythonAPI\RemoteFuncManager.cs" />
     <Compile Include="PythonConsole.cs" />
     <Compile Include="ClipboardTool\SelectedPoint.cs" />
     <Compile Include="ClipboardTool\SelectionTool.cs" />

@@ -13,7 +13,7 @@ namespace SkylinesRemotePython
     {
         private PythonEngine engine;
 
-        private Dictionary<long, Func<object, string, object>> callbackDict = new Dictionary<long, Func<object, string, object>>();
+        private Dictionary<long, CallbackHandle> callbackDict = new Dictionary<long, CallbackHandle>();
 
         private long counter = 1;
         public bool AsynchronousMode { get; set; }
@@ -37,7 +37,7 @@ namespace SkylinesRemotePython
                 engine = new PythonEngine(this);
                 while (true) {
                     try {
-                        GetMessage(out long _1, out object _2);
+                        GetMessage(out long _1, out object _2, out string _3);
                     }
                     catch (AbortScriptException) {
                         SendMessage(null, "c_ready");
@@ -50,10 +50,11 @@ namespace SkylinesRemotePython
             }
         }
 
-        private void GetMessage(out long requestId, out object result)
+        private void GetMessage(out long requestId, out object result, out string error)
         {
             requestId = 0;
             result = null;
+            error = null;
 
             MessageHeader msg = AwaitMessage();
 #if DEBUG
@@ -69,49 +70,76 @@ namespace SkylinesRemotePython
                 throw new AbortScriptException();
             }
 
+            if (msg.requestId != 0) {
+                var callback = callbackDict[msg.requestId];
+                callbackDict.Remove(msg.requestId);
+                requestId = msg.requestId;
+                callback.Resolved = true;
+                if(msg.messageType != "s_exception") {
+                    result = callback.Callback.Invoke(msg.payload, null);
+                } else {
+                    error = (string)msg.payload;
+                    Console.WriteLine("Exception: " + error);
+                    callback.Callback.Invoke(null, error);
+                }
+                return;
+            }
+
             if (msg.messageType == "s_exception") {
                 string text = (string)msg.payload;
                 Console.WriteLine("Exception: " + text);
                 throw new Exception(text);
             }
 
-            // todo handle exception !!
-            if(msg.requestId != 0) {
-                var callback = callbackDict[msg.requestId];
-                callbackDict.Remove(msg.requestId);
-                requestId = msg.requestId;
-                result = callback.Invoke(msg.payload, null);
-            }
-
             throw new Exception("Received unknown message: '" + msg.messageType + "'");
         }
 
-        public long RemoteCall(Contract contract, object param, Func<object, string, object> callback)
+        public CallbackHandle RemoteCall(Contract contract, object param, Func<object, string, object> callback)
         {
-            // todo synchronous by default - wait for the answer
+            var handle = RemoteCallInternal(contract, param, callback);
+            if (!AsynchronousMode) {
+                WaitOnHandle(handle);
+            }
+            return handle;
+        }
+
+        private CallbackHandle RemoteCallInternal(Contract contract, object param, Func<object, string, object> callback)
+        {
             long requestId = counter;
             counter++;
-            callbackDict.Add(requestId, callback);
-            SendMessage(param, "c_callfunc_" + contract.FuncName);
-            return requestId;
+            var handle = new CallbackHandle(requestId, callback);
+            callbackDict.Add(requestId, handle);
+            SendMessage(param, "c_callfunc_" + contract.FuncName, requestId);
+            return handle;
         }
 
         public T SynchronousCall<T>(Contract contract, object param)
         {
-            long handle = RemoteCall(contract, param, (ret, error) => {
+            var handle = RemoteCallInternal(contract, param, (ret, error) => {
                 return ret;
             });
             return (T)WaitOnHandle(handle);
         }
 
-        public object WaitOnHandle(long handle)
+        public object WaitOnHandle(CallbackHandle handle)
         {
-            if (!callbackDict.ContainsKey(handle)) {
+            if(handle.Resolved) {
+                return null;
+            }
+            if (!callbackDict.ContainsKey(handle.HandleId)) {
                 throw new Exception("Engine error (report to developers). Cannot wait on invalid handle");
             }
+#if DEBUG
+            var callerMethod = (new System.Diagnostics.StackTrace()).GetFrame(1).GetMethod();
+            var callerName = (new System.Diagnostics.StackTrace()).GetFrame(1).GetMethod().Name;
+            if(callerName == "SynchronousCall") {
+                callerMethod = (new System.Diagnostics.StackTrace()).GetFrame(2).GetMethod();
+            }
+            Console.WriteLine($"Waiting on handle {handle.HandleId}. Caller: {callerMethod.DeclaringType.Name}.{callerMethod.Name}");
+#endif
             while (true) {
-                GetMessage(out long requestId, out object result);
-                if(requestId == handle) {
+                GetMessage(out long requestId, out object result, out string error);
+                if(requestId == handle.HandleId) {
                     return result;
                 }
                 // feature - add infinite loop check
@@ -120,17 +148,39 @@ namespace SkylinesRemotePython
 
         public void WaitForNextMessage()
         {
-            GetMessage(out long requestId, out object result);
+            GetMessage(out long requestId, out object result, out string error);
         }
 
-        public override void SendMessage(object obj, string type, long requestId = 0, bool ignoreReturnValue = false)
+        public void Print(string text)
         {
-            // todo - make inaccessible
+            SendMessage(text, "c_output_message", 0);
+        }
+
+        public void SendMsg(object obj, string type)
+        {
+            SendMessage(obj, type);
+        }
+
+        protected override void SendMessage(object obj, string type, long requestId = 0, bool ignoreReturnValue = false)
+        {
             base.SendMessage(obj, type, requestId, ignoreReturnValue);
 #if DEBUG
             Console.WriteLine("Out: " + type);
 #endif
         }
+    }
+
+    public class CallbackHandle
+    {
+        public CallbackHandle(long handleId, Func<object, string, object> callback)
+        {
+            HandleId = handleId;
+            Callback = callback;
+        }
+
+        public long HandleId { get; private set; }
+        public Func<object, string, object> Callback { get; private set; }
+        public bool Resolved { get; set; }
     }
 
     public class AbortScriptException : Exception

@@ -63,7 +63,7 @@ namespace PythonConsole
             return null;
         }
 
-        public InstanceData ToMessage()
+        public object ToMessage()
         {
             if (ObjectType == Type.Point) {
                 return _point.position.FromUnity();

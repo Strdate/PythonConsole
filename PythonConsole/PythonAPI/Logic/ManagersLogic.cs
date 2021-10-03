@@ -13,41 +13,44 @@ namespace PythonConsole
         public static PropData PrepareProp(ushort id)
         {
             if (!ManagersUtil.ExistsProp(id)) {
-                return null;
+                return new PropData();
             }
             PropInstance prop = ManagersUtil.Prop(id);
             return new PropData() {
                 id = id,
                 position = prop.Position.FromUnity(),
                 prefab_name = prop.Info.name,
-                angle = prop.Angle
+                angle = prop.Angle,
+                exists = true
             };
         }
 
         public static TreeData PrepareTree(uint id)
         {
             if (!ManagersUtil.ExistsTree(id)) {
-                return null;
+                return new TreeData();
             }
             TreeInstance tree = ManagersUtil.Tree(id);
             return new TreeData() {
                 id = id,
                 position = tree.Position.FromUnity(),
-                prefab_name = tree.Info.name
+                prefab_name = tree.Info.name,
+                exists = true
             };
         }
 
         public static BuildingData PrepareBuilding(ushort id)
         {
             if (!ManagersUtil.ExistsBuilding(id)) {
-                return null;
+                return new BuildingData();
             }
             Building building = ManagersUtil.BuildingS(id);
             return new BuildingData() {
                 id = id,
                 position = building.m_position.FromUnity(),
                 prefab_name = building.Info.name,
-                angle = building.m_angle
+                angle = building.m_angle,
+                exists = true
             };
         }
 

@@ -109,7 +109,7 @@ namespace PythonConsole
         public static SkylinesPythonShared.NetNodeData PrepareNode(ushort id)
         {
             if (!NetUtil.ExistsNode(id)) {
-                return null;
+                return new NetNodeData();
             }
             ref NetNode node = ref NetUtil.Node(id);
             return new NetNodeData() {
@@ -118,14 +118,15 @@ namespace PythonConsole
                 prefab_name = node.Info.name,
                 terrain_offset = node.m_position.y - NetUtil.GetTerrainIncludeWater(node.m_position),
                 building_id = node.m_building,
-                seg_count = node.CountSegments()
+                seg_count = node.CountSegments(),
+                exists = true
             };
         }
 
         public static SkylinesPythonShared.NetSegmentData PrepareSegment(ushort id)
         {
             if (!NetUtil.ExistsSegment(id)) {
-                return null;
+                return new NetSegmentData();
             }
             ref NetSegment segment = ref NetUtil.Segment(id);
             ref NetNode startNode = ref NetUtil.Node(segment.m_startNode);
@@ -144,9 +145,10 @@ namespace PythonConsole
                 start_dir = segment.m_startDirection.FromUnity(),
                 end_dir = segment.m_endDirection.FromUnity(),
                 length = segment.m_averageLength,
-                middle_pos = segment.m_middlePosition.FromUnity(),
+                position = segment.m_middlePosition.FromUnity(),
                 bezier = bezier,
-                is_straight = segment.IsStraight()
+                is_straight = segment.IsStraight(),
+                exists = true
             };
         }
 
@@ -214,7 +216,7 @@ namespace PythonConsole
         {
             NetInfo info = PrefabCollection<NetInfo>.FindLoaded(name);
             return new NetPrefabData() {
-                name = info.name,
+                id = info.name,
                 width = info.m_halfWidth * 2,
                 is_overground = info.m_netAI.IsOverground(),
                 is_underground = info.m_netAI.IsUnderground(),

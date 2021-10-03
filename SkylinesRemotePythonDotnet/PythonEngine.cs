@@ -27,7 +27,6 @@ namespace SkylinesRemotePython
         private EngineAPI _engineAPI;
 
         internal GameAPI _gameAPI { get; private set; }
-        internal RemoteCaller _asyncCallbackHandler { get; private set; }
 
         [ThreadStatic]
         internal static PythonEngine Instance;
@@ -42,7 +41,6 @@ namespace SkylinesRemotePython
 
             _gameAPI = new GameAPI(client, _scope);
             _engineAPI = new EngineAPI(client);
-            _asyncCallbackHandler = new RemoteCaller(client);
 
             PrepareStaticLocals();
             
@@ -64,7 +62,7 @@ namespace SkylinesRemotePython
                 try
                 {
                     compiled.Execute(_scope);
-                    client.SendMessage(null, "c_script_end");
+                    client.SendMsg(null, "c_script_end");
                 }
                 catch(Exception ex)
                 {
@@ -75,12 +73,12 @@ namespace SkylinesRemotePython
                         details = " (" + (fileName == "<string>" ? "script" : fileName) + ": line " + frame.GetFileLineNumber() + ")";
                     } catch { }
                     
-                    client.SendMessage(ex.Message + details, "c_exception");
+                    client.SendMsg(ex.Message + details, "c_exception");
                 }
             }
             catch(Exception ex)
             {
-                client.SendMessage(ex.Message, "c_failed_to_compile");
+                client.SendMsg(ex.Message, "c_failed_to_compile");
             }
         }
 
@@ -112,23 +110,25 @@ namespace SkylinesRemotePython
             _scope.SetVariable(name, obj);
         }
 
-        private void PrepareDynamicLocals(InstanceData[] arr)
+        private void PrepareDynamicLocals(object[] arr)
         {
             List<object> res = new List<object>();
             object obj;
             for(int i = 0; i < arr.Length; i++) {
                 if(arr[i] is Vector) {
                     obj = new Point((Vector)arr[i]);
-                } else if(arr[i] is NetNodeData) {
-                    obj = new Node((NetNodeData)arr[i], _gameAPI);
-                } else if (arr[i] is NetSegmentData) {
-                    obj = new Segment((NetSegmentData)arr[i], _gameAPI);
-                } else if (arr[i] is BuildingData) {
-                    obj = new Building((BuildingData)arr[i], _gameAPI);
-                } else if (arr[i] is PropData) {
-                    obj = new Prop((PropData)arr[i], _gameAPI);
-                } else /*if (arr[i] is TreeMessage*/ {
-                    obj = new Tree((TreeData)arr[i], _gameAPI);
+                } else if(arr[i] is NetNodeData d1) {
+                    obj = ObjectStorage.Instance.Nodes.SaveData(d1);
+                } else if (arr[i] is NetSegmentData d2) {
+                    obj = ObjectStorage.Instance.Segments.SaveData(d2);
+                } else if (arr[i] is BuildingData d3) {
+                    obj = ObjectStorage.Instance.Buildings.SaveData(d3);
+                } else if (arr[i] is PropData d4) {
+                    obj = ObjectStorage.Instance.Props.SaveData(d4);
+                } else if (arr[i] is TreeData d5) {
+                    obj = ObjectStorage.Instance.Trees.SaveData(d5);
+                } else {
+                    throw new Exception($"Unknown object {arr[i].GetType()}");
                 }
                 res.Add(obj);
             }

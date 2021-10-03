@@ -47,6 +47,7 @@ namespace SkylinesRemotePython.API
         {
             base.AssignData(data, initializationErrorMsg);
             if(initializationErrorMsg == null) {
+                // fuj
                 _._cachedSegments = new CachedObj<List<Segment>>(() =>
                     ClientHandler.Instance.SynchronousCall<List<NetSegmentData>>(Contracts.GetSegmentsForNodeId, id).Select((obj) =>
                             ObjectStorage.Instance.Segments.SaveData(obj)

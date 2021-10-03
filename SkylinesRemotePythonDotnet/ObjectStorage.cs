@@ -19,12 +19,13 @@ namespace SkylinesRemotePython
             _client = client;
             Instance = this;
 
-            Nodes = new CitiesObjectStorage<NetNodeData, Node, uint>("node");
-            Buildings = new CitiesObjectStorage<BuildingData, Building, uint>("building");
-            Segments = new CitiesObjectStorage<NetSegmentData, Segment, uint>("Segments");
-            Props = new CitiesObjectStorage<PropData, Prop, uint>("prop");
-            Trees = new CitiesObjectStorage<TreeData, Tree, uint>("tree");
-            NetPrefabs = new CitiesObjectStorage<NetPrefabData, NetPrefab, string>("net prefab");
+            // feature - remove hardcoded limits
+            Nodes = new CitiesObjectStorage<NetNodeData, Node, uint>("node", new ArrayStorage<NetNodeData>(32768));
+            Buildings = new CitiesObjectStorage<BuildingData, Building, uint>("building", new ArrayStorage<BuildingData>(49152));
+            Segments = new CitiesObjectStorage<NetSegmentData, Segment, uint>("segment", new ArrayStorage<NetSegmentData>(36864));
+            Props = new CitiesObjectStorage<PropData, Prop, uint>("prop", new ArrayStorage<PropData>(65536));
+            Trees = new CitiesObjectStorage<TreeData, Tree, uint>("tree", new ArrayStorage<TreeData>(262144));
+            NetPrefabs = new CitiesObjectStorage<NetPrefabData, NetPrefab, string>("net prefab", new DictionaryStorage<string, NetPrefabData>());
 
             NaturalResources = new NaturalResourcesManager(client);
         }

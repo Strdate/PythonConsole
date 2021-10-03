@@ -26,6 +26,11 @@ namespace PythonConsole
             
         }
 
+        public void SendMsg(object obj, string type, long requestId = 0)
+        {
+            base.SendMessage(obj, type, requestId);
+        }
+
         public static void StartUpServer()
         {
             string archivePath = Path.Combine(ModPath.Instsance.AssemblyPath,"SkylinesRemotePython.zip");
