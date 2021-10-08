@@ -10,6 +10,7 @@ After first build:
 - Open mod target folder `C:\Users\<Username>\AppData\Local\Colossal Order\Cities_Skylines\Addons\Mods\PythonConsole`
 - Create a zip file `SkylinesRemotePython.zip` containing the contents of the build folder and move it to the mod target folder
   - For next builds you might copy only the `SkylinesRemotePythonDotnet.exe` to the zip file (if it has changed)
+- Download [PyPy 2.7](https://www.pypy.org/download.html), navigate to `lib-python\2.7`, copy the content to a new folder `pypy` and put it to `SkylinesRemotePython.zip`
 - Open example scripts folder `PythonConsole\PythonConsole\Resource\Examples`
 - Create a zip file `ExamplePythonScripts.zip` containing the contents of the folder and move it to the mod target folder
   - You need to repeat this only if you change any of the example script files
