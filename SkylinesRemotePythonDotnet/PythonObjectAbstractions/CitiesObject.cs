@@ -5,19 +5,22 @@ using System.Collections.Generic;
 using System.Text;
 
 namespace SkylinesRemotePython.API {
-    public abstract class CitiesObject : ApiRefObject, IPositionable, ISimpleToString
+    public abstract class CitiesObject<T,U> : CitiesObjectBase<T,U,uint>, IPositionable, ISimpleToString 
+        where T : InstanceData
+        where U : CitiesObject<T,U>, new()
     {
         [Doc("Game ID")]
-        public uint id { get; protected set; }
+        public uint id => _.id;
 
         [Doc("Returns if object exists")]
-        public bool deleted { get; protected set; }
+        public bool exists => _.exists;
 
-        protected Vector _position;
+        public bool deleted => !_.exists;
+
 
         [Doc("Object position. Can be assigned to to move the object")]
         public virtual Vector position { 
-            get => _position;
+            get => _.position;
             set => MoveImpl(value, null);//throw new Exception($"Position of {type} cannot be changed");
         }
 
@@ -27,57 +30,49 @@ namespace SkylinesRemotePython.API {
             get => position;
             set => position = value;
         }
-        
-        internal double _angle;
+
+        [Doc("Node asset name (eg. 'Basic Road', 'Elementary School')")]
+        public string prefab_name => _.prefab_name;
 
         [Doc("Reloads object properties from game")]
         public abstract void refresh();
 
-        internal abstract void AssignData(InstanceMessage msg);
-
-        [Doc("Object type (node, buidling, prop etc.)")]
-        public virtual string type => "";
-
-        internal CitiesObject(GameAPI api) : base(api)
-        {
-
-        }
-
         protected void MoveImpl(Vector position, float? angle)
         {
-            AssignData(api.client.RemoteCall<InstanceMessage>(Contracts.MoveObject, new MoveMessage() {
-                id = id,
-                type = type,
+            // Save before wiping from cache
+            uint _id = id;
+            string _type = type;
+            GetStorage().WipeFromCache(id);
+            ClientHandler.Instance.RemoteCall(Contracts.MoveObject, new MoveMessage() {
+                id = _id,
+                type = _type,
                 position = position,
                 angle = angle.HasValue ? angle.Value : 0f,
                 is_angle_defined = angle.HasValue
-            }));
+            },
+            (ret, error) => {
+                GetStorage().SaveData((T)ret);
+                return null;
+            });
         }
 
         [Doc("Delete object")]
-        public virtual bool delete()
+        public virtual void delete()
         {
-            if(deleted) {
-                return true;
+            if(!exists) {
+                return;
             }
-            api.client.RemoteCall<bool>(Contracts.DeleteObject, new DeleteObjectMessage() {
-                id = id,
-                type = type
-            });
-            if(!api.client.AsynchronousMode) {
-                refresh();
-            }
-            return deleted;
+            GetStorage().Delete(id);
         }
 
         public override bool Equals(object obj)
         {
-            CitiesObject other = (CitiesObject)obj;
+            CitiesObject<T, U> other = (CitiesObject<T, U>)obj;
             return this.type == other.type &&
                    id == other.id;
         }
 
-        public static bool operator ==(CitiesObject lhs, CitiesObject rhs)
+        public static bool operator ==(CitiesObject<T, U> lhs, CitiesObject<T, U> rhs)
         {
             if (System.Object.ReferenceEquals(lhs, null)) {
                 if (System.Object.ReferenceEquals(rhs, null)) {
@@ -86,17 +81,15 @@ namespace SkylinesRemotePython.API {
 
                 return false;
             }
+            if (System.Object.ReferenceEquals(rhs, null)) {
+                return false;
+            }
             return lhs.id == rhs.id && lhs.type == rhs.type;
         }
 
-        public static bool operator !=(CitiesObject lhs, CitiesObject rhs)
+        public static bool operator !=(CitiesObject<T, U> lhs, CitiesObject<T, U> rhs)
         {
             return !(lhs == rhs);
-        }
-
-        public override string ToString()
-        {
-            return PythonHelp.RuntimeToString(this);
         }
 
         public string SimpleToString()

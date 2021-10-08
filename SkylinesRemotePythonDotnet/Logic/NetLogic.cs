@@ -10,19 +10,6 @@ namespace SkylinesRemotePython
 {
     public class NetLogic
     {
-        private GameAPI api;
-
-        public NetLogic(GameAPI api)
-        {
-            this.api = api;
-        }
-
-        public static List<Segment> PrepareSegmentList(object obj, GameAPI api)
-        {
-            List<NetSegmentMessage> list = (List<NetSegmentMessage>)obj;
-            return list.Select(e => new Segment(e, api)).ToList();
-        }
-
         internal Segment CreateSegmentImpl(IPositionable startNode, IPositionable endNode, object type, Vector start_dir, Vector end_dir, IPositionable middle_pos)
         {
             NetOptions options = NetOptionsUtil.Ensure(type);
@@ -36,7 +23,19 @@ namespace SkylinesRemotePython
                 end_dir = end_dir,
                 control_point = middle_pos?.position
             };
-            return new Segment(api.client.RemoteCall<NetSegmentMessage>(Contracts.CreateSegment, msg), api);
+
+            Segment shell = ObjectStorage.Instance.Segments.CreateShell();
+            ClientHandler.Instance.RemoteCall(Contracts.CreateSegment, msg, (ret, error) => {
+                if (error != null) {
+                    shell.AssignData(null, error);
+                    return null;
+                }
+                NetSegmentData data = (NetSegmentData)ret;
+                ObjectStorage.Instance.Segments.AddDataToDictionary(data);
+                shell.AssignData(data);
+                return null;
+            });
+            return shell;
         }
 
         internal IList<Segment> CreateSegmentsImpl(IPositionable startNode, IPositionable endNode, object type, Vector start_dir, Vector end_dir, IPositionable middle_pos)
@@ -53,7 +52,19 @@ namespace SkylinesRemotePython
                 control_point = middle_pos?.position,
                 auto_split = true
             };
-            return NetLogic.PrepareSegmentList(api.client.RemoteCall<NetSegmentListMessage>(Contracts.CreateSegments, msg).list, api);
+
+            PythonList<Segment> shell = new PythonList<Segment>();
+            var handle = ClientHandler.Instance.RemoteCall(Contracts.CreateSegments, msg, (ret, error) => {
+                if(error != null) {
+                    shell.AssignData(null, error);
+                    return null;
+                }
+                NetSegmentListMessage raw = ret as NetSegmentListMessage;
+                shell.AssignData(raw.list.Select((item) => ObjectStorage.Instance.Segments.SaveData(item)).ToList());
+                return null;
+            });
+            shell.CacheFunc = () => { ClientHandler.Instance.WaitOnHandle(handle); };
+            return shell;
         }
     }
 }

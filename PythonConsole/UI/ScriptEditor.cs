@@ -26,7 +26,7 @@ namespace PythonConsole
         private readonly GUIArea footerArea;
 
         //private IModEntryPoint currentMod;
-        private string lastError = string.Empty;
+        private string contextMsg = string.Empty;
         private string output = "Starting remote python engine...\n";
 
         private Vector2 editorScrollPosition = Vector2.zero;
@@ -101,7 +101,7 @@ namespace PythonConsole
             isDefaultPath = Util.NormalizePath(projectWorkspacePath) == Util.NormalizePath(defaultPath);
             if (projectWorkspacePath.Length == 0)
             {
-                lastError = "Invalid project workspace path";
+                contextMsg = "Invalid project workspace path";
                 return;
             }
 
@@ -149,11 +149,11 @@ namespace PythonConsole
             }
             catch (Exception ex)
             {
-                lastError = ex.Message;
+                contextMsg = ex.Message;
                 return;
             }
 
-            lastError = string.Empty;
+            contextMsg = string.Empty;
         }
 
         public void PrintOutput(string text)
@@ -165,7 +165,7 @@ namespace PythonConsole
         public void PrintError(string text)
         {
             output += "Error: " + text + "\n";
-            lastError = text;
+            contextMsg = text;
             outputScrollPosition = new Vector2(outputScrollPosition.x, Mathf.Infinity);
         }
 
@@ -206,11 +206,11 @@ namespace PythonConsole
             }
             catch (Exception ex)
             {
-                lastError = ex.Message;
+                contextMsg = ex.Message;
                 return;
             }
 
-            lastError = string.Empty;
+            contextMsg = string.Empty;
         }
 
         public void OnUpdate()
@@ -333,7 +333,7 @@ namespace PythonConsole
             if(PythonConsole.Instance?.State == ConsoleState.Ready) {
                 AbortFileActions();
                 PythonConsole.Instance.ScheduleExecution(currentFile.Source);
-                lastError = string.Empty;
+                contextMsg = string.Empty;
             }
         }
 
@@ -366,7 +366,7 @@ namespace PythonConsole
 
             GUI.enabled = true;
 
-            GUILayout.Label(state == ConsoleState.ScriptRunning ? "Executing..." : (state == ConsoleState.ScriptAborting ? "Aborting..." : (lastError != "" ? "Last error: " + lastError : "")));
+            GUILayout.Label(state == ConsoleState.ScriptRunning ? "Executing..." : (state == ConsoleState.ScriptAborting ? "Aborting..." : (contextMsg != "" ? "Last error: " + contextMsg : "")));
 
             GUILayout.FlexibleSpace();
 
@@ -390,7 +390,7 @@ namespace PythonConsole
                 }
                 catch (Exception ex)
                 {
-                    lastError = ex.Message;
+                    contextMsg = ex.Message;
                     return;
                 }
             } else if(deletingFile)
@@ -404,7 +404,7 @@ namespace PythonConsole
                     }
                     catch (Exception ex)
                     {
-                        lastError = ex.Message;
+                        contextMsg = ex.Message;
                         return;
                     }
                     ReloadProjectWorkspace();
@@ -435,14 +435,15 @@ namespace PythonConsole
                     {
                         AbortFileActions();
                         SaveProjectFile(currentFile);
+                        contextMsg = "File saved";
                     }
                     catch (Exception ex)
                     {
-                        lastError = ex.Message;
+                        contextMsg = ex.Message;
                         return;
                     }
 
-                    lastError = string.Empty;
+                    contextMsg = string.Empty;
                 }
 
                 GUI.enabled = true;
@@ -474,7 +475,7 @@ namespace PythonConsole
             if (outputVisible) {
                 if (GUILayout.Button("Clear", GUILayout.ExpandWidth(false))) {
                     AbortFileActions();
-                    lastError = string.Empty;
+                    contextMsg = string.Empty;
                     output = string.Empty;
                 }
             }

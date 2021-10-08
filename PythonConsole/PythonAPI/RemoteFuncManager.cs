@@ -1,5 +1,4 @@
 ﻿using SkylinesPythonShared;
-using SkylinesPythonShared.Messages;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,33 +25,20 @@ namespace PythonConsole
             }
         }
 
-        public void HandleAPICall(object msg, string type, bool isAsync)
+        public void HandleAPICall(object msg, string type, long requestId)
         {
             object retVal = null;
             TargetInfo info = funcDict[type];
             try
             {
-                if(info.contract.IsBackgroundAsync) {
-                    retVal = info.method(((AsyncCallbackMessage)msg).payload);
-                } else {
-                    retVal = info.method(msg);
+                retVal = info.method(msg);
+                if (info.contract.RetType != null) {
+                    client.SendMsg(retVal, "s_ret_" + info.contract.RetType, requestId);
                 }
             }
             catch(Exception ex)
             {
-                if(isAsync) {
-                    UnityPythonObject.Instance.Print("Async error: " + ex.Message + " (source: " + info.contract.FuncName + ")\n");
-                } else {
-                    client.SendMessage(ex.Message + " (source: " + info.contract.FuncName + ")", "s_exception");
-                }
-            }
-            if(info.contract.IsBackgroundAsync) {
-                var amsg = new AsyncCallbackMessage();
-                amsg.callbackObjectKey = ((AsyncCallbackMessage)msg).callbackObjectKey;
-                amsg.payload = retVal;
-                client.SendMessage(amsg, "async_callback");
-            } else if(info.contract.RetType != null && !isAsync) {
-                client.SendMessage(retVal, "s_ret_" + info.contract.RetType);
+                client.SendMsg(ex.Message + " (source: " + info.contract.FuncName + ")", "s_exception", requestId);
             }
         }
 

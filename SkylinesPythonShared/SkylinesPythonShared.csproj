@@ -39,27 +39,29 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MessagesIn\GetObjectMessage.cs" />
+    <Compile Include="MessagesIn\GetObjectsFromIndexMessage.cs" />
     <Compile Include="MessagesIn\SetNaturalResourceMessage.cs" />
     <Compile Include="MessagesOut\BatchObjectMessage.cs" />
-    <Compile Include="MessagesOut\BuildingMessage.cs" />
+    <Compile Include="MessagesOut\BuildingData.cs" />
     <Compile Include="MessagesIn\CreateBuildingMessage.cs" />
     <Compile Include="MessagesIn\CreateNodeMessage.cs" />
     <Compile Include="MessagesIn\CreatePropMessage.cs" />
     <Compile Include="MessagesIn\CreateSegmentMessage.cs" />
     <Compile Include="MessagesIn\CreateTreeMessage.cs" />
     <Compile Include="MessagesIn\DeleteObjectMessage.cs" />
-    <Compile Include="Messages\AsyncCallbackMessage.cs" />
-    <Compile Include="Messages\InstanceMessage.cs" />
+    <Compile Include="Messages\InstanceData.cs" />
+    <Compile Include="Messages\InstanceDataBase.cs" />
     <Compile Include="Messages\MessageHeader.cs" />
     <Compile Include="MessagesIn\MoveMessage.cs" />
-    <Compile Include="MessagesOut\NetNodeMessage.cs" />
-    <Compile Include="MessagesOut\NetPrefabMessage.cs" />
+    <Compile Include="MessagesOut\NetNodeData.cs" />
+    <Compile Include="MessagesOut\NetPrefabData.cs" />
     <Compile Include="MessagesOut\NetSegmentListMessage.cs" />
-    <Compile Include="MessagesOut\NetSegmentMessage.cs" />
-    <Compile Include="MessagesOut\PropMessage.cs" />
+    <Compile Include="MessagesOut\NetSegmentData.cs" />
+    <Compile Include="MessagesOut\PropData.cs" />
     <Compile Include="MessagesIn\RenderCircleMessage.cs" />
     <Compile Include="MessagesIn\RenderVectorMessage.cs" />
-    <Compile Include="MessagesOut\TreeMessage.cs" />
+    <Compile Include="MessagesOut\TreeData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="MessagesOut\RunScriptMessage.cs" />
     <Compile Include="Protocol\Contracts.cs" />

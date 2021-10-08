@@ -5,6 +5,8 @@ using System.Linq;
 using System.Net.Sockets;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
+using System.Xml;
+using System.Xml.Serialization;
 
 namespace SkylinesPythonShared
 {
@@ -60,23 +62,32 @@ namespace SkylinesPythonShared
             }
         }
 
-        public virtual void SendMessage(object obj, string type, bool ignoreReturnValue = false)
+        protected virtual void SendMessage(object obj, string type, long requestId = 0, bool ignoreReturnValue = false)
         {
             MessageHeader msg = new MessageHeader();
+            msg.requestId = requestId;
             msg.payload = obj;
             msg.messageType = type;
-            msg.ignoreReturnValue = ignoreReturnValue;
             _client.Send(Serialize(msg));
         }
 
         public static MessageHeader Deserialize(byte[] data)
         {
+            /*string text = Encoding.UTF8.GetString(data);
+            return XmlDeserializeFromString<MessageHeader>(text);*/
             using (var memoryStream = new MemoryStream(data))
                 return (MessageHeader)(new BinaryFormatter()).Deserialize(memoryStream);
         }
 
         public static byte[] Serialize(MessageHeader obj)
         {
+            /*string xml = XmlSerializeToString(obj);
+
+            var bytes1 = Encoding.UTF8.GetBytes(xml);
+            byte[] bytes = new byte[bytes1.Length + 4];
+            BitConverter.GetBytes(bytes1.Length).CopyTo(bytes, 0);
+            bytes1.CopyTo(bytes, 4);
+            return bytes;*/
             using (var memoryStream = new MemoryStream())
             {
                 (new BinaryFormatter()).Serialize(memoryStream, obj);
@@ -87,5 +98,34 @@ namespace SkylinesPythonShared
                 return bytes;
             }
         }
+
+        /*public static string XmlSerializeToString(object objectInstance)
+        {
+            var serializer = new XmlSerializer(objectInstance.GetType());
+            var sb = new StringBuilder();
+
+            using (TextWriter writer = new StringWriter(sb)) {
+                serializer.Serialize(writer, objectInstance);
+            }
+
+            return sb.ToString();
+        }
+
+        public static T XmlDeserializeFromString<T>(string objectData)
+        {
+            return (T)XmlDeserializeFromString(objectData, typeof(T));
+        }
+
+        public static object XmlDeserializeFromString(string objectData, Type type)
+        {
+            var serializer = new XmlSerializer(type);
+            object result;
+
+            using (TextReader reader = new StringReader(objectData)) {
+                result = serializer.Deserialize(reader);
+            }
+
+            return result;
+        }*/
     }
 }

@@ -35,7 +35,7 @@ namespace SkylinesRemotePython
 
         private void WriteImpl(string value)
         {
-            client.SendMessage(value, "c_output_message");
+            client.SendMsg(value, "c_output_message");
         }
 
         protected override void Dispose(bool disposing)

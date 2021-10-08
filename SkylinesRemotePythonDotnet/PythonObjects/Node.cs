@@ -8,65 +8,60 @@ using System.Text;
 namespace SkylinesRemotePython.API
 {
     [Doc("Node structure - junction of Segments (roads/power lines etc.)")]
-    public class Node : CitiesObject
+    public class Node : CitiesObject<NetNodeData,Node>
     {
         public override string type => "node";
 
-        [Doc("Node asset name (eg. 'Basic Road')")]
-        public string prefab_name { get; private set; }
+        private protected override CitiesObjectStorage<NetNodeData,Node, uint> GetStorage()
+        {
+            return ObjectStorage.Instance.Nodes;
+        }
 
         [Doc("Node asset object (eg. 'Basic Road')")]
-        public NetPrefab prefab => NetPrefab.GetNetPrefab(prefab_name, api);
+        public NetPrefab prefab => ObjectStorage.Instance.NetPrefabs.GetById(prefab_name);
 
         [Doc("Elevation over terrain or water level")]
-        public double terrain_offset { get; private set; }
+        public double terrain_offset => _.terrain_offset;
 
         [Doc("ID of building (usually pillar)")]
-        public int building_id { get; private set; }
+        public int building_id => _.building_id;
 
         [Doc("Node building (usually pillar)")]
-        public Building building => building_id == 0 ? null : new Building(api.client.RemoteCall<BuildingMessage>(Contracts.GetBuildingFromId, (uint)building_id), api);
+        public Building building => building_id == 0 ? null : ObjectStorage.Instance.Buildings.GetById((uint)building_id);
 
         [Doc("Count of adjacent segments")]
-        public int seg_count { get; private set; }
+        public int seg_count => _.seg_count;
 
         [Doc("Move to new position")]
         public void move(IPositionable pos) => MoveImpl(pos.position, null);
 
-        private CachedObj<List<Segment>> _cachedSegments;
-
         [Doc("List of adjacent segments")]
-        public List<Segment> segments => _cachedSegments.Get;
+        public List<Segment> segments => ((CachedObj<List<Segment>>)_._cachedSegments).Get;
 
         public override void refresh()
         {
-            AssignData(api.client.RemoteCall<NetNodeMessage>(Contracts.GetNodeFromId, id));
+            ObjectStorage.Instance.Nodes.RefreshInstance(id);
         }
 
-        internal override void AssignData(InstanceMessage data)
+        internal override void AssignData(InstanceDataBase<uint> data, string initializationErrorMsg = null)
         {
-            NetNodeMessage msg = data as NetNodeMessage;
-            if (msg == null) {
-                deleted = true;
-                return;
+            base.AssignData(data, initializationErrorMsg);
+            if(initializationErrorMsg == null) {
+                var list = new PythonList<Segment>();
+                _._cachedSegments = list;
+                list.CacheFunc = () => {
+                    list.AssignData(ClientHandler.Instance.SynchronousCall<List<NetSegmentData>>(Contracts.GetSegmentsForNodeId, id).Select((obj) =>
+                            ObjectStorage.Instance.Segments.SaveData(obj)
+                        ).ToList());
+                };
             }
-            id = msg.id;
-            prefab_name = msg.prefab_name;
-            _position = msg.position;
-            terrain_offset = msg.terrain_offset;
-            building_id = msg.building_id;
-            seg_count = msg.seg_count;
-            _cachedSegments = new CachedObj<List<Segment>>(() => api.client.RemoteCall<List<NetSegmentMessage>>(Contracts.GetSegmentsForNodeId, id).Select((obj) => new Segment(obj, api)).ToList()); ;
         }
 
-        internal Node(NetNodeMessage obj, GameAPI api) : base(api)
+        public Node()
         {
-            AssignData(obj);
-        }
-
-        internal static Node GetNetNode(uint id, GameAPI api)
-        {
-            return new Node(api.client.RemoteCall<NetNodeMessage>(Contracts.GetNodeFromId, id), api);
+            if(!CitiesObjectController.AllowInstantiation) {
+                throw new Exception("Instantiation is not allowed!");
+            }
         }
     }
 }

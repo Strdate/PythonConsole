@@ -6,54 +6,43 @@ using System.Text;
 namespace SkylinesRemotePython.API
 {
     [Doc("Structure holding type of road/network (eg. 'Basic Road' or 'Power Line')")]
-    public class NetPrefab : ApiRefObject, ISimpleToString
+    public class NetPrefab : CitiesObjectBase<NetPrefabData, NetPrefab, string>, ISimpleToString
     {
+        public override string type => "net prefab";
+
+        private protected override CitiesObjectStorage<NetPrefabData, NetPrefab, string> GetStorage()
+        {
+            return ObjectStorage.Instance.NetPrefabs;
+        }
+
         [Doc("Network name")]
-        public string name { get; private set; }
+        public string name => _.id;
 
         [Doc("Network width")]
-        public float width { get; private set; }
+        public float width => _.width;
 
         [Doc("Is elevated/bridge")]
-        public bool is_overground { get; private set; }
+        public bool is_overground => _.is_overground;
 
         [Doc("Is tunnel")]
-        public bool is_underground { get; private set; }
+        public bool is_underground => _.is_underground;
 
         [Doc("Count of forward vehicle lanes")]
-        public int fw_vehicle_lane_count { get; private set; }
+        public int fw_vehicle_lane_count => _.fw_vehicle_lane_count;
 
         [Doc("Count of backward vehicle lanes")]
-        public int bw_vehicle_lane_count { get; private set; }
-
-        protected void AssignData(NetPrefabMessage msg)
-        {
-            name = msg.name;
-            width = msg.width;
-            is_overground = msg.is_overground;
-            is_underground = msg.is_underground;
-            fw_vehicle_lane_count = msg.fw_vehicle_lane_count;
-            bw_vehicle_lane_count = msg.bw_vehicle_lane_count;
-        }
-
-        protected NetPrefab(NetPrefabMessage obj, GameAPI api) : base(api)
-        {
-            AssignData(obj);
-        }
-
-        internal static NetPrefab GetNetPrefab(string name, GameAPI api)
-        {
-            return new NetPrefab(api.client.RemoteCall<NetPrefabMessage>(Contracts.GetNetPrefabFromName, name), api);
-        }
-
-        public override string ToString()
-        {
-            return PythonHelp.RuntimeToString(this);
-        }
+        public int bw_vehicle_lane_count => _.bw_vehicle_lane_count;
 
         public string SimpleToString()
         {
             return name;
+        }
+
+        public NetPrefab()
+        {
+            if (!CitiesObjectController.AllowInstantiation) {
+                throw new Exception("Instantiation is not allowed!");
+            }
         }
     }
 }

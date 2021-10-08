@@ -7,35 +7,28 @@ using System.Text;
 namespace SkylinesRemotePython.API
 {
     [Doc("Free standing tree structure")]
-    public class Tree : CitiesObject
+    public class Tree : CitiesObject<TreeData, Tree>
     {
         public override string type => "tree";
 
-        [Doc("Asset name (eg. 'Conifer')")]
-        public string prefab_name { get; private set; }
+        private protected override CitiesObjectStorage<TreeData, Tree, uint> GetStorage()
+        {
+            return ObjectStorage.Instance.Trees;
+        }
 
         [Doc("Moves node to new position")]
         public void move(IPositionable pos) => MoveImpl(pos.position, null);
 
         public override void refresh()
         {
-            AssignData(api.client.RemoteCall<TreeMessage>(Contracts.GetTreeFromId, id));
+            ObjectStorage.Instance.Trees.RefreshInstance(id);
         }
 
-        internal override void AssignData(InstanceMessage data)
+        public Tree()
         {
-            TreeMessage msg = data as TreeMessage;
-            if (msg == null) {
-                deleted = true;
-                return;
+            if (!CitiesObjectController.AllowInstantiation) {
+                throw new Exception("Instantiation is not allowed!");
             }
-            id = msg.id;
-            prefab_name = msg.prefab_name;
-            _position = msg.position;
-        }
-        internal Tree(TreeMessage obj, GameAPI api) : base(api)
-        {
-            AssignData(obj);
         }
     }
 }

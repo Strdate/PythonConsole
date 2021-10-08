@@ -7,16 +7,18 @@ using System.Text;
 namespace SkylinesRemotePython.API
 {
     [Doc("Structure for building objects (eg. 'Water Tower')")]
-    public class Building : CitiesObject
+    public class Building : CitiesObject<BuildingData,Building>
     {
         public override string type => "building";
 
-        [Doc("Prefab name - eg. 'Elementary School'")]
-        public string prefab_name { get; private set; }
+        private protected override CitiesObjectStorage<BuildingData, Building, uint> GetStorage()
+        {
+            return ObjectStorage.Instance.Buildings;
+        }
 
         [Doc("Building roation in rad")]
         public double angle {
-            get => _angle;
+            get => _.angle;
             set => MoveImpl(null, (float?)value);
         }
 
@@ -25,25 +27,14 @@ namespace SkylinesRemotePython.API
 
         public override void refresh()
         {
-            AssignData(api.client.RemoteCall<BuildingMessage>(Contracts.GetBuildingFromId, id));
+            ObjectStorage.Instance.Buildings.RefreshInstance(id);
         }
 
-        internal override void AssignData(InstanceMessage data)
+        public Building()
         {
-            BuildingMessage msg = data as BuildingMessage;
-            if (msg == null) {
-                deleted = true;
-                return;
+            if (!CitiesObjectController.AllowInstantiation) {
+                throw new Exception("Instantiation is not allowed!");
             }
-            id = msg.id;
-            prefab_name = msg.prefab_name;
-            _position = msg.position;
-            _angle = msg.angle;
-        }
-
-        internal Building(BuildingMessage obj, GameAPI api) : base(api)
-        {
-            AssignData(obj);
         }
     }
 }

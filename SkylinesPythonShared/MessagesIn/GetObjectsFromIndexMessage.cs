@@ -6,8 +6,10 @@ using System.Text;
 namespace SkylinesPythonShared
 {
     [Serializable]
-    public class NetSegmentListMessage
+    public class GetObjectsFromIndexMessage
     {
-        public List<NetSegmentData> list { get; set; }
+        public uint index { get; set; }
+
+        public string type { get; set; }
     }
 }

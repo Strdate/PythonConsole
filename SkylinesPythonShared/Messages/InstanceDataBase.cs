@@ -6,8 +6,8 @@ using System.Text;
 namespace SkylinesPythonShared
 {
     [Serializable]
-    public class NetSegmentListMessage
+    public abstract class InstanceDataBase<T>
     {
-        public List<NetSegmentData> list { get; set; }
+        public T id { get; set; }
     }
 }

@@ -10,51 +10,54 @@ namespace PythonConsole
 {
     public static class ManagersLogic
     {
-        public static PropMessage PrepareProp(ushort id)
+        public static PropData PrepareProp(ushort id)
         {
             if (!ManagersUtil.ExistsProp(id)) {
-                return null;
+                return new PropData();
             }
             PropInstance prop = ManagersUtil.Prop(id);
-            return new PropMessage() {
+            return new PropData() {
                 id = id,
                 position = prop.Position.FromUnity(),
                 prefab_name = prop.Info.name,
-                angle = prop.Angle
+                angle = prop.Angle,
+                exists = true
             };
         }
 
-        public static TreeMessage PrepareTree(uint id)
+        public static TreeData PrepareTree(uint id)
         {
             if (!ManagersUtil.ExistsTree(id)) {
-                return null;
+                return new TreeData();
             }
             TreeInstance tree = ManagersUtil.Tree(id);
-            return new TreeMessage() {
+            return new TreeData() {
                 id = id,
                 position = tree.Position.FromUnity(),
-                prefab_name = tree.Info.name
+                prefab_name = tree.Info.name,
+                exists = true
             };
         }
 
-        public static BuildingMessage PrepareBuilding(ushort id)
+        public static BuildingData PrepareBuilding(ushort id)
         {
             if (!ManagersUtil.ExistsBuilding(id)) {
-                return null;
+                return new BuildingData();
             }
             Building building = ManagersUtil.BuildingS(id);
-            return new BuildingMessage() {
+            return new BuildingData() {
                 id = id,
                 position = building.m_position.FromUnity(),
                 prefab_name = building.Info.name,
-                angle = building.m_angle
+                angle = building.m_angle,
+                exists = true
             };
         }
 
         public static BatchObjectMessage PreparePropsStartingFromIndex(ushort id)
         {
             var buffer = ManagersUtil.PropManager.m_props.m_buffer;
-            var resultArray = new PropMessage[500];
+            var resultArray = new PropData[500];
             int resultArrayIndex = 0;
             bool endOfStream = true;
             ushort i;
@@ -84,7 +87,7 @@ namespace PythonConsole
         public static BatchObjectMessage PrepareTreesStartingFromIndex(uint id)
         {
             var buffer = ManagersUtil.TreeManager.m_trees.m_buffer;
-            var resultArray = new TreeMessage[500];
+            var resultArray = new TreeData[500];
             int resultArrayIndex = 0;
             bool endOfStream = true;
             uint i;
@@ -114,7 +117,7 @@ namespace PythonConsole
         public static BatchObjectMessage PrepareBuildingsStartingFromIndex(ushort id)
         {
             var buffer = ManagersUtil.BuildingManager.m_buildings.m_buffer;
-            var resultArray = new BuildingMessage[500];
+            var resultArray = new BuildingData[500];
             int resultArrayIndex = 0;
             bool endOfStream = true;
             ushort i;
@@ -141,7 +144,7 @@ namespace PythonConsole
             };
         }
 
-        public static InstanceMessage Move(MoveMessage msg)
+        public static InstanceData Move(MoveMessage msg)
         {
             switch (msg.type) {
                 case "node":

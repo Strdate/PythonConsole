@@ -34,13 +34,13 @@ namespace SkylinesRemotePython
             if(_cachedCells == null) {
                 if(PythonHelp.NoCache) {
                     if(!_cacheDict.TryGetValue(id, out CellWrapper wrapper)) {
-                        var value = _client.RemoteCall<NaturalResourceCellBase>(Contracts.GetNaturalResourceCellSingle, id);
+                        var value = _client.SynchronousCall<NaturalResourceCellBase>(Contracts.GetNaturalResourceCellSingle, id);
                         wrapper = new CellWrapper(value);
                         _cacheDict[id] = wrapper;
                     }
                     return ref wrapper._base;
                 }
-                _cachedCells = _client.RemoteCall<NaturalResourceCellBase[]>(Contracts.GetNaturalResourceCells, null);
+                _cachedCells = _client.SynchronousCall<NaturalResourceCellBase[]>(Contracts.GetNaturalResourceCells, null);
             }
             return ref _cachedCells[id];
         }

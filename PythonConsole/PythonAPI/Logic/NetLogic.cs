@@ -13,7 +13,7 @@ namespace PythonConsole
 {
     public static class NetLogic
     {
-        public static NetSegmentMessage CreateSegment(CreateSegmentMessage data)
+        public static NetSegmentData CreateSegment(CreateSegmentMessage data)
         {
             ParseNetOptions(data.net_options, out NetInfo info, out bool invert, out TerrainMode mode);
 
@@ -45,7 +45,7 @@ namespace PythonConsole
                 + (new Vector2(halfWay.x, halfWay.z) - new Vector2(endNode.m_position.x, endNode.m_position.z)).magnitude;
             int numOfSegments = Mathf.Min(1000, Mathf.FloorToInt(length / (float)data.net_options.node_spacing) + 1);
 
-            List<NetSegmentMessage> segments = new List<NetSegmentMessage>();
+            List<NetSegmentData> segments = new List<NetSegmentData>();
             bool straight = NetSegment.IsStraight(startNode.m_position, firstStartDir, endNode.m_position, lastEndDir);
 
             ushort prevNodeId = 0;
@@ -106,26 +106,27 @@ namespace PythonConsole
             return ref NetUtil.Node(id);
         }
 
-        public static SkylinesPythonShared.NetNodeMessage PrepareNode(ushort id)
+        public static SkylinesPythonShared.NetNodeData PrepareNode(ushort id)
         {
             if (!NetUtil.ExistsNode(id)) {
-                return null;
+                return new NetNodeData();
             }
             ref NetNode node = ref NetUtil.Node(id);
-            return new NetNodeMessage() {
+            return new NetNodeData() {
                 id = id,
                 position = node.m_position.FromUnity(),
                 prefab_name = node.Info.name,
                 terrain_offset = node.m_position.y - NetUtil.GetTerrainIncludeWater(node.m_position),
                 building_id = node.m_building,
-                seg_count = node.CountSegments()
+                seg_count = node.CountSegments(),
+                exists = true
             };
         }
 
-        public static SkylinesPythonShared.NetSegmentMessage PrepareSegment(ushort id)
+        public static SkylinesPythonShared.NetSegmentData PrepareSegment(ushort id)
         {
             if (!NetUtil.ExistsSegment(id)) {
-                return null;
+                return new NetSegmentData();
             }
             ref NetSegment segment = ref NetUtil.Segment(id);
             ref NetNode startNode = ref NetUtil.Node(segment.m_startNode);
@@ -136,7 +137,7 @@ namespace PythonConsole
 
             NetSegment.CalculateMiddlePoints(startNode.m_position, segment.m_startDirection, endNode.m_position, segment.m_endDirection, smoothStart, smoothEnd, out Vector3 b, out Vector3 c);
             Bezier bezier = new Bezier3(startNode.m_position, b, c, endNode.m_position).FromUnity();
-            return new NetSegmentMessage() {
+            return new NetSegmentData() {
                 id = id,
                 prefab_name = segment.Info.name,
                 start_node_id = segment.m_startNode,
@@ -144,16 +145,17 @@ namespace PythonConsole
                 start_dir = segment.m_startDirection.FromUnity(),
                 end_dir = segment.m_endDirection.FromUnity(),
                 length = segment.m_averageLength,
-                middle_pos = segment.m_middlePosition.FromUnity(),
+                position = segment.m_middlePosition.FromUnity(),
                 bezier = bezier,
-                is_straight = segment.IsStraight()
+                is_straight = segment.IsStraight(),
+                exists = true
             };
         }
 
         public static BatchObjectMessage PrepareNodesStartingFromIndex(ushort id)
         {
             var buffer = NetUtil.Manager.m_nodes.m_buffer;
-            var resultArray = new NetNodeMessage[500];
+            var resultArray = new NetNodeData[500];
             int resultArrayIndex = 0;
             bool endOfStream = true;
             ushort i;
@@ -183,7 +185,7 @@ namespace PythonConsole
         public static BatchObjectMessage PrepareSegmentsStartingFromIndex(ushort id)
         {
             var buffer = NetUtil.Manager.m_segments.m_buffer;
-            var resultArray = new NetSegmentMessage[500];
+            var resultArray = new NetSegmentData[500];
             int resultArrayIndex = 0;
             bool endOfStream = true;
             ushort i;
@@ -210,11 +212,11 @@ namespace PythonConsole
             };
         }
 
-        public static NetPrefabMessage PrepareNetInfo(string name)
+        public static NetPrefabData PrepareNetInfo(string name)
         {
             NetInfo info = PrefabCollection<NetInfo>.FindLoaded(name);
-            return new NetPrefabMessage() {
-                name = info.name,
+            return new NetPrefabData() {
+                id = info.name,
                 width = info.m_halfWidth * 2,
                 is_overground = info.m_netAI.IsOverground(),
                 is_underground = info.m_netAI.IsUnderground(),

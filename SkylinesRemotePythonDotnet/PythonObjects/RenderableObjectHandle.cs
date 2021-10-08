@@ -6,7 +6,7 @@ using System.Text;
 namespace SkylinesRemotePython.API
 {
     [Doc("Handle for deleting shapes rendered on the map")]
-    public class RenderableObjectHandle : ApiRefObject, ISimpleToString
+    public class RenderableObjectHandle : ISimpleToString
     {
         [Doc("Handle ID")]
         public int id { get; private set; }
@@ -14,10 +14,10 @@ namespace SkylinesRemotePython.API
         [Doc("Deletes the shape")]
         public void delete()
         {
-            api.client.RemoteCall<Object>(Contracts.RemoveRenderedObject, id);
+            ClientHandler.Instance.SynchronousCall<object>(Contracts.RemoveRenderedObject, id);
         }
 
-        internal RenderableObjectHandle(int id, GameAPI api) : base(api)
+        internal RenderableObjectHandle(int id)
         {
             this.id = id;
         }

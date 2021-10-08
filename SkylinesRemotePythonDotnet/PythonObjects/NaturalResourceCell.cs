@@ -36,7 +36,7 @@ namespace SkylinesRemotePython.API
             get => _base.ore;
             set {
                 _base.ore = value;
-                ClientHandler.Instance.RemoteCall<object>(Contracts.SetNaturalResource, new SetNaturalResourceMessage {
+                ClientHandler.Instance.SynchronousCall<object>(Contracts.SetNaturalResource, new SetNaturalResourceMessage {
                     cell_id = natural_resources_cell_id,
                     type = "ore",
                     value = value
@@ -49,7 +49,7 @@ namespace SkylinesRemotePython.API
             get => _base.oil;
             set {
                 _base.oil = value;
-                ClientHandler.Instance.RemoteCall<object>(Contracts.SetNaturalResource, new SetNaturalResourceMessage {
+                ClientHandler.Instance.SynchronousCall<object>(Contracts.SetNaturalResource, new SetNaturalResourceMessage {
                     cell_id = natural_resources_cell_id,
                     type = "oil",
                     value = value
@@ -65,7 +65,7 @@ namespace SkylinesRemotePython.API
             get => _base.fertility;
             set {
                 _base.fertility = value;
-                ClientHandler.Instance.RemoteCall<object>(Contracts.SetNaturalResource, new SetNaturalResourceMessage {
+                ClientHandler.Instance.SynchronousCall<object>(Contracts.SetNaturalResource, new SetNaturalResourceMessage {
                     cell_id = natural_resources_cell_id,
                     type = "fertility",
                     value = value
@@ -78,7 +78,7 @@ namespace SkylinesRemotePython.API
             get => _base.pollution;
             set {
                 _base.pollution = value;
-                ClientHandler.Instance.RemoteCall<object>(Contracts.SetNaturalResource, new SetNaturalResourceMessage {
+                ClientHandler.Instance.SynchronousCall<object>(Contracts.SetNaturalResource, new SetNaturalResourceMessage {
                     cell_id = natural_resources_cell_id,
                     type = "pollution",
                     value = value
@@ -90,14 +90,14 @@ namespace SkylinesRemotePython.API
         public byte water => _base.water;
 
         [Doc("Reloads cached values from the game")]
-        public void refresh() => CachedObjects.Instance.NaturalResources.InvalidateCache();
+        public void refresh() => ObjectStorage.Instance.NaturalResources.InvalidateCache();
 
         public string SimpleToString()
         {
             return PythonHelp.RuntimeToString(this);
         }
 
-        private ref NaturalResourceCellBase _base => ref CachedObjects.Instance.NaturalResources.FromId(natural_resources_cell_id);
+        private ref NaturalResourceCellBase _base => ref ObjectStorage.Instance.NaturalResources.FromId(natural_resources_cell_id);
 
         [Doc("Returns row ID of the natural resources coordinate system")]
         public static int row_id_from_vector(Vector pos)

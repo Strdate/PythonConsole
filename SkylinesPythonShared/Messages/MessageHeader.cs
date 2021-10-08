@@ -10,7 +10,7 @@ namespace SkylinesPythonShared
     {
         public string version;
         public string messageType;
-        public bool ignoreReturnValue;
+        public long requestId;
         public object payload;
     }
 }

@@ -7,12 +7,8 @@ using System.Text;
 namespace SkylinesPythonShared
 {
     [Serializable]
-    public class NetSegmentMessage : InstanceMessage
+    public class NetSegmentData : InstanceData
     {
-        public ushort id { get; set; }
-
-        public string prefab_name { get; set; }
-
         public ushort start_node_id { get; set; }
 
         public ushort end_node_id { get; set; }
@@ -20,8 +16,6 @@ namespace SkylinesPythonShared
         public Vector start_dir { get; set; }
 
         public Vector end_dir { get; set; }
-
-        public Vector middle_pos { get; set; }
 
         public Bezier bezier { get; set; }
 

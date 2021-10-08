@@ -50,6 +50,9 @@ namespace PythonConsole
 
         private void RemotePythonThread()
         {
+            if(ModInfo.DoNotLaunchRemoteConsole.value) {
+                PrintAsync("Warning: Option 'Do not launch remote python console server' is enabled in settings. Turn it off if you don't know what you are doing.\n");
+            }
             TcpClient.StartUpServer();
             while(_startUpTrials < 10) {
                 try {
@@ -97,7 +100,7 @@ namespace PythonConsole
                     }
 
                     if(State == ConsoleState.ScriptAborting) {
-                        _client.SendMessage(null, "s_script_abort");
+                        _client.SendMsg(null, "s_script_abort");
                         continue;
                     }
 
@@ -109,13 +112,8 @@ namespace PythonConsole
                             State = ConsoleState.Ready;
                             PrintErrorAsync("Failed to compile: " + (string)header.payload);
                             break;
-                        case "c_script_end":
-                            _stopWatch.Stop();
-                            State = ConsoleState.Ready;
-                            PrintAsync("Execution took " + _stopWatch.ElapsedMilliseconds + " ms\n");
-                            break;
                         default:
-                            if (header.messageType.StartsWith("c_callfunc_")) {
+                            if (header.messageType.StartsWith("c_callfunc_") || header.messageType == "c_script_end") {
                                 _simulationQueue.Enqueue(header);
                             }
                             break;
@@ -153,23 +151,23 @@ namespace PythonConsole
                     };
                     _stopWatch = new Stopwatch();
                     _stopWatch.Start();
-                    _client.SendMessage(msg, "s_script_run");
+                    _client.SendMsg(msg, "s_script_run");
                     State = ConsoleState.ScriptRunning;
                 }
             }
-            catch {
+            catch(Exception e) {
                 State = ConsoleState.Dead;
-                throw;
+                UnityPythonObject.Instance.PrintError(e.ToString());
             }
         }
 
         public void AbortScript()
         {
             State = ConsoleState.ScriptAborting;
-            _client.SendMessage(null, "s_script_abort");
+            _client.SendMsg(null, "s_script_abort");
         }
 
-        private InstanceMessage[] GetClipboardObjects()
+        private object[] GetClipboardObjects()
         {
             return SelectionTool.Instance.Clipboard.Where((obj) => obj.Exists).Select((obj) => obj.ToMessage()).ToArray();
         }
@@ -180,19 +178,29 @@ namespace PythonConsole
                 UnityPythonObject.Instance.scriptEditor.projectWorkspacePath,
                 Path.Combine(UnityPythonObject.Instance.scriptEditor.projectWorkspacePath, "imports"),
                 Path.Combine(UnityPythonObject.Instance.scriptEditor.projectWorkspacePath, "examples"),
-                Path.Combine(ModInfo.RemotePythonFolder, "imports")
+                Path.Combine(ModInfo.RemotePythonFolder, "imports"),
+                Path.Combine(ModInfo.RemotePythonFolder, "pypy")
             };
         }
 
         public void SimulationStep()
         {
             do {
-                if (State == ConsoleState.ScriptRunning || State == ConsoleState.Ready) {
+                if (State == ConsoleState.ScriptRunning) {
                     while (_simulationQueue.Count > 0) {
                         MessageHeader header = (MessageHeader)_simulationQueue.Dequeue();
-                        _remoteFuncManager.HandleAPICall(header.payload, header.messageType, header.ignoreReturnValue);
+                        switch(header.messageType) {
+                            case "c_script_end":
+                                _stopWatch.Stop();
+                                State = ConsoleState.Ready;
+                                PrintAsync("Execution took " + _stopWatch.ElapsedMilliseconds + " ms\n");
+                                break;
+                            default:
+                                _remoteFuncManager.HandleAPICall(header.payload, header.messageType, header.requestId);
+                                break;
+                        }
                     }
-                    if(ExecuteSynchronously) {
+                    if(ExecuteSynchronously && State == ConsoleState.ScriptRunning) {
                         Thread.Sleep(1);
                     }
                     MoveItTool.instance.SimulationStep();
