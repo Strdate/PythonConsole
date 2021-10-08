@@ -29,9 +29,16 @@ namespace SkylinesRemotePython.API
             storage = GetStorage();
         }
 
-        private uint pointer;
+        private int pointer = -1;
         private uint gamePointer;
         private bool endOfStream;
+
+        private CallbackHandle _handle;
+        /*private CallbackHandle handle {
+            get { return _handle; }
+            set { _handle = value; }
+        }*/
+
         private CallbackHandle handle;
         private string error;
 
@@ -48,6 +55,10 @@ namespace SkylinesRemotePython.API
                     T data = (T)item;
                     storage.SaveData(data);
                 }
+                /*Console.WriteLine($"New lastVisitedIndex: {batch.lastVisitedIndex}, old: {gamePointer}, eos: {batch.endOfStream}");
+                if(gamePointer > batch.lastVisitedIndex) {
+                    throw new Exception("Internal error: gamePointer > lastVisitedIndex");
+                }*/
 
                 gamePointer = batch.lastVisitedIndex;
                 endOfStream = batch.endOfStream;
@@ -74,7 +85,7 @@ namespace SkylinesRemotePython.API
 
         public object Current {
             get {
-                U obj = storage.GetCached(pointer);
+                U obj = storage.GetCached((uint)pointer);
                 if(obj == null) {
                     throw new Exception("Internal error: null data in Current"); // feature - detect wiped cache and ask for new data
                 }
@@ -88,18 +99,25 @@ namespace SkylinesRemotePython.API
             if(error != null) {
                 throw new Exception(error);
             }
-            if(pointer == gamePointer && endOfStream) {
-                return false;
-            }
-            if(gamePointer - pointer < 100 && handle == null && !endOfStream) {
-                AskForData();
-            }
-            if(pointer == gamePointer) {
-                ClientHandler.Instance.WaitOnHandle(handle);
-            }
-            while(pointer < gamePointer && storage.GetCached(pointer) == null) {
+            do {
                 pointer++;
-            }
+                if(pointer > gamePointer) {
+                    throw new Exception("Internal error: pointer > gamePointer");
+                }
+                if (pointer == gamePointer && endOfStream) {
+                    Dispose();
+                    return false;
+                }
+                if (gamePointer - pointer < 200 && handle == null && !endOfStream) {
+                    AskForData();
+                }
+                if (pointer == gamePointer) {
+                    if(handle.Resolved) {
+                        throw new Exception("Internal error: resolved handle");
+                    }
+                    ClientHandler.Instance.WaitOnHandle(handle);
+                }
+            } while (storage.GetCached((uint)pointer) == null || !storage.GetCached((uint)pointer).deleted);
             return true;
         }
 

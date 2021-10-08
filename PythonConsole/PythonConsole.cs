@@ -112,13 +112,8 @@ namespace PythonConsole
                             State = ConsoleState.Ready;
                             PrintErrorAsync("Failed to compile: " + (string)header.payload);
                             break;
-                        case "c_script_end":
-                            _stopWatch.Stop();
-                            State = ConsoleState.Ready;
-                            PrintAsync("Execution took " + _stopWatch.ElapsedMilliseconds + " ms\n");
-                            break;
                         default:
-                            if (header.messageType.StartsWith("c_callfunc_")) {
+                            if (header.messageType.StartsWith("c_callfunc_") || header.messageType == "c_script_end") {
                                 _simulationQueue.Enqueue(header);
                             }
                             break;
@@ -190,12 +185,21 @@ namespace PythonConsole
         public void SimulationStep()
         {
             do {
-                if (State == ConsoleState.ScriptRunning || State == ConsoleState.Ready) {
+                if (State == ConsoleState.ScriptRunning) {
                     while (_simulationQueue.Count > 0) {
                         MessageHeader header = (MessageHeader)_simulationQueue.Dequeue();
-                        _remoteFuncManager.HandleAPICall(header.payload, header.messageType, header.requestId);
+                        switch(header.messageType) {
+                            case "c_script_end":
+                                _stopWatch.Stop();
+                                State = ConsoleState.Ready;
+                                UnityPythonObject.Instance.Print("Execution took " + _stopWatch.ElapsedMilliseconds + " ms\n");
+                                break;
+                            default:
+                                _remoteFuncManager.HandleAPICall(header.payload, header.messageType, header.requestId);
+                                break;
+                        }
                     }
-                    if(ExecuteSynchronously) {
+                    if(ExecuteSynchronously && State == ConsoleState.ScriptRunning) {
                         Thread.Sleep(1);
                     }
                     MoveItTool.instance.SimulationStep();

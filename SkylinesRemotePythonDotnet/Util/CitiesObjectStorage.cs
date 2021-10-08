@@ -51,7 +51,7 @@ namespace SkylinesRemotePython
             ClientHandler.Instance.RemoteCall(
                 Contracts.GetObjectFromId,
                 new GetObjectMessage() {
-                    id = id as uint?,
+                    id = typeof(V) == typeof(uint) ? (uint)(object)id : 0,
                     idString = id as string,
                     type = _type
                 }, (ret, err) => {
@@ -82,7 +82,7 @@ namespace SkylinesRemotePython
                 val = (T)ClientHandler.Instance.SynchronousCall<InstanceDataBase<V>>(
                     Contracts.GetObjectFromId,
                     new GetObjectMessage() {
-                        id = id as uint?,
+                        id = typeof(V) == typeof(uint) ? (uint)(object)id : 0,
                         idString = id as string,
                         type = _type
                     });

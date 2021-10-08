@@ -11,13 +11,23 @@ namespace SkylinesRemotePython.API
     {
         private IList<T> _internalList { get; set; }
 
-        protected override IList<T> Retrieve() => _internalList;
+        internal Action CacheFunc { get; set; }
+
+        protected override IList<T> Retrieve()
+        {
+            if (_internalList == null) {
+                CacheFunc();
+            }
+            return _internalList;
+        }
 
         internal virtual void AssignData(IList<T> list, string initializationErrorMsg = null)
         {
             Initialize(initializationErrorMsg);
             _internalList = list;
         }
+
+        internal PythonList() { }
 
         public T this[int index] { get => _[index]; }
 

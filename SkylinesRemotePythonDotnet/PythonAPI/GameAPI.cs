@@ -82,8 +82,8 @@ namespace SkylinesRemotePython.API
                     return null;
                 }
                 PropData data = (PropData)ret;
-                shell.AssignData(data);
                 ObjectStorage.Instance.Props.AddDataToDictionary(data);
+                shell.AssignData(data);
                 return null;
             });
             return shell;
@@ -104,8 +104,8 @@ namespace SkylinesRemotePython.API
                     return null;
                 }
                 TreeData data = (TreeData)ret;
-                shell.AssignData(data);
                 ObjectStorage.Instance.Trees.AddDataToDictionary(data);
+                shell.AssignData(data);
                 return null;
             });
             return shell;
@@ -127,8 +127,8 @@ namespace SkylinesRemotePython.API
                     return null;
                 }
                 BuildingData data = (BuildingData)ret;
-                shell.AssignData(data);
                 ObjectStorage.Instance.Buildings.AddDataToDictionary(data);
+                shell.AssignData(data);
                 return null;
             });
             return shell;

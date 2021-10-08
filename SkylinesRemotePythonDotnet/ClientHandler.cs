@@ -97,7 +97,7 @@ namespace SkylinesRemotePython
         public CallbackHandle RemoteCall(Contract contract, object param, Func<object, string, object> callback)
         {
             var handle = RemoteCallInternal(contract, param, callback);
-            if (!AsynchronousMode) {
+            if (!AsynchronousMode && !contract.IsAsyncByDefault) {
                 WaitOnHandle(handle);
             }
             return handle;

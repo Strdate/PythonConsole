@@ -25,5 +25,16 @@ namespace SkylinesRemotePython.API
             get => client.AsynchronousMode;
             set => client.AsynchronousMode = value;
         }
+
+        // Prints into python engine console
+        public void __WriteLine(object msg)
+        {
+            Console.WriteLine(msg);
+        }
+
+        public void __Write(string msg)
+        {
+            Console.Write(msg);
+        }
     }
 }

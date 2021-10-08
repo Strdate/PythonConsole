@@ -18,7 +18,7 @@ namespace PythonConsole
             
         }
 
-        private static object GetObjectFromIdInternal(uint? id, string idString, string type)
+        private static object GetObjectFromIdInternal(uint id, string idString, string type)
         {
             object ret;
             switch (type) {

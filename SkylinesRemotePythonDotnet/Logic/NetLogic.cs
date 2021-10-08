@@ -31,8 +31,8 @@ namespace SkylinesRemotePython
                     return null;
                 }
                 NetSegmentData data = (NetSegmentData)ret;
-                shell.AssignData(data);
                 ObjectStorage.Instance.Segments.AddDataToDictionary(data);
+                shell.AssignData(data);
                 return null;
             });
             return shell;
@@ -54,7 +54,7 @@ namespace SkylinesRemotePython
             };
 
             PythonList<Segment> shell = new PythonList<Segment>();
-            ClientHandler.Instance.RemoteCall(Contracts.CreateSegments, msg, (ret, error) => {
+            var handle = ClientHandler.Instance.RemoteCall(Contracts.CreateSegments, msg, (ret, error) => {
                 if(error != null) {
                     shell.AssignData(null, error);
                     return null;
@@ -63,6 +63,7 @@ namespace SkylinesRemotePython
                 shell.AssignData(raw.list.Select((item) => ObjectStorage.Instance.Segments.SaveData(item)).ToList());
                 return null;
             });
+            shell.CacheFunc = () => { ClientHandler.Instance.WaitOnHandle(handle); };
             return shell;
         }
     }

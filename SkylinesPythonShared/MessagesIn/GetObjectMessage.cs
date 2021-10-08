@@ -9,7 +9,7 @@ namespace SkylinesPythonShared
     [Serializable]
     public class GetObjectMessage
     {
-        public uint? id { get; set; }
+        public uint id { get; set; }
 
         public string idString { get; set; }
 

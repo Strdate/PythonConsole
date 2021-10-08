@@ -26,7 +26,7 @@ namespace SkylinesPythonShared
         public static Contract GetNaturalResourceCellSingle = new Contract() { FuncName = "GetNaturalResourceCellSingle", RetType = "NaturalResourceCellBase" };
         public static Contract RemoveRenderedObject = new Contract() { FuncName = "RemoveRenderedObject", RetType = null };
         public static Contract SetNaturalResource = new Contract() { FuncName = "SetNaturalResource", RetType = null };
-        public static Contract GetObjectsStartingFromIndex = new Contract() { FuncName = "GetObjectsStartingFromIndex", RetType = "any" };
+        public static Contract GetObjectsStartingFromIndex = new Contract() { FuncName = "GetObjectsStartingFromIndex", RetType = "any", IsAsyncByDefault = true };
     }
 
     public class Contract
@@ -35,6 +35,9 @@ namespace SkylinesPythonShared
 
         public string RetType { get; internal set; }
 
+        // unused
         public bool CanRunAsync { get; internal set; }
+
+        public bool IsAsyncByDefault { get; internal set; }
     }
 }
