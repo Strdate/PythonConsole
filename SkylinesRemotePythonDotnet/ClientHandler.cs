@@ -79,8 +79,12 @@ namespace SkylinesRemotePython
                     result = callback.Callback.Invoke(msg.payload, null);
                 } else {
                     error = (string)msg.payload;
-                    Console.WriteLine("Exception: " + error);
                     callback.Callback.Invoke(null, error);
+                    if(!AsynchronousMode) {
+                        throw new Exception(error);
+                    } else {
+                        Print("Exception: " + error + "\n");
+                    }
                 }
                 return;
             }
@@ -97,7 +101,7 @@ namespace SkylinesRemotePython
         public CallbackHandle RemoteCall(Contract contract, object param, Func<object, string, object> callback)
         {
             var handle = RemoteCallInternal(contract, param, callback);
-            if (!AsynchronousMode && !contract.IsAsyncByDefault) {
+            if (!AsynchronousMode && !contract.IsAsyncByDefault && contract.RetType != null) {
                 WaitOnHandle(handle);
             }
             return handle;
@@ -118,7 +122,7 @@ namespace SkylinesRemotePython
             var handle = RemoteCallInternal(contract, param, (ret, error) => {
                 return ret;
             });
-            return (T)WaitOnHandle(handle);
+            return contract.RetType != null ?(T)WaitOnHandle(handle) : default(T);
         }
 
         public object WaitOnHandle(CallbackHandle handle)

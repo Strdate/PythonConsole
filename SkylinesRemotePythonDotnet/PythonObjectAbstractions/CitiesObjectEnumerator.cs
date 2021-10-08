@@ -117,7 +117,7 @@ namespace SkylinesRemotePython.API
                     }
                     ClientHandler.Instance.WaitOnHandle(handle);
                 }
-            } while (storage.GetCached((uint)pointer) == null || !storage.GetCached((uint)pointer).deleted);
+            } while (storage.GetCached((uint)pointer) == null || storage.GetCached((uint)pointer).deleted);
             return true;
         }
 

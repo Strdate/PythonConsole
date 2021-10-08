@@ -178,7 +178,8 @@ namespace PythonConsole
                 UnityPythonObject.Instance.scriptEditor.projectWorkspacePath,
                 Path.Combine(UnityPythonObject.Instance.scriptEditor.projectWorkspacePath, "imports"),
                 Path.Combine(UnityPythonObject.Instance.scriptEditor.projectWorkspacePath, "examples"),
-                Path.Combine(ModInfo.RemotePythonFolder, "imports")
+                Path.Combine(ModInfo.RemotePythonFolder, "imports"),
+                Path.Combine(ModInfo.RemotePythonFolder, "pypy")
             };
         }
 
@@ -192,7 +193,7 @@ namespace PythonConsole
                             case "c_script_end":
                                 _stopWatch.Stop();
                                 State = ConsoleState.Ready;
-                                UnityPythonObject.Instance.Print("Execution took " + _stopWatch.ElapsedMilliseconds + " ms\n");
+                                PrintAsync("Execution took " + _stopWatch.ElapsedMilliseconds + " ms\n");
                                 break;
                             default:
                                 _remoteFuncManager.HandleAPICall(header.payload, header.messageType, header.requestId);

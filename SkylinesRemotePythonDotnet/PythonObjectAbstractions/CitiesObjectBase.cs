@@ -20,7 +20,9 @@ namespace SkylinesRemotePython.API
         internal virtual void AssignData(InstanceDataBase<V> msg, string initializationErrorMsg = null)
         {
             Initialize(initializationErrorMsg);
-            _internalId = ((T)msg).id;
+            if(msg != null) {
+                _internalId = ((T)msg).id;
+            }
         }
 
         [Doc("Object type (node, buidling, prop etc.)")]
