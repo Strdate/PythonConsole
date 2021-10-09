@@ -5,8 +5,8 @@ using System.Linq;
 using System.Net.Sockets;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
-using System.Xml;
-using System.Xml.Serialization;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Json;
 
 namespace SkylinesPythonShared
 {
@@ -75,8 +75,10 @@ namespace SkylinesPythonShared
         {
             /*string text = Encoding.UTF8.GetString(data);
             return XmlDeserializeFromString<MessageHeader>(text);*/
-            using (var memoryStream = new MemoryStream(data))
-                return (MessageHeader)(new BinaryFormatter()).Deserialize(memoryStream);
+            
+            return JsonDeserialize<MessageHeader>(data);
+            // using (var memoryStream = new MemoryStream(data))
+            //     return (MessageHeader)(new BinaryFormatter()).Deserialize(memoryStream);
         }
 
         public static byte[] Serialize(MessageHeader obj)
@@ -88,15 +90,56 @@ namespace SkylinesPythonShared
             BitConverter.GetBytes(bytes1.Length).CopyTo(bytes, 0);
             bytes1.CopyTo(bytes, 4);
             return bytes;*/
-            using (var memoryStream = new MemoryStream())
-            {
-                (new BinaryFormatter()).Serialize(memoryStream, obj);
-                byte[] res = memoryStream.ToArray();
-                byte[] bytes = new byte[res.Length + 4];
-                BitConverter.GetBytes(res.Length).CopyTo(bytes, 0);
-                res.CopyTo(bytes, 4);
-                return bytes;
-            }
+
+            byte[] json = JsonSerialize(obj);
+            byte[] result = new byte[json.Length + 4];
+            BitConverter.GetBytes(json.Length).CopyTo(result, 0);
+            json.CopyTo(result, 4);
+            return result;
+
+            // using (var memoryStream = new MemoryStream())
+            // {
+            //     (new BinaryFormatter()).Serialize(memoryStream, obj);
+            //     byte[] res = memoryStream.ToArray();
+            //     byte[] bytes = new byte[res.Length + 4];
+            //     BitConverter.GetBytes(res.Length).CopyTo(bytes, 0);
+            //     res.CopyTo(bytes, 4);
+            //     return bytes;
+            // }
+        }
+
+        public static byte[] JsonSerialize(object obj)
+        {
+            var serializer = new DataContractJsonSerializer(obj.GetType());
+            var buffer = new MemoryStream();
+            serializer.WriteObject(buffer, obj);
+            byte[] result = buffer.ToArray();
+            buffer.Close();
+            return result;
+        }
+
+        public static object JsonDeserialize(byte[] src, Type T)
+        {
+            var serializer = new DataContractJsonSerializer(T);
+            var buffer = new MemoryStream(src);
+            object result = serializer.ReadObject(buffer);
+            buffer.Close();
+            return result;
+        }
+
+        public static object JsonDeserialize(string src, Type T)
+        {
+            return JsonDeserialize(Encoding.UTF8.GetBytes(src), T);
+        }
+
+        public static T JsonDeserialize<T>(string src)
+        {
+            return (T)JsonDeserialize(src, typeof(T));
+        }
+
+        public static T JsonDeserialize<T>(byte[] src)
+        {
+            return (T)JsonDeserialize(src, typeof(T));
         }
 
         /*public static string XmlSerializeToString(object objectInstance)
