@@ -1,6 +1,6 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import Any, Callable, Dict, Optional
+from typing import Any, Callable, Dict, Optional, Type, TypeVar, overload
 
 from .base import XMLNode
 
@@ -32,6 +32,8 @@ class SupportsXML(ABC):
     def from_xml_node(cls, root: XMLNode):
         ...
 
+T = TypeVar('T')
+
 class XMLInclude():
     """ Custom class name registration """
 
@@ -48,12 +50,25 @@ class XMLInclude():
         'bool': bool,
     }
 
-    def __new__(cls, xsi_name: Optional[str | Callable] = None):
+    @overload
+    def __new__(cls, xsi_name: Type[T]) -> Type[T]:
+        ...
+
+    @overload
+    def __new__(cls, xsi_name: Optional[str]) -> Callable[[Type[T]], Type[T]]:
+        ...
+
+    def __new__(cls,
+        xsi_name: Optional[str] | Type[T] = None
+    ) -> Type[T] | Callable[[Type[T]], Type[T]]:
 
         if callable(xsi_name):
+            result = xsi_name
             xsi_name = None
+        else:
+            result = None
 
-        def wrapper(class_: type):
+        def wrapper(class_: Type[T]) -> Type[T]:
             assert isinstance(xsi_name, str) or xsi_name is None
             if not issubclass(class_, SupportsXML):
                 raise TypeError("Registered classes should be subclass of `SupportsXML`")
@@ -62,8 +77,10 @@ class XMLInclude():
             cls._registered_name.update({name: class_})
             cls._registered_class.update({class_: name})
             return class_
+        if result is None:
+            return wrapper
 
-        return wrapper
+        return wrapper(result)
 
     @classmethod
     def registered_class(cls):
@@ -164,6 +181,7 @@ class XMLDeserializer():
                     raise ValueError("Child node in built-in types")
                 return type_(self.deserialize(root))
 
+            assert issubclass(type_, SupportsXML)
             try:
                 return type_.from_xml_node(root)
             except AttributeError:
@@ -186,6 +204,7 @@ class XMLDeserializer():
 
         # Direct custom attribute 
         for _ in XMLInclude.registered_class():
+            assert issubclass(_, SupportsXML)
             try:
                 return _.from_xml_node(root)
             except IncompatibleError:
