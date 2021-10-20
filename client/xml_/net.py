@@ -1,6 +1,7 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import Any, Callable, Dict, Optional, Type, TypeVar, overload
+from typing import Callable, Dict, List, NoReturn, Optional, Type, TypeVar, Union, overload
+from typing_extensions import Literal
 
 from .base import XMLNode
 
@@ -29,10 +30,14 @@ class SupportsXML(ABC):
 
     @classmethod
     @abstractmethod
-    def from_xml_node(cls, root: XMLNode):
+    def from_xml_node(cls, root: XMLNode) -> SupportsXML:
         ...
 
 T = TypeVar('T')
+BUILT_IN = Union[int, float, bool, str]
+CONTAINER = List[Union[SupportsXML, BUILT_IN]]
+TRUE = Literal[True]
+FALSE = Literal[False]
 
 class XMLInclude():
     """ Custom class name registration """
@@ -111,7 +116,7 @@ class XMLInclude():
 class XMLSerializer():
     """ Serialize a Python object to XML node """
 
-    def serialize(self, obj: SupportsXML, *,
+    def serialize(self, obj: SupportsXML | BUILT_IN | CONTAINER, *,
         force_xsi_name: bool = False, type_override: Optional[str] = None,
         name_override: Optional[str] = None, parent: Optional[XMLNode] = None
     ) -> XMLNode:
@@ -150,6 +155,7 @@ class XMLSerializer():
 
         else:
             # Processing custom types
+            assert isinstance(obj, SupportsXML)
             try:
                 ret: XMLNode = obj.default(parent)
             except AttributeError as exception:
@@ -157,6 +163,8 @@ class XMLSerializer():
                     from exception
             if force_xsi_name:
                 ret.attrs.update({'xsi:type': XMLInclude.get_name(type(obj))})
+            if name_override is not None:
+                ret._name = name_override
 
 
         if parent is not None:
@@ -167,12 +175,60 @@ class XMLSerializer():
 class XMLDeserializer():
     """ Deserialize XML node to Python object """
 
+    @overload
+    def deserialize(self, root: XMLNode, *,
+        is_container: TRUE = True, in_container: TRUE = True,
+        type_override: None = None
+    ) -> NoReturn:
+        ...
+
+    @overload
+    def deserialize(self, root: XMLNode, *,
+        is_container: TRUE = True, in_container: FALSE = False,
+        type_override: None = None
+    ) -> CONTAINER:
+        ...
+
+    @overload
+    def deserialize(self, root: XMLNode, *,
+        is_container: FALSE = False, in_container: bool = False,
+        type_override: None = None
+    ) -> SupportsXML | BUILT_IN:
+        ...
+    
+    @overload
+    def deserialize(self, root: XMLNode, *,
+        is_container: TRUE = True, in_container: FALSE = False,
+        type_override: Type[T]
+    ) -> List[T]:
+        ...
+
+    @overload
+    def deserialize(self, root: XMLNode, *,
+        is_container: FALSE = False, in_container: bool = False,
+        type_override: Type[T]
+    ) -> T:
+        ...
+
     def deserialize(self, root: XMLNode, *,
         is_container: bool = False,
         in_container: bool = False,
-    ) -> Any:
+        type_override: Optional[Type[T]] = None
+    ) -> SupportsXML | BUILT_IN | CONTAINER | NoReturn | T | List[T]:
         if is_container:
-            return [self.deserialize(_, in_container=True) for _ in root.child]
+            if type_override is None:
+                return [
+                    self.deserialize(_, in_container=True, is_container=False)
+                    for _ in root.child
+                ]
+            else:
+                return [
+                    self.deserialize(_,
+                        in_container=True, is_container=False,
+                        type_override=type_override
+                    )
+                    for _ in root.child
+                ]
         if in_container or 'xsi:type' in root.attrs:
             name = root.attrs['xsi:type'] if root.name is None else root.name
             type_ = XMLInclude.get_class(name)
@@ -189,6 +245,8 @@ class XMLDeserializer():
 
         if not root.child: # Built-in types
             ret = ''.join(root.content).strip()
+            if type_override is not None:
+                return type_override(ret)
             if ret == 'true':
                 return True
             if ret == 'false':
@@ -202,12 +260,16 @@ class XMLDeserializer():
             
             return ret
 
-        # Direct custom attribute 
-        for _ in XMLInclude.registered_class():
-            assert issubclass(_, SupportsXML)
-            try:
-                return _.from_xml_node(root)
-            except IncompatibleError:
-                continue
+        # Direct custom attribute
+        if type_override is None:
+            for _ in XMLInclude.registered_class():
+                assert issubclass(_, SupportsXML)
+                try:
+                    return _.from_xml_node(root)
+                except IncompatibleError:
+                    continue
+        else:
+            assert issubclass(type_override, SupportsXML)
+            return type_override.from_xml_node(root)
 
         raise ValueError("No compatible registered class found")
