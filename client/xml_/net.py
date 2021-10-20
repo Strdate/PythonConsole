@@ -20,7 +20,7 @@ class SupportsXML(ABC):
     @classmethod
     def __subclasshook__(cls, C):
         if cls is SupportsXML:
-            if 'default' in C.__dict__ and 'from_xml_node' in C.__dict:
+            if 'default' in C.__dict__ and 'from_xml_node' in C.__dict__:
                 return True
         return NotImplemented
 
@@ -133,7 +133,8 @@ class XMLSerializer():
 
             if isinstance(obj, bool):
                 ret.add_content(str(obj).lower())
-            ret.add_content(str(obj))
+            else:
+                ret.add_content(str(obj))
 
         elif isinstance(obj, list):
             # Processing container types
