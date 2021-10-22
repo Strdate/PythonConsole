@@ -44,9 +44,13 @@ class BaseMessage(xml_.SupportsXML):
             parent=parent, **{'xsi:type': xml_.XMLInclude.get_name(type(self))}
         )
         for _ in self.attributes:
+            if self.content[_] is None:
+                continue
             try:
                 encoder.serialize(
-                    self.content[_], name_override=_, parent=ret_node)
+                    self.content[_],
+                    name_override=_, parent=ret_node, force_xsi_name=True
+                )
             except KeyError as e:
                 raise KeyError("Attribute {0} not found".format(_)) from e
         return ret_node
