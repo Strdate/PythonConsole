@@ -10,21 +10,21 @@ namespace SkylinesPythonShared.API
     public class Vector : IPositionable, ISimpleToString
     {
         [Doc("X cooord")]
-        public double x { get; private set; }
+        public double x { get; set; }
 
         [Doc("Y cooord (height)")]
-        public double y { get; private set; }
+        public double y { get; set; }
 
         [Doc("Z cooord")]
-        public double z { get; private set; }
+        public double z { get; set; }
 
         [Doc("Is height (Y coord) defined")]
-        public bool is_height_defined { get; private set; }
+        public bool is_height_defined { get; set; }
 
         [Doc("Returns itself")]
         public Vector position => this;
 
-        private Vector()
+        public Vector()
         {
             
         }

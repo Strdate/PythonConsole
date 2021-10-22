@@ -5,8 +5,8 @@ using System.Linq;
 using System.Net.Sockets;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
-using System.Runtime.Serialization;
-using System.Runtime.Serialization.Json;
+using System.Xml.Serialization;
+using JsonFx.Json;
 
 namespace SkylinesPythonShared
 {
@@ -73,29 +73,30 @@ namespace SkylinesPythonShared
 
         public static MessageHeader Deserialize(byte[] data)
         {
-            /*string text = Encoding.UTF8.GetString(data);
-            return XmlDeserializeFromString<MessageHeader>(text);*/
+            string text = Encoding.UTF8.GetString(data);
+            Console.WriteLine(text);
+            return XmlDeserializeFromString<MessageHeader>(text);
             
-            return JsonDeserialize<MessageHeader>(data);
+            // return JsonDeserialize<MessageHeader>(data);
             // using (var memoryStream = new MemoryStream(data))
             //     return (MessageHeader)(new BinaryFormatter()).Deserialize(memoryStream);
         }
 
         public static byte[] Serialize(MessageHeader obj)
         {
-            /*string xml = XmlSerializeToString(obj);
-
+            string xml = XmlSerializeToString(obj);
+            Console.WriteLine(xml);
             var bytes1 = Encoding.UTF8.GetBytes(xml);
             byte[] bytes = new byte[bytes1.Length + 4];
             BitConverter.GetBytes(bytes1.Length).CopyTo(bytes, 0);
             bytes1.CopyTo(bytes, 4);
-            return bytes;*/
+            return bytes;
 
-            byte[] json = JsonSerialize(obj);
-            byte[] result = new byte[json.Length + 4];
-            BitConverter.GetBytes(json.Length).CopyTo(result, 0);
-            json.CopyTo(result, 4);
-            return result;
+            // byte[] json = JsonSerialize(obj);
+            // byte[] result = new byte[json.Length + 4];
+            // BitConverter.GetBytes(json.Length).CopyTo(result, 0);
+            // json.CopyTo(result, 4);
+            // return result;
 
             // using (var memoryStream = new MemoryStream())
             // {
@@ -110,39 +111,28 @@ namespace SkylinesPythonShared
 
         public static byte[] JsonSerialize(object obj)
         {
-            var serializer = new DataContractJsonSerializer(obj.GetType());
-            var buffer = new MemoryStream();
-            serializer.WriteObject(buffer, obj);
-            byte[] result = buffer.ToArray();
-            buffer.Close();
-            return result;
-        }
-
-        public static object JsonDeserialize(byte[] src, Type T)
-        {
-            var serializer = new DataContractJsonSerializer(T);
-            var buffer = new MemoryStream(src);
-            object result = serializer.ReadObject(buffer);
-            buffer.Close();
-            return result;
-        }
-
-        public static object JsonDeserialize(string src, Type T)
-        {
-            return JsonDeserialize(Encoding.UTF8.GetBytes(src), T);
+            var settings = new JsonWriterSettings();
+            var result = new StringBuilder();
+            settings.TypeHintName = "__type";
+            var serializer = new JsonWriter(result, settings);
+            serializer.Write(obj);
+            return Encoding.UTF8.GetBytes(result.ToString());
         }
 
         public static T JsonDeserialize<T>(string src)
         {
-            return (T)JsonDeserialize(src, typeof(T));
+            var settings = new JsonReaderSettings();
+            settings.TypeHintName = "__type";
+            var deserializer = new JsonReader(src, settings);
+            return deserializer.Deserialize<T>();
         }
 
         public static T JsonDeserialize<T>(byte[] src)
         {
-            return (T)JsonDeserialize(src, typeof(T));
+            return JsonDeserialize<T>(Encoding.UTF8.GetString(src));
         }
 
-        /*public static string XmlSerializeToString(object objectInstance)
+        public static string XmlSerializeToString(object objectInstance)
         {
             var serializer = new XmlSerializer(objectInstance.GetType());
             var sb = new StringBuilder();
@@ -169,6 +159,6 @@ namespace SkylinesPythonShared
             }
 
             return result;
-        }*/
+        }
     }
 }
