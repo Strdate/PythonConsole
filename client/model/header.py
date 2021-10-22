@@ -25,7 +25,7 @@ class BaseMessage(xml_.SupportsXML):
         decoder = xml_.XMLDeserializer()
         child = {_.name: _ for _ in root_node.child}
         ret = super().__new__(cls)
-        
+
         if set(child) != set(ret.attributes):
             raise xml_.IncompatibleError
         kwargs = {}
@@ -50,6 +50,15 @@ class BaseMessage(xml_.SupportsXML):
             except KeyError as e:
                 raise KeyError("Attribute {0} not found".format(_)) from e
         return ret_node
+
+    def __contains__(self, o: str):
+        return o in self.content
+
+    def __getitem__(self, name: str) -> Any:
+        return self.content[name]
+
+    def __iter__(self):
+        return iter(self.content)
 
 
 class InstanceDataBase(BaseMessage):
