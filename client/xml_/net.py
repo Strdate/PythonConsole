@@ -5,6 +5,11 @@ from typing_extensions import Literal
 
 from .base import XMLNode
 
+XML_NAMESPACE = {
+    "xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
+    "xmlns:xsd": "http://www.w3.org/2001/XMLSchema"
+}
+
 
 class IncompatibleError(Exception):
 
@@ -115,6 +120,17 @@ class XMLInclude():
 
 class XMLSerializer():
     """ Serialize a Python object to XML node """
+
+    def export(self, obj: SupportsXML | BUILT_IN | CONTAINER, *,
+        force_xsi_name: bool = False, type_override: Optional[str] = None,
+        name_override: Optional[str] = None, parent: Optional[XMLNode] = None
+    ) -> XMLNode:
+        ret = self.serialize(
+            obj, force_xsi_name=force_xsi_name, type_override=type_override,
+            name_override=name_override, parent=parent
+        )
+        ret.attrs.update(XML_NAMESPACE)
+        return ret
 
     def serialize(self, obj: SupportsXML | BUILT_IN | CONTAINER, *,
         force_xsi_name: bool = False, type_override: Optional[str] = None,
