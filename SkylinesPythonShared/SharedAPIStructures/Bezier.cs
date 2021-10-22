@@ -9,6 +9,15 @@ namespace SkylinesPythonShared.API
 	[Doc("Abstract bezier structure")]
 	public class Bezier
     {
+        [Doc("Dummy constructor for XML Serialization")]
+		public Bezier()
+		{
+            this.a = Vector.zero;
+            this.b = Vector.zero;
+            this.c = Vector.zero;
+            this.d = Vector.zero;
+		}
+
 		[Doc("Creates new bezier from 4 control points")]
 		public Bezier(Vector _a, Vector _b, Vector _c, Vector _d)
 		{
@@ -33,7 +42,7 @@ namespace SkylinesPythonShared.API
 		public Vector tangent(float t)
 		{
 			float num = t * t;
-			float num2 = 3f * num;
+			float num2 = 3f * num; 
 			float num3 = 6f * t - 9f * num;
 			float num4 = 3f - 12f * t + 9f * num;
 			float num5 = 6f * t - 3f - 3f * num;
@@ -51,16 +60,16 @@ namespace SkylinesPythonShared.API
 		public Bezier inverted => new Bezier(this.d, this.c, this.b, this.a);
 
 		[Doc("Point A (start)")]
-		public Vector a { get; private set; }
+		public Vector a { get; set; }
 
 		[Doc("Point B")]
-		public Vector b { get; private set; }
+		public Vector b { get; set; }
 
 		[Doc("Point C")]
-		public Vector c { get; private set; }
+		public Vector c { get; set; }
 
 		[Doc("Point D (end)")]
-		public Vector d { get; private set; }
+		public Vector d { get; set; }
 
 		public override string ToString()
 		{
