@@ -231,7 +231,7 @@ class XMLDeserializer():
                     for _ in root.child
                 ]
         if in_container or 'xsi:type' in root.attrs:
-            name = root.attrs['xsi:type'] if root.name is None else root.name
+            name = root.attrs['xsi:type'] if 'xsi:type' in root.attrs else root.name
             type_ = XMLInclude.get_class(name)
             if type_ in XMLInclude.BUILTIN_CLASS:
                 if root.child:
@@ -273,4 +273,4 @@ class XMLDeserializer():
             assert issubclass(type_override, SupportsXML)
             return type_override.from_xml_node(root)
 
-        raise ValueError("No compatible registered class found")
+        raise ValueError("No compatible registered class found for {root.name}")

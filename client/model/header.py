@@ -18,21 +18,23 @@ class BaseMessage(xml_.SupportsXML):
     @property
     @abstractmethod
     def attributes(self) -> Dict[str, bool]:
-        ...
+        return {}
 
     @classmethod
     def from_xml_node(cls, root_node: xml_.XMLNode):
         decoder = xml_.XMLDeserializer()
         child = {_.name: _ for _ in root_node.child}
         ret = super().__new__(cls)
+        
         if set(child) != set(ret.attributes):
             raise xml_.IncompatibleError
+        kwargs = {}
         for _ in ret.attributes:
             if ret.attributes[_]:
-                update = {_: decoder.deserialize(child[_], is_container=True)}
+                kwargs.update({_: decoder.deserialize(child[_], is_container=True)})
             else:
-                update = {_: decoder.deserialize(child[_], is_container=False)}
-            ret.content.update(update)
+                kwargs.update({_: decoder.deserialize(child[_], is_container=False)})
+        ret.__init__(**kwargs)
         return ret
 
     def default(self, parent: Optional[xml_.XMLNode]) -> xml_.XMLNode:
@@ -86,6 +88,6 @@ class MessageHeader(BaseMessage):
     @property
     def attributes(self):
         return {
-            'version': False, 'messageType': False,
+            'messageType': False,
             'requestId': False, 'payload': False
         }
