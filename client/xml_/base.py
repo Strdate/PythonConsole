@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Callable, Dict, List, Optional
+from typing import Dict, List, Optional
 
 
 class XMLNode():
@@ -56,30 +56,43 @@ class XMLNode():
         self._seq.append(0)
         self._content.append(content)
 
+    @staticmethod
+    def quote(src: str) -> str:
+        _quote = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&apos;'
+        }
+        for k, v in _quote.items():
+            src = src.replace(k, v)
+        return src
+
     def __str__(self) -> str:
         """ Returns the raw XML string """
-        attrs = " ".join(f'{k}="{v}"' for k, v in self._attrs.items())
+        attrs = " ".join(f'{k}="{self.quote(v)}"' for k, v in self._attrs.items())
         content = iter(self._content)
         child = iter(self._child)
 
         return '''<{header}>{content}</{ending}>'''.format(
             header=" ".join([self._name, attrs]).strip(),
             content="".join(
-                str(next(child)) if _ else next(content) for _ in self._seq
+                str(next(child)) if _ else self.quote(next(content)) for _ in self._seq
             ),
             ending=self._name
         )
 
     def __repr__(self) -> str:
         """ Returns the minified XML string """
-        attrs = " ".join(f'{k}="{v}"' for k, v in self._attrs.items())
+        attrs = " ".join(f'{k}="{self.quote(v)}"' for k, v in self._attrs.items())
         content = iter(self._content)
         child = iter(self._child)
 
         return '''<{header}>{content}</{ending}>'''.format(
             header=" ".join([self._name, attrs]).strip(),
             content="".join(
-                repr(next(child)) if _ else next(content).strip() for _ in self._seq
+                repr(next(child)) if _ else self.quote(next(content).strip()) for _ in self._seq
             ),
             ending=self._name
         )
