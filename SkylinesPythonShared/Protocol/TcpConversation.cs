@@ -6,7 +6,6 @@ using System.Net.Sockets;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Xml.Serialization;
-using JsonFx.Json;
 
 namespace SkylinesPythonShared
 {
@@ -76,10 +75,6 @@ namespace SkylinesPythonShared
             string text = Encoding.UTF8.GetString(data);
             Console.WriteLine(text);
             return XmlDeserializeFromString<MessageHeader>(text);
-            
-            // return JsonDeserialize<MessageHeader>(data);
-            // using (var memoryStream = new MemoryStream(data))
-            //     return (MessageHeader)(new BinaryFormatter()).Deserialize(memoryStream);
         }
 
         public static byte[] Serialize(MessageHeader obj)
@@ -92,12 +87,6 @@ namespace SkylinesPythonShared
             bytes1.CopyTo(bytes, 4);
             return bytes;
 
-            // byte[] json = JsonSerialize(obj);
-            // byte[] result = new byte[json.Length + 4];
-            // BitConverter.GetBytes(json.Length).CopyTo(result, 0);
-            // json.CopyTo(result, 4);
-            // return result;
-
             // using (var memoryStream = new MemoryStream())
             // {
             //     (new BinaryFormatter()).Serialize(memoryStream, obj);
@@ -107,29 +96,6 @@ namespace SkylinesPythonShared
             //     res.CopyTo(bytes, 4);
             //     return bytes;
             // }
-        }
-
-        public static byte[] JsonSerialize(object obj)
-        {
-            var settings = new JsonWriterSettings();
-            var result = new StringBuilder();
-            settings.TypeHintName = "__type";
-            var serializer = new JsonWriter(result, settings);
-            serializer.Write(obj);
-            return Encoding.UTF8.GetBytes(result.ToString());
-        }
-
-        public static T JsonDeserialize<T>(string src)
-        {
-            var settings = new JsonReaderSettings();
-            settings.TypeHintName = "__type";
-            var deserializer = new JsonReader(src, settings);
-            return deserializer.Deserialize<T>();
-        }
-
-        public static T JsonDeserialize<T>(byte[] src)
-        {
-            return JsonDeserialize<T>(Encoding.UTF8.GetString(src));
         }
 
         public static string XmlSerializeToString(object objectInstance)
