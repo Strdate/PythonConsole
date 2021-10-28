@@ -252,6 +252,8 @@ class XMLDeserializer():
             if type_ in XMLInclude.BUILTIN_CLASS:
                 if root.child:
                     raise ValueError("Child node in built-in types")
+                if 'xsi:type' in root.attrs:
+                    del root.attrs['xsi:type']
                 return type_(self.deserialize(root))
 
             assert issubclass(type_, SupportsXML)
