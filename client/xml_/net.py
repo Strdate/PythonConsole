@@ -289,4 +289,4 @@ class XMLDeserializer():
             assert issubclass(type_override, SupportsXML)
             return type_override.from_xml_node(root)
 
-        raise ValueError("No compatible registered class found for {root.name}")
+        raise ValueError(f"No compatible registered class found for {root.name}")
