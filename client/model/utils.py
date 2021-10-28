@@ -286,10 +286,13 @@ class Bezier(xml_.SupportsXML):
     def from_xml_node(cls, root_node: xml_.XMLNode) -> 'Bezier':
         decoder = xml_.XMLDeserializer()
         kwargs = {
-            _.name: Vector.from_xml_node(_)
+            _.name: decoder.deserialize(_)
             for _ in root_node.child
         }
-        return Bezier(**kwargs)
+        try:
+            return Bezier(**kwargs)
+        except:
+            raise xml_.IncompatibleError
 
 @xml_.XMLInclude
 class NetOptions(xml_.SupportsXML):
@@ -399,11 +402,13 @@ class NaturalResourceCellBase(xml_.SupportsXML):
     @classmethod
     def from_xml_node(cls, root_node: xml_.XMLNode) -> 'NaturalResourceCellBase':
         decoder = xml_.XMLDeserializer()
-        kwargs = {
-            _.name: decoder.deserialize(_, is_container=False, type_override=int)
-            for _ in root_node.child
-        }
         try:
+            kwargs = {
+                _.name: decoder.deserialize(_, is_container=False, type_override=int)
+                for _ in root_node.child
+            }
             return NaturalResourceCellBase(**kwargs)
+        except ValueError:
+            raise xml_.IncompatibleError
         except TypeError:
             raise xml_.IncompatibleError

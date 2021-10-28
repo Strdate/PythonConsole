@@ -26,14 +26,17 @@ class BaseMessage(xml_.SupportsXML):
         child = {_.name: _ for _ in root_node.child}
         ret = super().__new__(cls)
 
-        if set(child) != set(ret.attributes):
+        if set(child) - set(ret.attributes):
             raise xml_.IncompatibleError
         kwargs = {}
-        for _ in ret.attributes:
+        for _ in child:
             if ret.attributes[_]:
                 kwargs.update({_: decoder.deserialize(child[_], is_container=True)})
             else:
                 kwargs.update({_: decoder.deserialize(child[_], is_container=False)})
+        for _ in ret.attributes:
+            if _ not in child:
+                kwargs[_] = None
         ret.__init__(**kwargs)
         return ret
 
@@ -76,7 +79,7 @@ class InstanceDataBase(BaseMessage):
         return {'id': False}
 
 
-class InstanceData(BaseMessage):
+class InstanceData(InstanceDataBase):
     """ Building information """
 
     def __init__(self, **kwargs):

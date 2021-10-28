@@ -8,7 +8,7 @@ from .out_ import (CreateBuildingMessage, CreateNodeMessage, CreatePropMessage,
                    GetObjectsFromIndexMessage, MoveMessage,
                    RenderCircleMessage, RenderVectorMessage,
                    SetNaturalResourceMessage)
-from .utils import Bezier, NaturalResourceCellBase, NetOptions, Vector
+from .utils import Bezier, NaturalResourceCellBase, NetOptions, Vector, IPositionable
 
 __all__ = [
     'BatchObjectMessage', 'BuildingData', 'NetNodeData', 'NetPrefabData',
@@ -18,5 +18,5 @@ __all__ = [
     'DeleteObjectMessage', 'GetObjectMessage', 'GetObjectsFromIndexMessage',
     'MoveMessage', 'RenderCircleMessage', 'RenderVectorMessage',
     'SetNaturalResourceMessage', 'Vector', 'Bezier', 'NetOptions',
-    'NaturalResourceCellBase', 'MessageHeader'
+    'NaturalResourceCellBase', 'MessageHeader', 'IPositionable'
 ]
