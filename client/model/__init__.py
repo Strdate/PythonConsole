@@ -1,4 +1,4 @@
-from .header import MessageHeader
+from .header import MessageHeader, BaseMessage
 from .in_ import (BatchObjectMessage, BuildingData, NetNodeData, NetPrefabData,
                   NetSegmentData, NetSegmentListMessage, PropData,
                   RunScriptMessage, TreeData)
@@ -18,5 +18,5 @@ __all__ = [
     'DeleteObjectMessage', 'GetObjectMessage', 'GetObjectsFromIndexMessage',
     'MoveMessage', 'RenderCircleMessage', 'RenderVectorMessage',
     'SetNaturalResourceMessage', 'Vector', 'Bezier', 'NetOptions',
-    'NaturalResourceCellBase', 'MessageHeader', 'IPositionable'
+    'NaturalResourceCellBase', 'MessageHeader', 'IPositionable', 'BaseMessage'
 ]

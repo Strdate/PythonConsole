@@ -8,7 +8,7 @@ class BaseMessage(xml_.SupportsXML):
         absent = list(set(self.attributes) - set(kwargs))
         if absent:
             absent.sort()
-            raise ValueError(f"Field {0} not found in kwargs".format(absent))
+            raise ValueError(f"Field {absent} not found in kwargs")
         self._attrs = {_: kwargs[_] for _ in self.attributes}
 
     @property
