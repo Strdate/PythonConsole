@@ -9,6 +9,17 @@ namespace SkylinesPythonShared
     [Serializable]
     [XmlInclude(typeof(RunScriptMessage))]
     [XmlInclude(typeof(GetObjectMessage))]
+    [XmlInclude(typeof(DeleteObjectMessage))]
+    [XmlInclude(typeof(CreateBuildingMessage))]
+    [XmlInclude(typeof(CreateNodeMessage))]
+    [XmlInclude(typeof(CreatePropMessage))]
+    [XmlInclude(typeof(CreateSegmentMessage))]
+    [XmlInclude(typeof(CreateTreeMessage))]
+    [XmlInclude(typeof(GetObjectsFromIndexMessage))]
+    [XmlInclude(typeof(MoveMessage))]
+    [XmlInclude(typeof(RenderCircleMessage))]
+    [XmlInclude(typeof(RenderVectorMessage))]
+    [XmlInclude(typeof(SetNaturalResourceMessage))]
     public class MessageHeader
     {
         [XmlElement("version")] public string version { get; set; }
