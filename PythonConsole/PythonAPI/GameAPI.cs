@@ -75,7 +75,7 @@ namespace PythonConsole
 
         public static object GetSegmentsForNodeId(object msg)
         {
-            return NetUtil.GetSegmentsFromNode((ushort)(uint)msg).Select((seg) => NetLogic.PrepareSegment(seg)).ToList();
+            return NetUtil.GetSegmentsFromNode(Convert.ToUInt16(msg)).Select((seg) => NetLogic.PrepareSegment(seg)).ToList();
         }
 
         public static object CreateTree(object msg)
