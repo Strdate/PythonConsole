@@ -2,12 +2,42 @@ from __future__ import annotations
 
 import functools
 import json
-from typing import Any, List, Optional, overload
+from typing import Any, Callable, Generic, List, Optional, Type, TypeVar, overload
 from typing_extensions import Literal
 
 from .. import meta, model, protocol, xml_
 from . import objects, runtime
 
+ST = TypeVar('ST', bound=objects.EntityObject)
+DT = TypeVar('DT', bound=model.BaseMessage)
+
+class GameObjectIterator(Generic[ST, DT]):
+    
+    def __init__(self, shell_type: Type[ST], data_type: Type[DT], fetch: Callable[[int], List[DT]]):
+        self._shell_type = shell_type
+        self._data_type = data_type
+        self._fetch = fetch
+        self._idx = 0
+        self._cache: List[ST] = []
+
+    def _feed(self) -> None:
+        for _ in self._fetch(self._idx + 1):
+            self._cache.append(self._shell_type.from_message(_))
+
+    def __iter__(self):
+        return self
+
+    def __next__(self) -> ST:
+        if not self._cache:
+            self._feed()
+        if not self._cache:
+            raise StopIteration
+        ret = self._cache.pop(0)
+        self._idx = ret.id_
+        return ret
+
+    def reset(self) -> None:
+        self._idx = 0
 
 class Game(metaclass=meta.Singleton):
 
@@ -15,6 +45,41 @@ class Game(metaclass=meta.Singleton):
 
     def __init__(self) -> None:
         self._async_mode = False
+
+    @property
+    def trees(self) -> GameObjectIterator[objects.Tree, model.TreeData]:
+        return GameObjectIterator(
+            objects.Tree, model.TreeData,
+            functools.partial(self._get_batch_object, type_='tree')
+        )
+
+    @property
+    def buildings(self) -> GameObjectIterator[objects.Building, model.BuildingData]:
+        return GameObjectIterator(
+            objects.Building, model.BuildingData,
+            functools.partial(self._get_batch_object, type_='building')
+        )
+
+    @property
+    def nodes(self) -> GameObjectIterator[objects.Node, model.NetNodeData]:
+        return GameObjectIterator(
+            objects.Node, model.NetNodeData,
+            functools.partial(self._get_batch_object, type_='node')
+        )
+
+    @property
+    def props(self) -> GameObjectIterator[objects.Prop, model.PropData]:
+        return GameObjectIterator(
+            objects.Prop, model.PropData,
+            functools.partial(self._get_batch_object, type_='prop')
+        )
+
+    @property
+    def segments(self) -> GameObjectIterator[objects.Segment, model.NetSegmentData]:
+        return GameObjectIterator(
+            objects.Segment, model.NetSegmentData,
+            functools.partial(self._get_batch_object, type_='segment')
+        )
 
     @property
     def async_mode(self) -> bool:
@@ -38,7 +103,7 @@ class Game(metaclass=meta.Singleton):
             'async': async_mode,
             'builtin': builtin
         }))
-        if response:
+        if response is not None:
             ret = decoder.deserialize(xml_.parse(response))
             return ret
         else:
@@ -89,6 +154,14 @@ class Game(metaclass=meta.Singleton):
             ret.append(objects.Segment.from_message(_))
         
         return ret
+
+    def _get_batch_object(self, id_: int, type_: str):
+        ret = self._remote_call(
+            protocol.REMOTE_METHODS['get_object_starting_from_index'],
+            model.GetObjectsFromIndexMessage(index=id_, type=type_)
+        )
+        assert isinstance(ret, model.BatchObjectMessage)
+        return ret['array']
 
     def get_prop(self, id_: int) -> objects.Prop:
         return objects.Prop.from_message(self._get_obj(id_=id_, type_='prop'))

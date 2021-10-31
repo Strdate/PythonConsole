@@ -27,7 +27,7 @@ REMOTE_METHODS: Dict[str, Contract] = {
     ),
     'get_object_from_id': Contract('GetObjectFromId', True),
     'get_object_starting_from_index': Contract(
-        'GetObjectStartingFromIndex', True, True, True
+        'GetObjectsStartingFromIndex', True
     ),
     'get_segment_for_node_id': Contract('GetSegmentsForNodeId', True),
     'get_terrain_height': Contract('GetTerrainHeight', True),
