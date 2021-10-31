@@ -138,9 +138,9 @@ class XMLSerializer():
     ) -> XMLNode:
         """ Serialize a Python object into XMLNode tree """
         if type(obj) in XMLInclude.BUILTIN_CLASS:
-            # Processing built-in types 
+            # Processing built-in types
             if name_override is None:
-                raise ValueError("Unknown tag name for value {0}".format(obj))
+                name_override = XMLInclude.get_name(type(obj))
             if force_xsi_name:
                 attrs = {'xsi:type': 'xsd:' + XMLInclude.get_name(type(obj))}
             else:
@@ -155,9 +155,14 @@ class XMLSerializer():
         elif isinstance(obj, list):
             # Processing container types
             if name_override is None:
-                raise ValueError("Unknown tag name for value {0}".format(obj))
+                name_override = 'list'
 
             ret = XMLNode(name_override, parent=parent)
+            if len(set(type(_) for _ in obj)) == 1 \
+                and type(obj[0]) not in XMLInclude.BUILTIN_CLASS:
+
+                ret.attrs.update({'xsi:type': f'ArrayOf{type(obj[0]).__name__}'})
+
             child_name = "anyType" if type_override is None else type_override
             force_xsi_name = type_override is None
             for _ in obj:
@@ -246,6 +251,10 @@ class XMLDeserializer():
                     )
                     for _ in root.child
                 ]
+        if root.attrs.get('xsi:type', '').startswith("ArrayOf"):
+            del root.attrs['xsi:type']
+            return self.deserialize(root, is_container=True)
+            
         if in_container or 'xsi:type' in root.attrs:
             name = root.attrs['xsi:type'] if 'xsi:type' in root.attrs else root.name
             type_ = XMLInclude.get_class(name)
