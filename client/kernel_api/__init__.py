@@ -6,6 +6,7 @@ import ipykernel.comm
 
 from . import runtime, gamelib
 from .runtime import debug, info, warning, error, critical
+from ..model import Vector, Bezier
 
 if TYPE_CHECKING:
     import ipykernel.zmqshell
@@ -50,4 +51,8 @@ game = gamelib.Game()
 
 runtime.info(str(game._channel))
 
-__all__ = ['cb', 'game', 'debug', 'info', 'warning', 'error', 'critical']
+__all__ = [
+    'cb', 'game',
+    'debug', 'info', 'warning', 'error', 'critical',
+    'Vector', 'Bezier'
+]
