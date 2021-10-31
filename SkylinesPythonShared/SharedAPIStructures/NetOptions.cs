@@ -10,21 +10,28 @@ namespace SkylinesPythonShared.API
     public class NetOptions : ISimpleToString
     {
         [Doc("Network type (eg. 'Basic Road')")]
-        public string prefab_name { get; private set; }
+        public string prefab_name { get; set; }
 
         [Doc("Supported values: True (follow), False (do not follow - default), \"auto_offset\" - Keeps start and end node at given elevation and interpolates elevation of intermediate nodes")]
-        public string follow_terrain { get; private set; }
+        public string follow_terrain { get; set; }
 
         [Doc("Elevation mode: default, ground, elevated, bridge, tunnel, slope")]
-        public string elevation_mode { get; private set; }
+        public string elevation_mode { get; set; }
 
         [Doc("Invert road (eg. flip direction of one-way streets)")]
-        public bool invert { get; private set; }
+        public bool invert { get; set; }
 
         [Doc("Spacing betwwen two nodes (pillars). Default 100")]
-        public int node_spacing { get; private set; }
+        public int node_spacing { get; set; }
 
         [Doc("Example call: NetOptions(\"Basic Road\", false, \"elevated\", true)")]
+        public NetOptions() {
+            prefab_name = "";
+            follow_terrain = "false";
+            elevation_mode = "default";
+            invert = false;
+            node_spacing = 100;
+        }
         public NetOptions(string prefab_name, object follow_terrain = null, string elevation_mode = "default", bool invert = false, int node_spacing = 100)
         {
             follow_terrain = follow_terrain ?? "false";
