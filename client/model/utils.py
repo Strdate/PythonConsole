@@ -3,7 +3,9 @@ from __future__ import annotations
 import abc
 import functools
 import math
-from typing import Generator, Iterable, List, Optional, Tuple, TypeVar
+from typing import Any, Generator, Iterable, List, Optional, Tuple, TypeVar
+
+from . import objects
 
 from .. import xml_
 
@@ -309,6 +311,20 @@ class NetOptions(xml_.SupportsXML):
         self.elevation_mode = elevation_mode.lower()
         self.invert = invert
         self.node_spacing = node_spacing
+
+    @classmethod
+    def ensure(cls, obj: str |  NetOptions | objects.NetPrefab) -> 'NetOptions':
+        if not isinstance(obj, (str, NetOptions, objects.NetPrefab)):
+            raise ValueError(
+                "Segment type must be prefab name, "
+                f"NetPrefab or NetOptions object - not {type(obj)}"
+            )
+        if isinstance(obj, NetOptions):
+            return obj
+        if isinstance(obj, str):
+            return NetOptions(obj)
+        return NetOptions(obj.name)
+            
 
     def default(self, parent: Optional[xml_.XMLNode]) -> xml_.XMLNode:
         encoder = xml_.XMLSerializer()
