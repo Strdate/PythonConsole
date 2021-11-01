@@ -105,6 +105,8 @@ class Game(metaclass=meta.Singleton):
         }))
         if response is not None:
             ret = decoder.deserialize(xml_.parse(response))
+            if isinstance(ret, Exception):
+                raise ret
             return ret
         else:
             return None

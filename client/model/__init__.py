@@ -1,3 +1,4 @@
+from .exception import RemoteException
 from .header import BaseMessage, MessageHeader
 from .in_ import (BatchObjectMessage, BuildingData, NetNodeData, NetPrefabData,
                   NetSegmentData, NetSegmentListMessage, PropData,
@@ -11,10 +12,10 @@ from .objects import Node as NodeABC
 from .objects import PathBuilder as PathBuilderABC
 from .objects import Point as PointABC
 from .objects import Prop as PropABC
+from .objects import RenderableObjectHandle as RenderableObjectHandleABC
 from .objects import RotatableEntity as RotatableEntityABC
 from .objects import Segment as SegmentABC
 from .objects import Tree as TreeABC
-from .objects import RenderableObjectHandle as RenderableObjectHandleABC
 from .out_ import (CreateBuildingMessage, CreateNodeMessage, CreatePropMessage,
                    CreateSegmentMessage, CreateTreeMessage,
                    DeleteObjectMessage, GetObjectMessage,
@@ -34,7 +35,7 @@ __all__ = [
     'NetNodeData', 'NetOptions', 'NetPrefab', 'NetPrefabData', 'NetSegmentData',
     'NetSegmentListMessage', 'NetworkObjectABC', 'NodeABC', 'PathBuilderABC',
     'PointABC', 'PropABC', 'PropData', 'RenderCircleMessage',
-    'RenderableObjectHandleABC',
+    'RenderableObjectHandleABC', 'RemoteException',
     'RenderVectorMessage', 'RotatableEntityABC', 'RunScriptMessage',
     'SegmentABC', 'SetNaturalResourceMessage', 'TreeABC', 'TreeData', 'Vector'
 ]

@@ -88,7 +88,7 @@ class AsyncServerHandler(AsyncMessageHandler, kernel.AsyncKernelHandler):
             payload = payload
             if messageType == "s_exception":
                 self._callback[requestId].set_exception(
-                    RuntimeError(str(payload)))
+                    model.RemoteException(str(payload)))
             else:
                 self._callback[requestId].set_result(payload)
         else:
@@ -201,9 +201,14 @@ class AsyncServerHandler(AsyncMessageHandler, kernel.AsyncKernelHandler):
 
             def remote_callback(future: 'asyncio.Future[Any]'):
                 loop = asyncio.get_event_loop()
-                loop.create_task(self.input(
-                    str(self._encoder.export(future.result()))
-                ))
+                try:
+                    loop.create_task(self.input(
+                        str(self._encoder.export(future.result()))
+                    ))
+                except model.RemoteException as e:
+                    loop.create_task(self.input(
+                        str(self._encoder.export(e))
+                    ))
 
             await self.remote_call(contract, message, remote_callback)
         except Exception:
