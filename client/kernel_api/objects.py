@@ -80,35 +80,35 @@ class NaturalResourceCell(model.NaturalResourceCellABC):
     def pollution(self, pollution: int) -> None:
         _game = gamelib.Game()
         _game._set_resource(
-            self.natural_resources_cell_id, 'pollution', pollution
+            self.id_, 'pollution', pollution
         )
 
     @model.NaturalResourceCellABC.fertility.setter
     def fertility(self, fertility: int) -> None:
         _game = gamelib.Game()
         _game._set_resource(
-            self.natural_resources_cell_id, 'fertility', fertility
+            self.id_, 'fertility', fertility
         )
     
     @model.NaturalResourceCellABC.forest.setter
     def forest(self, forest: int) -> None:
         _game = gamelib.Game()
         _game._set_resource(
-            self.natural_resources_cell_id, 'forest', forest
+            self.id_, 'forest', forest
         )
     
     @model.NaturalResourceCellABC.ore.setter
     def ore(self, ore: int) -> None:
         _game = gamelib.Game()
         _game._set_resource(
-            self.natural_resources_cell_id, 'ore', ore
+            self.id_, 'ore', ore
         )
 
     @model.NaturalResourceCellABC.oil.setter
     def oil(self, oil: int) -> None:
         _game = gamelib.Game()
         _game._set_resource(
-            self.natural_resources_cell_id, 'oil', oil
+            self.id_, 'oil', oil
         )
 
 
@@ -133,3 +133,44 @@ class PathBuilder(model.PathBuilderABC):
         )
         assert ret is not None
         return ret
+
+class NaturalResource(model.NaturalResourceCellABC):
+
+    def fetch_data(self) -> model.BaseMessage:
+        _game = gamelib.Game()
+        return _game._get_resource(self.id_)
+
+    @model.NaturalResourceCellABC.pollution.setter
+    def pollution(self, pollution: int) -> None:
+        _game = gamelib.Game()
+        _game._set_resource(
+            self.id_, 'pollution', pollution
+        )
+
+    @model.NaturalResourceCellABC.fertility.setter
+    def fertility(self, fertility: int) -> None:
+        _game = gamelib.Game()
+        _game._set_resource(
+            self.id_, 'fertility', fertility
+        )
+    
+    @model.NaturalResourceCellABC.forest.setter
+    def forest(self, forest: int) -> None:
+        _game = gamelib.Game()
+        _game._set_resource(
+            self.id_, 'forest', forest
+        )
+
+    @model.NaturalResourceCellABC.ore.setter
+    def ore(self, ore: int) -> None:
+        _game = gamelib.Game()
+        _game._set_resource(
+            self.id_, 'ore', ore
+        )
+    
+    @model.NaturalResourceCellABC.oil.setter
+    def oil(self, oil: int) -> None:
+        _game = gamelib.Game()
+        _game._set_resource(
+            self.id_, 'oil', oil
+        )

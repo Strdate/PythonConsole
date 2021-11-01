@@ -165,6 +165,11 @@ class Game(metaclass=meta.Singleton):
         assert isinstance(ret, model.BatchObjectMessage)
         return ret['array']
 
+    def _get_resource(self, id_: int):
+        return self._remote_call(
+            protocol.REMOTE_METHODS['get_natural_resource_cell_single'], id_
+        )
+
     def get_prop(self, id_: int) -> objects.Prop:
         return objects.Prop.from_message(self._get_obj(id_=id_, type_='prop'))
 

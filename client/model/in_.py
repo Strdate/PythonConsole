@@ -134,3 +134,17 @@ class TreeData(InstanceData):
     @property
     def attributes(self):
         return super().attributes
+
+
+@xml_.XMLInclude
+class NaturalResourceCellBase(BaseMessage):
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    @property
+    def attributes(self):
+        return {
+            'ore': False, 'oil': False, 'forest': False,
+            'fertility': False, 'pollution': False, 'water': False
+        }

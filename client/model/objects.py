@@ -40,7 +40,13 @@ class NaturalResourceCell(BaseObject):
     def from_pos(cls, pos: utils.Vector) -> 'NaturalResourceCell':
         rowID = cls.clamp(int(pos.x / 33.75 + 256), 0, 511)
         columnID = cls.clamp(int(pos.z / 33.75 + 256), 0, 511)
-        return cls(rowID=rowID, columnID=columnID)
+        ret = cls(rowID=rowID, columnID=columnID)
+        ret.update(ret.fetch_data())
+        return ret
+        
+    @abc.abstractmethod
+    def fetch_data(self) -> header.BaseMessage:
+        ...
 
     @property
     def rowID(self) -> int:
@@ -100,7 +106,7 @@ class NaturalResourceCell(BaseObject):
         ...
 
     @property
-    def natural_resources_cell_id(self) -> int:
+    def id_(self) -> int:
         return self.rowID * 512 + self.columnID
 
 class Point(utils.IPositionable):
