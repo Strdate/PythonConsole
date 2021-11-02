@@ -3,14 +3,15 @@ from __future__ import annotations
 import abc
 from typing import Any, Dict, List, Optional, Type, TypeVar
 
-from . import header, utils
+from . import header, utils, api
 
 T = TypeVar('T', bound='BaseObject')
 
 class BaseObject(abc.ABC):
     _attrs: Dict[str, Any]
 
-    def __init__(self, **kwargs):
+    def __init__(self, game: api.Game, *, **kwargs):
+        self._game = game
         self._attrs = {}
         self._attrs.update(kwargs)
 
@@ -37,16 +38,16 @@ class NaturalResourceCell(BaseObject):
         return val
 
     @classmethod
-    def from_pos(cls, pos: utils.Vector) -> 'NaturalResourceCell':
+    def from_pos(cls, game: api.Game, pos: utils.Vector) -> 'NaturalResourceCell':
         rowID = cls.clamp(int(pos.x / 33.75 + 256), 0, 511)
         columnID = cls.clamp(int(pos.z / 33.75 + 256), 0, 511)
-        ret = cls(rowID=rowID, columnID=columnID)
+        ret = cls(game, rowID=rowID, columnID=columnID)
         ret.update(ret.fetch_data())
         return ret
         
     @abc.abstractmethod
     def fetch_data(self) -> header.BaseMessage:
-        ...
+        return self._game._get_resource(self.id_)
 
     @property
     def rowID(self) -> int:
@@ -65,45 +66,50 @@ class NaturalResourceCell(BaseObject):
         return self._attrs['pollution']
 
     @pollution.setter
-    @abc.abstractmethod
     def pollution(self, pollution: int) -> None:
-        ...
+        self._game._set_resource(
+            self.id_, 'pollution', pollution
+        )
 
     @property
     def fertility(self) -> int:
         return self._attrs['fertility']
 
     @fertility.setter
-    @abc.abstractmethod
     def fertility(self, fertility: int) -> None:
-        ...
+        self._game._set_resource(
+            self.id_, 'fertility', fertility
+        )
     
     @property
     def forest(self) -> int:
         return self._attrs['forest']
 
     @forest.setter
-    @abc.abstractmethod
     def forest(self, forest: int) -> None:
-        ...
+        self._game._set_resource(
+            self.id_, 'forest', forest
+        )
 
     @property
     def ore(self) -> int:
         return self._attrs['ore']
 
     @ore.setter
-    @abc.abstractmethod
     def ore(self, ore: int) -> None:
-        ...
+        self._game._set_resource(
+            self.id_, 'ore', ore
+        )
 
     @property
     def oil(self) -> int:
         return self._attrs['oil']
 
     @oil.setter
-    @abc.abstractmethod
     def oil(self, oil: int) -> None:
-        ...
+        self._game._set_resource(
+            self.id_, 'oil', oil
+        )
 
     @property
     def id_(self) -> int:
@@ -111,8 +117,9 @@ class NaturalResourceCell(BaseObject):
 
 class Point(utils.IPositionable):
 
-    def __init__(self, vector: utils.Vector):
+    def __init__(self, game: api.Game, vector: utils.Vector):
         self._vector = vector
+        self._game = game
 
     @property
     def type(self) -> str:
@@ -125,7 +132,7 @@ class Point(utils.IPositionable):
     @property
     @abc.abstractmethod
     def resources(self) -> NaturalResourceCell:
-        return NaturalResourceCell.from_pos(self._vector)
+        return NaturalResourceCell.from_pos(self._game, self._vector)
 
 
 class RenderableObjectHandle(BaseObject):
@@ -134,9 +141,8 @@ class RenderableObjectHandle(BaseObject):
     def id_(self) -> int:
         return self._attrs['id']
 
-    @abc.abstractmethod
     def delete(self) -> None:
-        ...
+        return self._game.remove_render_object(self.id_)
 
 class GameObject(utils.IPositionable, BaseObject):
 
@@ -176,17 +182,14 @@ class EntityObject(GameObject):
     def prefab_name(self) -> str:
         return self._attrs['prefab_name']
 
-    @abc.abstractmethod
     def delete(self):
-        ...
+        return self._game._delete_obj(self.id_, self.type)
 
-    @abc.abstractmethod
     def move(self, pos: utils.IPositionable):
-        ...
+        return self._game._move_obj(self.id_, self.type, pos)
 
-    @abc.abstractmethod
     def refresh(self):
-        ...
+        self.update(self._game._get_obj(id_=self.id_, type_=self.type))
 
 
 class RotatableEntity(EntityObject):
@@ -199,9 +202,8 @@ class RotatableEntity(EntityObject):
     def angle(self, angle: float) -> None:
         self.move(self.position, angle)
 
-    @abc.abstractmethod
     def move(self, pos: utils.IPositionable, angle: float):
-        ...
+        return self._game._move_obj(self.id_, self.type, pos, angle)
 
 
 class NetPrefab(BaseObject):
@@ -242,9 +244,8 @@ class NetPrefab(BaseObject):
 class NetworkObject(EntityObject):
 
     @property
-    @abc.abstractmethod
     def prefab(self) -> NetPrefab:
-        ...
+        return self._game.get_net_prefab(self.prefab_name)
 
 
 class Tree(EntityObject):
@@ -287,14 +288,15 @@ class Node(NetworkObject):
         return self._attrs['seg_count']
 
     @property
-    @abc.abstractmethod
-    def building(self) -> Building:
-        ...
+    def building(self) -> Optional[Building]:
+        if self.building_id:
+            return self._game.get_building(id_=self.building_id)
+        else:
+            return None
 
     @property
-    @abc.abstractmethod
     def segments(self) -> List['Segment']:
-        ...
+        return self._game._get_adj_segments(self.id_)
 
 
 class Segment(NetworkObject):
@@ -332,14 +334,12 @@ class Segment(NetworkObject):
         return self._attrs['is_straight']
 
     @property
-    @abc.abstractmethod
     def start_node(self) -> Node:
-        ...
+        return self._game.get_node(self.start_node_id)
 
     @property
-    @abc.abstractmethod
     def end_node(self) -> Node:
-        ...
+        return self._game.get_node(self.end_node_id)
 
     def get_other_node(self, node: Node | int) -> Node:
         if isinstance(node, Node):
@@ -351,7 +351,7 @@ class Segment(NetworkObject):
 
 class PathBuilder():
 
-    def __init__(self,
+    def __init__(self, game: api.Game,
         start_node: utils.IPositionable,
         options: Optional[str | utils.NetOptions] = None
     ):
@@ -364,6 +364,7 @@ class PathBuilder():
                     "param, if that connot be inferred from first param"
                 )
 
+        self._game = game
         self.options = utils.NetOptions.ensure(options)
         self._last_position = start_node
         self._last_segments: List[Segment] = []
@@ -386,13 +387,17 @@ class PathBuilder():
     def last_node(self) -> Node:
         return self.segments[-1].end_node
 
-    @abc.abstractmethod
     def _create_segments(self,
         end_node: utils.IPositionable,
         options: Any, start_dir: Optional[utils.Vector],
         end_dir: Optional[utils.Vector], middle_pos: Optional[utils.Vector]
     ) -> List[Segment]:
-        ...
+        ret = self._game.create_segments(
+            self.last_node.position, end_node, options,
+            start_dir=start_dir, end_dir=end_dir, control_point=middle_pos,
+        )
+        assert ret is not None
+        return ret
 
     def _create_path(
         self, end_node: utils.IPositionable, options: Any,

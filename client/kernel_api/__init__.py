@@ -37,7 +37,6 @@ def _initialize():
 
     log = ipykernel.comm.Comm(target_name='log', data={})
     runtime.RuntimeLogger(log)
-    game = gamelib.Game()
 
     shell.kernel.comm_manager.register_target('runtime', runtime_wrapper)
 
@@ -48,8 +47,6 @@ _initialize()
 
 cb = runtime.Clipboard()
 game = gamelib.Game()
-
-runtime.info(str(game._channel))
 
 __all__ = [
     'cb', 'game',

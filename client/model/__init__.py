@@ -1,21 +1,12 @@
+from .api import Game as GameABC
 from .exception import RemoteException
 from .header import BaseMessage, MessageHeader
 from .in_ import (BatchObjectMessage, BuildingData, NetNodeData, NetPrefabData,
                   NetSegmentData, NetSegmentListMessage, PropData,
                   RunScriptMessage, TreeData)
-from .objects import Building as BuildingABC
-from .objects import EntityObject as EntityObjectABC
-from .objects import NaturalResourceCell as NaturalResourceCellABC
-from .objects import NetPrefab
-from .objects import NetworkObject as NetworkObjectABC
-from .objects import Node as NodeABC
-from .objects import PathBuilder as PathBuilderABC
-from .objects import Point as PointABC
-from .objects import Prop as PropABC
-from .objects import RenderableObjectHandle as RenderableObjectHandleABC
-from .objects import RotatableEntity as RotatableEntityABC
-from .objects import Segment as SegmentABC
-from .objects import Tree as TreeABC
+from .objects import (Building, EntityObject, NaturalResourceCell, NetPrefab,
+                      NetworkObject, Node, PathBuilder, Point, Prop,
+                      RenderableObjectHandle, RotatableEntity, Segment, Tree)
 from .out_ import (CreateBuildingMessage, CreateNodeMessage, CreatePropMessage,
                    CreateSegmentMessage, CreateTreeMessage,
                    DeleteObjectMessage, GetObjectMessage,
@@ -26,16 +17,17 @@ from .utils import (Bezier, IPositionable, NaturalResourceCellBase, NetOptions,
                     Vector)
 
 __all__ = [
-    'BaseMessage', 'BatchObjectMessage', 'Bezier', 'BuildingABC',
+    'BaseMessage', 'BatchObjectMessage', 'Bezier', 'Building',
     'BuildingData', 'CreateBuildingMessage', 'CreateNodeMessage',
     'CreatePropMessage', 'CreateSegmentMessage', 'CreateTreeMessage',
-    'DeleteObjectMessage', 'EntityObjectABC', 'GetObjectMessage', 
+    'DeleteObjectMessage', 'EntityObject', 'GetObjectMessage', 
     'GetObjectsFromIndexMessage', 'IPositionable', 'MessageHeader',
-    'MoveMessage', 'NaturalResourceCellABC', 'NaturalResourceCellBase',
+    'MoveMessage', 'NaturalResourceCell', 'NaturalResourceCellBase',
     'NetNodeData', 'NetOptions', 'NetPrefab', 'NetPrefabData', 'NetSegmentData',
-    'NetSegmentListMessage', 'NetworkObjectABC', 'NodeABC', 'PathBuilderABC',
-    'PointABC', 'PropABC', 'PropData', 'RenderCircleMessage',
-    'RenderableObjectHandleABC', 'RemoteException',
-    'RenderVectorMessage', 'RotatableEntityABC', 'RunScriptMessage',
-    'SegmentABC', 'SetNaturalResourceMessage', 'TreeABC', 'TreeData', 'Vector'
+    'NetSegmentListMessage', 'NetworkObject', 'Node', 'PathBuilder',
+    'Point', 'Prop', 'PropData', 'RenderCircleMessage',
+    'RenderableObjectHandle', 'RemoteException',
+    'RenderVectorMessage', 'RotatableEntity', 'RunScriptMessage',
+    'Segment', 'SetNaturalResourceMessage', 'Tree', 'TreeData', 'Vector',
+    'GameABC'
 ]
