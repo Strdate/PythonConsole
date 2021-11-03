@@ -10,15 +10,15 @@ T = TypeVar('T', bound='BaseObject')
 class BaseObject(abc.ABC):
     _attrs: Dict[str, Any]
 
-    def __init__(self, game: api.Game, *, **kwargs):
+    def __init__(self, game: api.Game, **kwargs):
         self._game = game
         self._attrs = {}
         self._attrs.update(kwargs)
 
     @classmethod
-    def from_message(cls: Type[T], message: header.BaseMessage) -> T:
+    def from_message(cls: Type[T], game: api.Game, message: header.BaseMessage) -> T:
         ret = super().__new__(cls)
-        ret.__init__(**message.content)
+        ret.__init__(game, **message.content)
         return ret
 
     def update(self, message: header.BaseMessage) -> None:

@@ -1,5 +1,6 @@
 from typing import Callable, Generic, List, Type, TypeVar
 
+from .. import api
 from .. import header, objects
 
 ST = TypeVar('ST', bound=objects.EntityObject)
@@ -7,16 +8,17 @@ DT = TypeVar('DT', bound=header.BaseMessage)
 
 class GameObjectIterator(Generic[ST, DT]):
 
-    def __init__(self, shell_type: Type[ST], data_type: Type[DT], fetch: Callable[[int], List[DT]]):
+    def __init__(self, _game, shell_type: Type[ST], data_type: Type[DT], fetch: Callable[[int], List[DT]]):
         self._shell_type = shell_type
         self._data_type = data_type
         self._fetch = fetch
         self._idx = 0
         self._cache: List[ST] = []
+        self._game = _game
 
     def _feed(self) -> None:
         for _ in self._fetch(self._idx + 1):
-            self._cache.append(self._shell_type.from_message(_))
+            self._cache.append(self._shell_type.from_message(self._game, _))
 
     def __iter__(self):
         return self

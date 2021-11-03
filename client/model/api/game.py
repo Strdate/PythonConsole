@@ -34,35 +34,35 @@ class Game(game_abc.BaseGame, metaclass=meta.Singleton):
 
     @property
     def trees(self) -> iterobj.GameObjectIterator[objects.Tree, in_.TreeData]:
-        return iterobj.GameObjectIterator(
+        return iterobj.GameObjectIterator(self,
             objects.Tree, in_.TreeData,
             functools.partial(self._get_batch_object, type_='tree')
         )
 
     @property
     def buildings(self) -> iterobj.GameObjectIterator[objects.Building, in_.BuildingData]:
-        return iterobj.GameObjectIterator(
+        return iterobj.GameObjectIterator(self,
             objects.Building, in_.BuildingData,
             functools.partial(self._get_batch_object, type_='building')
         )
 
     @property
     def nodes(self) -> iterobj.GameObjectIterator[objects.Node, in_.NetNodeData]:
-        return iterobj.GameObjectIterator(
+        return iterobj.GameObjectIterator(self,
             objects.Node, in_.NetNodeData,
             functools.partial(self._get_batch_object, type_='node')
         )
 
     @property
     def props(self) -> iterobj.GameObjectIterator[objects.Prop, in_.PropData]:
-        return iterobj.GameObjectIterator(
+        return iterobj.GameObjectIterator(self,
             objects.Prop, in_.PropData,
             functools.partial(self._get_batch_object, type_='prop')
         )
 
     @property
     def segments(self) -> iterobj.GameObjectIterator[objects.Segment, in_.NetSegmentData]:
-        return iterobj.GameObjectIterator(
+        return iterobj.GameObjectIterator(self,
             objects.Segment, in_.NetSegmentData,
             functools.partial(self._get_batch_object, type_='segment')
         )
@@ -126,7 +126,7 @@ class Game(game_abc.BaseGame, metaclass=meta.Singleton):
         ret: List[objects.Segment] = []
         for _ in msg:
             assert isinstance(_, header.BaseMessage)
-            ret.append(objects.Segment.from_message(_))
+            ret.append(objects.Segment.from_message(self, _))
         return ret
 
     # Iterator support
@@ -142,21 +142,21 @@ class Game(game_abc.BaseGame, metaclass=meta.Singleton):
     # API - get object
 
     def get_prop(self, id_: int) -> objects.Prop:
-        return objects.Prop.from_message(self._get_obj(id_=id_, type_='prop'))
+        return objects.Prop.from_message(self, self._get_obj(id_=id_, type_='prop'))
 
     def get_tree(self, id_: int) -> objects.Tree:
-        return objects.Tree.from_message(self._get_obj(id_=id_, type_='tree'))
+        return objects.Tree.from_message(self, self._get_obj(id_=id_, type_='tree'))
 
     def get_building(self, id_: int) -> objects.Building:
         return objects.Building.from_message(
-            self._get_obj(id_=id_, type_='building')
+            self, self._get_obj(id_=id_, type_='building')
         )
 
     def get_node(self, id_: int) -> objects.Node:
-        return objects.Node.from_message(self._get_obj(id_=id_, type_='node'))
+        return objects.Node.from_message(self, self._get_obj(id_=id_, type_='node'))
 
     def get_segment(self, id_: int) -> objects.Segment:
-        return objects.Segment.from_message(self._get_obj(id_=id_, type_='segment'))
+        return objects.Segment.from_message(self, self._get_obj(id_=id_, type_='segment'))
 
     # API - create object
 
@@ -167,7 +167,7 @@ class Game(game_abc.BaseGame, metaclass=meta.Singleton):
             Position=position.position, Type=prefab_name, Angle=angle
         )
         if isinstance(ret, header.BaseMessage):
-            return objects.Prop.from_message(ret)
+            return objects.Prop.from_message(self, ret)
         return None
 
     def create_tree(self, position: utils.IPositionable, prefab_name: str):
@@ -175,7 +175,7 @@ class Game(game_abc.BaseGame, metaclass=meta.Singleton):
             Position=position.position, prefab_name=prefab_name
         )
         if isinstance(ret, header.BaseMessage):
-            return objects.Tree.from_message(ret)
+            return objects.Tree.from_message(self, ret)
         return None
 
     def create_building(self,
@@ -185,7 +185,7 @@ class Game(game_abc.BaseGame, metaclass=meta.Singleton):
             Position=position.position, Type=type_, Angle=angle
         )
         if isinstance(ret, header.BaseMessage):
-            return objects.Building.from_message(ret)
+            return objects.Building.from_message(self, ret)
         return None
 
     def create_node(self,
@@ -199,7 +199,7 @@ class Game(game_abc.BaseGame, metaclass=meta.Singleton):
                                    prefab, str) else prefab.name
                                )
         if isinstance(ret, header.BaseMessage):
-            return objects.Node.from_message(ret)
+            return objects.Node.from_message(self, ret)
         return None
 
     @overload
@@ -252,9 +252,9 @@ class Game(game_abc.BaseGame, metaclass=meta.Singleton):
 
         ret = self._create_obj('segment', **kwargs)
         if isinstance(ret, header.BaseMessage):
-            return objects.Segment.from_message(ret)
+            return objects.Segment.from_message(self, ret)
         if isinstance(ret, list):
-            return [objects.Segment.from_message(_) for _ in ret]
+            return [objects.Segment.from_message(self, _) for _ in ret]
         return None
     
     def create_segment(self,
@@ -337,7 +337,7 @@ class Game(game_abc.BaseGame, metaclass=meta.Singleton):
     # Net prefab handling
 
     def get_net_prefab(self, name: str) -> objects.NetPrefab:
-        return objects.NetPrefab.from_message(
+        return objects.NetPrefab.from_message(self,
             self._get_obj(idString=name, type_='net prefab')
         )
 
