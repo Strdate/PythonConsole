@@ -3,10 +3,13 @@ from __future__ import annotations
 import abc
 import functools
 from typing import Any, Dict, List, Optional, Type, overload
+
 from typing_extensions import Literal
-from . import iterobj, abc as game_abc
-from .. import objects, header, in_, out_, utils
+
 from ... import meta, protocol
+from .. import header, in_, objects, out_, utils
+from . import abc as game_abc
+from . import cache, iterobj
 
 _CREATE_OBJ_MSG: Dict[str, Type[header.BaseMessage]] = {
     'prop': out_.CreatePropMessage,
@@ -19,6 +22,7 @@ _CREATE_OBJ_MSG: Dict[str, Type[header.BaseMessage]] = {
 class Game(game_abc.BaseGame, metaclass=meta.Singleton):
     def __init__(self) -> None:
         self._async_mode = False
+        self._cache = cache.CacheManager()
 
     @property
     def async_mode(self) -> bool:
@@ -68,6 +72,9 @@ class Game(game_abc.BaseGame, metaclass=meta.Singleton):
         )
 
     # object handling
+
+    def _get_cache(self, type_: str, id_: int = 0, idString: Optional[str] = None):
+        return self._cache[cache.CacheKey(type_, id_, idString)]
 
     def _get_obj(self, type_: str, id_: int = 0, idString: Optional[str] = None):
         ret = self._remote_call(
@@ -141,22 +148,50 @@ class Game(game_abc.BaseGame, metaclass=meta.Singleton):
 
     # API - get object
 
-    def get_prop(self, id_: int) -> objects.Prop:
-        return objects.Prop.from_message(self, self._get_obj(id_=id_, type_='prop'))
+    def get_prop(self, id_: int, use_cache: bool = True) -> objects.Prop:
+        pattern = {'id_': id_, 'type_': 'prop'}
+        ret = self._get_cache(**pattern)
+        if not (isinstance(ret, objects.Prop) and use_cache):
+            ret = objects.Prop.from_message(
+                self, self._get_obj(**pattern)
+            )
+        return ret
 
-    def get_tree(self, id_: int) -> objects.Tree:
-        return objects.Tree.from_message(self, self._get_obj(id_=id_, type_='tree'))
+    def get_tree(self, id_: int, use_cache: bool = True) -> objects.Tree:
+        pattern = {'id_': id_, 'type_': 'tree'}
+        ret = self._get_cache(**pattern)
+        if not (isinstance(ret, objects.Tree) and use_cache):
+            ret = objects.Tree.from_message(
+                self, self._get_obj(**pattern)
+            )
+        return ret
 
-    def get_building(self, id_: int) -> objects.Building:
-        return objects.Building.from_message(
-            self, self._get_obj(id_=id_, type_='building')
-        )
+    def get_building(self, id_: int, use_cache: bool = True) -> objects.Building:
+        pattern = {'id_': id_, 'type_': 'building'}
+        ret = self._get_cache(**pattern)
+        if not (isinstance(ret, objects.Building) and use_cache):
+            ret = objects.Building.from_message(
+                self, self._get_obj(**pattern)
+            )
+        return ret
 
-    def get_node(self, id_: int) -> objects.Node:
-        return objects.Node.from_message(self, self._get_obj(id_=id_, type_='node'))
+    def get_node(self, id_: int, use_cache: bool = True) -> objects.Node:
+        pattern = {'id_': id_, 'type_': 'node'}
+        ret = self._get_cache(**pattern)
+        if not (isinstance(ret, objects.Node) and use_cache):
+            ret = objects.Node.from_message(
+                self, self._get_obj(**pattern)
+            )
+        return ret
 
-    def get_segment(self, id_: int) -> objects.Segment:
-        return objects.Segment.from_message(self, self._get_obj(id_=id_, type_='segment'))
+    def get_segment(self, id_: int, use_cache: bool = True) -> objects.Segment:
+        pattern = {'id_': id_, 'type_': 'segment'}
+        ret = self._get_cache(**pattern)
+        if not (isinstance(ret, objects.Segment) and use_cache):
+            ret = objects.Segment.from_message(
+                self, self._get_obj(**pattern)
+            )
+        return ret
 
     # API - create object
 
@@ -336,10 +371,14 @@ class Game(game_abc.BaseGame, metaclass=meta.Singleton):
 
     # Net prefab handling
 
-    def get_net_prefab(self, name: str) -> objects.NetPrefab:
-        return objects.NetPrefab.from_message(self,
-            self._get_obj(idString=name, type_='net prefab')
-        )
+    def get_net_prefab(self, name: str, use_cache: bool = True) -> objects.NetPrefab:
+        pattern = {'idString': name, 'type_': 'node'}
+        ret = self._get_cache(**pattern)
+        if not (isinstance(ret, objects.NetPrefab) and use_cache):
+            ret = objects.NetPrefab.from_message(
+                self, self._get_obj(**pattern)
+            )
+        return ret
 
     def is_prefab(self, name: str) -> bool:
         return self._remote_call(

@@ -4,6 +4,7 @@ import abc
 from typing import Any, Dict, List, Optional, Type, TypeVar
 
 from . import header, utils, api
+from .api import cache
 
 T = TypeVar('T', bound='BaseObject')
 
@@ -144,7 +145,15 @@ class RenderableObjectHandle(BaseObject):
     def delete(self) -> None:
         return self._game.remove_render_object(self.id_)
 
-class GameObject(utils.IPositionable, BaseObject):
+class GameObject(utils.IPositionable, BaseObject, cache.CachedObject):
+
+    def __init__(self, game: api.Game, **kwargs):
+        super().__init__(game, **kwargs)
+        self._game._cache[self._cache_key] = self
+
+    def update(self, message: header.BaseMessage) -> None:
+        super().update(message)
+        self.out_dated = False
 
     @property
     def id_(self) -> int:
@@ -158,6 +167,10 @@ class GameObject(utils.IPositionable, BaseObject):
     @abc.abstractmethod
     def type(self) -> str:
         ...
+
+    @property
+    def _cache_key(self) -> api.CacheKey:
+        return api.CacheKey(self.type, self.id_)
 
 
 class EntityObject(GameObject):
@@ -183,12 +196,15 @@ class EntityObject(GameObject):
         return self._attrs['prefab_name']
 
     def delete(self):
+        self.out_dated = True
         return self._game._delete_obj(self.id_, self.type)
 
     def move(self, pos: utils.IPositionable):
+        self.out_dated = True
         return self._game._move_obj(self.id_, self.type, pos)
 
     def refresh(self):
+        self.out_dated = True
         self.update(self._game._get_obj(id_=self.id_, type_=self.type))
 
 
@@ -203,6 +219,7 @@ class RotatableEntity(EntityObject):
         self.move(self.position, angle)
 
     def move(self, pos: utils.IPositionable, angle: float):
+        self.out_dated = True
         return self._game._move_obj(self.id_, self.type, pos, angle)
 
 
@@ -219,6 +236,10 @@ class NetPrefab(BaseObject):
     @property
     def name(self) -> str:
         return self.id_
+
+    @property
+    def _cache_key(self) -> api.CacheKey:
+        return api.CacheKey(self.type, 0, self.id_)
 
     @property
     def width(self) -> float:
