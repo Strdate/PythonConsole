@@ -12,9 +12,12 @@ from .. import xml_
 T = TypeVar('T')
 
 class IPositionable(abc.ABC):
+    """ Any object that has the 'position' attribute """
+
     @property
     @abc.abstractmethod
     def position(self) -> Vector:
+        """ Object position """
         ...
 
     @classmethod
@@ -25,10 +28,12 @@ class IPositionable(abc.ABC):
 
 @xml_.XMLInclude
 class Vector(xml_.SupportsXML, IPositionable):
+    """ 3D Vector class """
     def __init__(self,
         x: float = 0, y: float = 0, z: float = 0,
         is_height_defined: bool = True
     ):
+        """ Creates new vector given all 3 coords """
         self._x = x
         self._y = y
         self._z = z
@@ -36,10 +41,12 @@ class Vector(xml_.SupportsXML, IPositionable):
 
     @property
     def position(self) -> Vector:
+        """ Returns itself """
         return self
 
     @property
     def x(self) -> float:
+        """ X cooord """
         return self._x
 
     @x.setter
@@ -48,6 +55,7 @@ class Vector(xml_.SupportsXML, IPositionable):
 
     @property
     def y(self) -> float:
+        """ Y cooord (height) """
         if self.is_height_defined:
             return self._y
         return 0
@@ -58,6 +66,7 @@ class Vector(xml_.SupportsXML, IPositionable):
 
     @property
     def z(self) -> float:
+        """ Z cooord """
         return self._z
 
     @z.setter
@@ -114,6 +123,7 @@ class Vector(xml_.SupportsXML, IPositionable):
         )
 
     def __abs__(self) -> float:
+        """ Vector length """
         return (self.x ** 2 + self.y ** 2 + self.z ** 2) ** 0.5
 
     def __str__(self) -> str:
@@ -128,6 +138,7 @@ class Vector(xml_.SupportsXML, IPositionable):
     @classmethod
     @property
     def zero(cls):
+        """ Returns zero vector """
         return Vector(0, 0, 0)
 
     def flat_angle(self, o: Optional['Vector']):
@@ -143,6 +154,7 @@ class Vector(xml_.SupportsXML, IPositionable):
         return angle if angle > 0 else angle + 2 * math.pi
 
     def flat_rotate(self, angle: float, pivot: Optional['Vector'] = None) -> 'Vector':
+        """ Rotates vector in XZ plane """
         if pivot is None:
             pivot = self.zero
         diff = self - pivot
@@ -155,18 +167,22 @@ class Vector(xml_.SupportsXML, IPositionable):
         )
 
     def increase_y(self, o: float) -> 'Vector':
+        """ Returns new vector with changed y value """
         return Vector(self.x, self.y + o, self.z)
 
     @property
     def magnitude(self):
+        """ Vector length """
         return abs(self)
 
     @property
     def normalized(self):
+        """ Returns new vectors with length 1 """
         return self / abs(self)
 
     @property
     def flat(self):
+        """ Returns new vector with undefined Y coord """
         return Vector.vector_xz(self.x, self.z)
 
     @staticmethod
@@ -212,12 +228,14 @@ class Vector(xml_.SupportsXML, IPositionable):
 
 @xml_.XMLInclude
 class Bezier(xml_.SupportsXML):
+    """ Abstract bezier structure """
     def __init__(self,
         a: Vector = Vector.zero,
         b: Vector = Vector.zero,
         c: Vector = Vector.zero,
         d: Vector = Vector.zero
     ):
+        """ Creates new bezier from 4 control points """
         self.a = a
         self.b = b
         self.c = c
@@ -234,10 +252,12 @@ class Bezier(xml_.SupportsXML):
 
     @property
     def controls(self):
+        """ Returns control points """
         return [self.a, self.b, self.c, self.d].copy()
 
     @property
     def reversed(self):
+        """ Returns inverted bezier """
         return Bezier(self.d, self.c, self.b, self.a)
 
     @classmethod
@@ -248,12 +268,14 @@ class Bezier(xml_.SupportsXML):
         ]
 
     def position(self, t: float) -> Vector:
+        """ Returns point on bezier (t is number from 0 to 1) """
         controls = self.controls
         while len(controls) > 1:
             controls = self.lower(controls, 1 - t)
         return controls[0]
         
     def tangent(self, t: float) -> Vector:
+        """ Returns tangent vector to the bezier (t is number from 0 to 1) """
         controls = self.controls
         while len(controls) > 2:
             controls = self.lower(controls, 1 - t)
@@ -261,6 +283,7 @@ class Bezier(xml_.SupportsXML):
         return (y - x).normalized
 
     def flat_normal(self, t: float) -> Vector:
+        """ Returns normal vector to the bezier. Y coord is undefined """
         return self.tangent(t).flat_rotate(math.pi / 2)
 
     def __str__(self) -> str:
@@ -270,6 +293,7 @@ class Bezier(xml_.SupportsXML):
         return f'<Bezier(a={self.a}, b={self.b}, c={self.c}, d={self.d})>'
 
     def default(self, parent: Optional[xml_.XMLNode]) -> xml_.XMLNode:
+        """ For XML Serialization" """
         encoder = xml_.XMLSerializer()
         ret_node = xml_.XMLNode(
             xml_.XMLInclude.get_name(Bezier),
@@ -286,6 +310,7 @@ class Bezier(xml_.SupportsXML):
 
     @classmethod
     def from_xml_node(cls, root_node: xml_.XMLNode) -> 'Bezier':
+        """ For XML Deserialization" """
         decoder = xml_.XMLDeserializer()
         kwargs = {
             _.name: decoder.deserialize(_)
@@ -298,10 +323,13 @@ class Bezier(xml_.SupportsXML):
 
 @xml_.XMLInclude
 class NetOptions(xml_.SupportsXML):
+    """ Network options object """
+
     def __init__(self, prefab_name: str, *,
         follow_terrain: Optional[str | bool] = None, elevation_mode: str = 'default',
         invert: bool = False, node_spacing: int = 100
     ):
+        """ Example call: NetOptions(\"Basic Road\", false, \"elevated\", true) """
         if follow_terrain is None:
             follow_terrain = 'false'
         self.follow_terrain = str(follow_terrain)

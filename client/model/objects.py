@@ -52,18 +52,22 @@ class NaturalResourceCell(BaseObject):
 
     @property
     def rowID(self) -> int:
+        """ Internal row id """
         return self._attrs['rowID']
 
     @property
     def columnID(self) -> int:
+        """ Internal column id """
         return self._attrs['columnID']
 
     @property
     def water(self) -> int:
+        """ Water level: 0-256 """
         return self._attrs['water']
 
     @property
     def pollution(self) -> int:
+        """ Pollution level: 0-256 """
         return self._attrs['pollution']
 
     @pollution.setter
@@ -74,6 +78,7 @@ class NaturalResourceCell(BaseObject):
 
     @property
     def fertility(self) -> int:
+        """ Fertility level: 0-256 """
         return self._attrs['fertility']
 
     @fertility.setter
@@ -84,6 +89,7 @@ class NaturalResourceCell(BaseObject):
     
     @property
     def forest(self) -> int:
+        """ Forest level: 0-256 """
         return self._attrs['forest']
 
     @forest.setter
@@ -94,6 +100,7 @@ class NaturalResourceCell(BaseObject):
 
     @property
     def ore(self) -> int:
+        """ Ore level: 0-256 """
         return self._attrs['ore']
 
     @ore.setter
@@ -104,6 +111,7 @@ class NaturalResourceCell(BaseObject):
 
     @property
     def oil(self) -> int:
+        """ Oil level: 0-256 """
         return self._attrs['oil']
 
     @oil.setter
@@ -114,6 +122,7 @@ class NaturalResourceCell(BaseObject):
 
     @property
     def id_(self) -> int:
+        """ Internal cell id """
         return self.rowID * 512 + self.columnID
 
 class Point(utils.IPositionable):
@@ -128,15 +137,18 @@ class Point(utils.IPositionable):
 
     @property
     def position(self) -> utils.Vector:
+        """ Position (Y is height) """
         return self._vector
     
     @property
     @abc.abstractmethod
     def resources(self) -> NaturalResourceCell:
+        """ Returns natural resources and pollution at the point """
         return NaturalResourceCell.from_pos(self._game, self._vector)
 
 
 class RenderableObjectHandle(BaseObject):
+    """ Handle for deleting shapes rendered on the map """
 
     @property
     def id_(self) -> int:
@@ -157,6 +169,7 @@ class GameObject(utils.IPositionable, BaseObject, cache.CachedObject):
 
     @property
     def id_(self) -> int:
+        """ Game ID """
         return self._attrs['id']
 
     @property
@@ -166,6 +179,7 @@ class GameObject(utils.IPositionable, BaseObject, cache.CachedObject):
     @property
     @abc.abstractmethod
     def type(self) -> str:
+        """ Object type (node, buidling, prop etc.) """
         ...
 
     @property
@@ -177,6 +191,7 @@ class EntityObject(GameObject):
 
     @property
     def exists(self) -> bool:
+        """ Returns if object exists """
         return self._attrs['exists']
 
     @property
@@ -185,6 +200,7 @@ class EntityObject(GameObject):
 
     @property
     def position(self) -> utils.Vector:
+        """ Object position. Can be assigned to to move the object """
         return self._attrs['position']
 
     @position.setter
@@ -193,17 +209,21 @@ class EntityObject(GameObject):
 
     @property
     def prefab_name(self) -> str:
+        """ Node asset name (eg. 'Basic Road', 'Elementary School') """
         return self._attrs['prefab_name']
 
     def delete(self):
+        """ Delete object """
         self.out_dated = True
         return self._game._delete_obj(self.id_, self.type)
 
     def move(self, pos: utils.IPositionable):
+        """ Move object"""
         self.out_dated = True
         return self._game._move_obj(self.id_, self.type, pos)
 
     def refresh(self):
+        """ Reloads object properties from game """
         self.out_dated = True
         self.update(self._game._get_obj(id_=self.id_, type_=self.type))
 
@@ -231,10 +251,12 @@ class NetPrefab(BaseObject):
 
     @property
     def id_(self) -> str:
+        """ Network name """
         return self._attrs['id']
 
     @property
     def name(self) -> str:
+        """ Network name """
         return self.id_
 
     @property
@@ -247,18 +269,22 @@ class NetPrefab(BaseObject):
 
     @property
     def is_overground(self) -> bool:
+        """ Is elevated/bridge """
         return self._attrs['is_overground']
 
     @property
     def is_underground(self) -> bool:
+        """ Is tunnel """
         return self._attrs['is_underground']
 
     @property
     def fw_vehicle_lane_count(self) -> int:
+        """ Count of forward vehicle lanes """
         return self._attrs['fw_vehicle_lane_count']
 
     @property
     def bw_vehicle_lane_count(self) -> int:
+        """ Count of backward vehicle lanes """
         return self._attrs['bw_vehicle_lane_count']
 
 
@@ -266,10 +292,12 @@ class NetworkObject(EntityObject):
 
     @property
     def prefab(self) -> NetPrefab:
+        """ Network asset """
         return self._game.get_net_prefab(self.prefab_name)
 
 
 class Tree(EntityObject):
+    """ Free standing tree structure """
 
     @property
     def type(self) -> str:
@@ -277,6 +305,7 @@ class Tree(EntityObject):
 
 
 class Building(RotatableEntity):
+    """ Structure for building objects (eg. 'Water Tower') """
 
     @property
     def type(self) -> str:
@@ -284,6 +313,7 @@ class Building(RotatableEntity):
 
 
 class Prop(RotatableEntity):
+    """ Free standing prop object """
 
     @property
     def type(self) -> str:
@@ -298,18 +328,22 @@ class Node(NetworkObject):
 
     @property
     def terrain_offset(self) -> float:
+        """ Elevation over terrain or water level """
         return self._attrs['terrain_offset']
 
     @property
     def building_id(self) -> int:
+        """ ID of building (usually pillar), 0 if none """
         return self._attrs['building_id']
 
     @property
     def seg_count(self) -> int:
+        """ Count of adjacent segments """
         return self._attrs['seg_count']
 
     @property
     def building(self) -> Optional[Building]:
+        """ Node building (usually pillar) """
         if self.building_id:
             return self._game.get_building(id_=self.building_id)
         else:
@@ -317,10 +351,12 @@ class Node(NetworkObject):
 
     @property
     def segments(self) -> List['Segment']:
+        """ List of adjacent segments """
         return self._game._get_adj_segments(self.id_)
 
 
 class Segment(NetworkObject):
+    """ Network object (road, pipe, power line etc.) """
 
     @property
     def type(self) -> str:
@@ -328,41 +364,56 @@ class Segment(NetworkObject):
 
     @property
     def start_node_id(self) -> int:
+        """ ID of start node (junction) """
         return self._attrs['start_node_id']
 
     @property
     def end_node_id(self) -> int:
+        """ ID of end node (junction) """
         return self._attrs['end_node_id']
 
     @property
     def start_dir(self) -> utils.Vector:
+        """ Road direction at start node """
         return self._attrs['start_dir']
 
     @property
     def end_dir(self) -> utils.Vector:
+        """ Road direction at end node """
         return self._attrs['end_dir']
 
     @property
     def bezier(self) -> utils.Bezier:
+        """ Underlying bezier shape """
         return self._attrs['bezier']
 
     @property
     def length(self) -> float:
+        """ Road length """
         return self._attrs['length']
 
     @property
     def is_straight(self) -> bool:
+        """ Is segment straight """
         return self._attrs['is_straight']
 
     @property
     def start_node(self) -> Node:
+        """ Road start node (junction) """
         return self._game.get_node(self.start_node_id)
 
     @property
     def end_node(self) -> Node:
+        """ Road end node (junction) """
         return self._game.get_node(self.end_node_id)
 
+    def delete(self, keep_nodes: bool = False):
+        """ Delete object """
+        self.out_dated = True
+        return self._game._delete_obj(self.id_, self.type, keep_nodes)
+
     def get_other_node(self, node: Node | int) -> Node:
+        """ Returns the other junction given the first one """
         if isinstance(node, Node):
             node = node.id_
         if node == self.start_node_id:
@@ -376,6 +427,7 @@ class PathBuilder():
         start_node: utils.IPositionable,
         options: Optional[str | utils.NetOptions] = None
     ):
+        """ Abstract structure for building a row of linked segments """
         if options is None:
             if isinstance(start_node, Node):
                 options = start_node.prefab_name
@@ -393,19 +445,22 @@ class PathBuilder():
 
     @property
     def last_segments(self) -> List[Segment]:
+        """ Returns list of the last batch of segments built """
         return self._last_segments
 
     @property
     def segments(self) -> List[Segment]:
+        """ Returns list of all segments built with this PathBuilder """
         return self._segments
-        self._last_position = value
 
     @property
     def first_node(self) -> Node:
+        """ Start of the road """
         return self.segments[0].start_node
 
     @property
     def last_node(self) -> Node:
+        """ Current end of the road """
         return self.segments[-1].end_node
 
     def _create_segments(self,
@@ -437,6 +492,7 @@ class PathBuilder():
         end_dir: Optional[utils.Vector] = None,
         middle_pos: Optional[utils.Vector] = None
     ):
+        """ Creates multiple segments to the given position """
         if (start_dir is None) ^ (end_dir is None):
             raise ValueError("start_dir and end_dir must be both set or both unset")
         if (middle_pos is None) == (start_dir is None):
