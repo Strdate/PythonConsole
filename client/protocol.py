@@ -36,5 +36,5 @@ REMOTE_METHODS: Dict[str, Contract] = {
     'remove_render_object': Contract('RemoveRenderObject', False),
     'render_circle': Contract('RenderCircle', True, True),
     'render_vector': Contract('RenderVector', True, True),
-    'set_natural_resource': Contract('SetNaturalResource', False),
+    'set_natural_resource': Contract('SetNaturalResource', True, True),
 }

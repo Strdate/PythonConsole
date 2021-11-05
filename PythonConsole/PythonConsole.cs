@@ -186,25 +186,25 @@ namespace PythonConsole
         public void SimulationStep()
         {
             do {
-                if (State == ConsoleState.ScriptRunning) {
-                    while (_simulationQueue.Count > 0) {
-                        MessageHeader header = (MessageHeader)_simulationQueue.Dequeue();
-                        switch(header.messageType) {
-                            case "c_script_end":
+                while (_simulationQueue.Count > 0) {
+                    MessageHeader header = (MessageHeader)_simulationQueue.Dequeue();
+                    switch(header.messageType) {
+                        case "c_script_end":
+                            if (State == ConsoleState.ScriptRunning) {
                                 _stopWatch.Stop();
                                 State = ConsoleState.Ready;
                                 PrintAsync("Execution took " + _stopWatch.ElapsedMilliseconds + " ms\n");
-                                break;
-                            default:
-                                _remoteFuncManager.HandleAPICall(header.payload, header.messageType, header.requestId);
-                                break;
-                        }
+                            }
+                            break;
+                        default:
+                            _remoteFuncManager.HandleAPICall(header.payload, header.messageType, header.requestId);
+                            break;
                     }
-                    if(ExecuteSynchronously && State == ConsoleState.ScriptRunning) {
-                        Thread.Sleep(1);
-                    }
-                    MoveItTool.instance.SimulationStep();
                 }
+                if(ExecuteSynchronously && State == ConsoleState.ScriptRunning) {
+                    Thread.Sleep(1);
+                }
+                MoveItTool.instance.SimulationStep();
             } while (State == ConsoleState.ScriptRunning && ExecuteSynchronously);
         }
 
