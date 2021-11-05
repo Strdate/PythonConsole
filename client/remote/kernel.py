@@ -86,16 +86,14 @@ class AsyncKernelHandler():
             raise RuntimeError("Kernel not started")
         logging.debug("Receiving kernel message")
         ret = await self._client.get_iopub_msg()
-        logging.debug(ret)
         return ret
 
     async def recv_stdin_msg(self):
         if self._client is None:
             logging.error("Kernel not started")
             raise RuntimeError("Kernel not started")
-        logging.debug("Receiving kernel message")
+        logging.debug("Receiving input message")
         ret = await self._client.get_stdin_msg()
-        logging.debug(ret)
         return ret
 
     async def clear_kernel_msg(self):
@@ -103,12 +101,10 @@ class AsyncKernelHandler():
             logging.error("Kernel not started")
             raise RuntimeError("Kernel not started")
         ret = await self._client.iopub_channel.get_msgs()
-        logging.debug(ret)
         return ret
 
     async def input(self, content: str):
         if self._client is None:
             logging.error("Kernel not started")
             raise RuntimeError("Kernel not started")
-        logging.debug(content)
         self._client.input(content)
