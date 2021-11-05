@@ -128,12 +128,12 @@ class Vector(xml_.SupportsXML, IPositionable):
 
     def __str__(self) -> str:
         if self.is_height_defined:
-            return '{{x: {0.x}, y: {0.y}, z: {0.z}}}'.format(self)
-        return '{{x: {0.x}, y: undefined, z: {0.z}}}'.format(self)
+            return '({0.x:.2f}, {0.y:.2f}, {0.z:.2f})'.format(self)
+        return '({0.x:.2f}, undefined, {0.z:.2f})'.format(self)
 
     def __repr__(self) -> str:
-        return f'<Vector(x={self.x}, y={self.y}, z={self.z}, ' \
-            'is_height_defined={self.is_height_defined})>'
+        return f'<Vector(x={self.x:.2f}, y={self.y:.2f}, z={self.z:.2f}, ' \
+            f'is_height_defined={self.is_height_defined})>'
 
     @classmethod
     @property
@@ -287,10 +287,10 @@ class Bezier(xml_.SupportsXML):
         return self.tangent(t).flat_rotate(math.pi / 2)
 
     def __str__(self) -> str:
-        return f'a: {self.a}, b: {self.b}, c: {self.c}, d: {self.d}'
+        return f'[{self.a}, {self.b}, {self.c}, {self.d}]'
     
     def __repr__(self) -> str:
-        return f'<Bezier(a={self.a}, b={self.b}, c={self.c}, d={self.d})>'
+        return f'<Bezier[a={self.a}, b={self.b}, c={self.c}, d={self.d}]>'
 
     def default(self, parent: Optional[xml_.XMLNode]) -> xml_.XMLNode:
         """ For XML Serialization" """
@@ -352,7 +352,14 @@ class NetOptions(xml_.SupportsXML):
         if isinstance(obj, str):
             return NetOptions(obj)
         return NetOptions(obj.name)
-            
+
+    def __repr__(self) -> str:
+        return f'NetOptions:\n' \
+            f'Prefab name: {self.prefab_name}\n' \
+            f'Elevation mode: {self.elevation_mode}\n' \
+            f'Follow terrain: {self.follow_terrain}\n' \
+            f'Invert: {self.invert}\n' \
+            f'Node spacing: {self.node_spacing}\n'
 
     def default(self, parent: Optional[xml_.XMLNode]) -> xml_.XMLNode:
         encoder = xml_.XMLSerializer()

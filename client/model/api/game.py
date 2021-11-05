@@ -372,7 +372,7 @@ class Game(game_abc.BaseGame, metaclass=meta.Singleton):
     # Net prefab handling
 
     def get_net_prefab(self, name: str, use_cache: bool = True) -> objects.NetPrefab:
-        pattern = {'idString': name, 'type_': 'node'}
+        pattern = {'idString': name, 'type_': 'net prefab'}
         ret = self._get_cache(**pattern)
         if not (isinstance(ret, objects.NetPrefab) and use_cache):
             ret = objects.NetPrefab.from_message(

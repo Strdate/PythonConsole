@@ -50,14 +50,14 @@ class XMLInclude():
     _registered_name: Dict[str, type] = {}
     _registered_class: Dict[type, str] = {}
     BUILTIN_CLASS: Dict[type, str] = {
-        int: 'int', str: 'string', float: 'float', bool: 'bool'}
+        int: 'int', str: 'string', float: 'float', bool: 'boolean'}
     BUILTIN_NAMES: Dict[str, type] = {
         'int': int,
         'uint': int,
         'float': float,
         'double': float,
         'string': str,
-        'bool': bool,
+        'boolean': bool,
     }
 
     @overload

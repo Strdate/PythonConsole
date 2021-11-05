@@ -19,11 +19,11 @@ class BaseObject(abc.ABC):
     @classmethod
     def from_message(cls: Type[T], game: api.Game, message: header.BaseMessage) -> T:
         ret = super().__new__(cls)
-        ret.__init__(game, **message.content)
+        ret.__init__(game, **message._attrs)
         return ret
 
     def update(self, message: header.BaseMessage) -> None:
-        self._attrs.update(message.content)
+        self._attrs.update(message._attrs)
 
 
 class NaturalResourceCell(BaseObject):
@@ -46,7 +46,6 @@ class NaturalResourceCell(BaseObject):
         ret.update(ret.fetch_data())
         return ret
         
-    @abc.abstractmethod
     def fetch_data(self) -> header.BaseMessage:
         return self._game._get_resource(self.id_)
 
@@ -125,6 +124,16 @@ class NaturalResourceCell(BaseObject):
         """ Internal cell id """
         return self.rowID * 512 + self.columnID
 
+    def __repr__(self) -> str:
+        return 'Natural Resource: \n' +\
+            f'ID: {self.id_}\n' + \
+            (f'Oil: {self.oil}\n' if self.oil else '')+ \
+            (f'Ore: {self.ore}\n' if self.ore else '') + \
+            (f'Forest: {self.forest}\n' if self.forest else '') + \
+            (f'Fertility: {self.fertility}\n' if self.fertility else '') + \
+            (f'Pollution: {self.pollution}\n' if self.pollution else '') + \
+            (f'Water: {self.water}' if self.water else '')
+
 class Point(utils.IPositionable):
 
     def __init__(self, game: api.Game, vector: utils.Vector):
@@ -141,7 +150,6 @@ class Point(utils.IPositionable):
         return self._vector
     
     @property
-    @abc.abstractmethod
     def resources(self) -> NaturalResourceCell:
         """ Returns natural resources and pollution at the point """
         return NaturalResourceCell.from_pos(self._game, self._vector)
@@ -156,6 +164,9 @@ class RenderableObjectHandle(BaseObject):
 
     def delete(self) -> None:
         return self._game.remove_render_object(self.id_)
+
+    def __repr__(self) -> str:
+        return f'RenderableObjectHandle: {self.id_}'
 
 class GameObject(utils.IPositionable, BaseObject, cache.CachedObject):
 
@@ -185,6 +196,11 @@ class GameObject(utils.IPositionable, BaseObject, cache.CachedObject):
     @property
     def _cache_key(self) -> api.CacheKey:
         return api.CacheKey(self.type, self.id_)
+
+    def __repr__(self) -> str:
+        return f'{self.type.title()}:\n' \
+            f'ID: {self.id_}\n' \
+            f'Position: {self.position}\n'
 
 
 class EntityObject(GameObject):
@@ -227,6 +243,9 @@ class EntityObject(GameObject):
         self.out_dated = True
         self.update(self._game._get_obj(id_=self.id_, type_=self.type))
 
+    def __repr__(self) -> str:
+        return super().__repr__() + f'Prefab name: {self.prefab_name}\n'
+
 
 class RotatableEntity(EntityObject):
 
@@ -241,6 +260,9 @@ class RotatableEntity(EntityObject):
     def move(self, pos: utils.IPositionable, angle: float):
         self.out_dated = True
         return self._game._move_obj(self.id_, self.type, pos, angle)
+
+    def __repr__(self) -> str:
+        return super().__repr__() + f'Angle: {self.angle}\n'
 
 
 class NetPrefab(BaseObject):
@@ -287,6 +309,14 @@ class NetPrefab(BaseObject):
         """ Count of backward vehicle lanes """
         return self._attrs['bw_vehicle_lane_count']
 
+    def __repr__(self) -> str:
+        return f'Name: {self.name}\n' \
+            f'Width: {self.width}\n' \
+            f'Is overground: {self.is_overground}\n' \
+            f'Is underground: {self.is_underground}\n' \
+            f'Vehicle lanes: {self.fw_vehicle_lane_count}' \
+                f'+{self.bw_vehicle_lane_count}\n' \
+
 
 class NetworkObject(EntityObject):
 
@@ -294,6 +324,12 @@ class NetworkObject(EntityObject):
     def prefab(self) -> NetPrefab:
         """ Network asset """
         return self._game.get_net_prefab(self.prefab_name)
+
+    def __repr__(self) -> str:
+        return super().__repr__() + '\n'.join(
+            '    ' + _
+            for _ in repr(self.prefab).splitlines()
+        ) + '\n'
 
 
 class Tree(EntityObject):
@@ -353,6 +389,12 @@ class Node(NetworkObject):
     def segments(self) -> List['Segment']:
         """ List of adjacent segments """
         return self._game._get_adj_segments(self.id_)
+
+    def __repr__(self) -> str:
+        return super().__repr__() + \
+            f'Terrain offset: {self.terrain_offset:.2f}\n' \
+            f'Building ID: {self.building_id}\n' \
+            f'Segment count: {self.seg_count}\n'
 
 
 class Segment(NetworkObject):
@@ -420,6 +462,16 @@ class Segment(NetworkObject):
             return self.end_node
         else:
             return self.start_node
+
+    def __repr__(self) -> str:
+        return super().__repr__() + \
+            f'Start node ID: {self.start_node_id}\n' \
+            f'End node ID: {self.end_node_id}\n' \
+            f'Start direction: {self.start_dir}\n' \
+            f'End direction: {self.end_dir}\n' \
+            f'Bezier: {self.bezier}\n' \
+            f'Length: {self.length:.2f}\n' \
+            f'Straight: {self.is_straight}'
 
 class PathBuilder():
 
