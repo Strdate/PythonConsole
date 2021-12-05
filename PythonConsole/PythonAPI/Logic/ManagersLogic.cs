@@ -57,7 +57,7 @@ namespace PythonConsole
         public static BatchObjectMessage PreparePropsStartingFromIndex(ushort id)
         {
             var buffer = ManagersUtil.PropManager.m_props.m_buffer;
-            var resultArray = new PropData[500];
+            var resultArray = new List<object>(500);
             int resultArrayIndex = 0;
             bool endOfStream = true;
             ushort i;
@@ -74,9 +74,6 @@ namespace PythonConsole
                     break;
                 }
             }
-            if (endOfStream) {
-                Array.Resize(ref resultArray, resultArrayIndex);
-            }
             return new BatchObjectMessage() {
                 array = resultArray,
                 endOfStream = endOfStream,
@@ -87,7 +84,7 @@ namespace PythonConsole
         public static BatchObjectMessage PrepareTreesStartingFromIndex(uint id)
         {
             var buffer = ManagersUtil.TreeManager.m_trees.m_buffer;
-            var resultArray = new TreeData[500];
+            var resultArray = new List<object>(500);
             int resultArrayIndex = 0;
             bool endOfStream = true;
             uint i;
@@ -104,9 +101,6 @@ namespace PythonConsole
                     break;
                 }
             }
-            if (endOfStream) {
-                Array.Resize(ref resultArray, resultArrayIndex);
-            }
             return new BatchObjectMessage() {
                 array = resultArray,
                 endOfStream = endOfStream,
@@ -117,7 +111,7 @@ namespace PythonConsole
         public static BatchObjectMessage PrepareBuildingsStartingFromIndex(ushort id)
         {
             var buffer = ManagersUtil.BuildingManager.m_buildings.m_buffer;
-            var resultArray = new BuildingData[500];
+            var resultArray = new List<object>(500);
             int resultArrayIndex = 0;
             bool endOfStream = true;
             ushort i;
@@ -133,9 +127,6 @@ namespace PythonConsole
                 if (i == ushort.MaxValue) {
                     break;
                 }
-            }
-            if (endOfStream) {
-                Array.Resize(ref resultArray, resultArrayIndex);
             }
             return new BatchObjectMessage() {
                 array = resultArray,

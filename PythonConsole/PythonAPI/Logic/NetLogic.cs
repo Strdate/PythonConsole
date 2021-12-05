@@ -155,7 +155,7 @@ namespace PythonConsole
         public static BatchObjectMessage PrepareNodesStartingFromIndex(ushort id)
         {
             var buffer = NetUtil.Manager.m_nodes.m_buffer;
-            var resultArray = new NetNodeData[500];
+            var resultArray = new List<object>(500);
             int resultArrayIndex = 0;
             bool endOfStream = true;
             ushort i;
@@ -172,9 +172,6 @@ namespace PythonConsole
                     break;
                 }
             }
-            if (endOfStream) {
-                Array.Resize(ref resultArray, resultArrayIndex);
-            }
             return new BatchObjectMessage() {
                 array = resultArray,
                 endOfStream = endOfStream,
@@ -185,7 +182,7 @@ namespace PythonConsole
         public static BatchObjectMessage PrepareSegmentsStartingFromIndex(ushort id)
         {
             var buffer = NetUtil.Manager.m_segments.m_buffer;
-            var resultArray = new NetSegmentData[500];
+            var resultArray = new List<object>(500);
             int resultArrayIndex = 0;
             bool endOfStream = true;
             ushort i;
@@ -201,9 +198,6 @@ namespace PythonConsole
                 if (i == ushort.MaxValue) {
                     break;
                 }
-            }
-            if (endOfStream) {
-                Array.Resize(ref resultArray, resultArrayIndex);
             }
             return new BatchObjectMessage() {
                 array = resultArray,

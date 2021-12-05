@@ -167,14 +167,14 @@ namespace PythonConsole
             _client.SendMsg(null, "s_script_abort");
         }
 
-        private object[] GetClipboardObjects()
+        private List<object> GetClipboardObjects()
         {
-            return SelectionTool.Instance.Clipboard.Where((obj) => obj.Exists).Select((obj) => obj.ToMessage()).ToArray();
+            return SelectionTool.Instance.Clipboard.Where((obj) => obj.Exists).Select((obj) => obj.ToMessage()).ToList();
         }
 
-        private string[] GetSearchPaths()
+        private List<string> GetSearchPaths()
         {
-            return new string[]{
+            return new List<string>{
                 UnityPythonObject.Instance.scriptEditor.projectWorkspacePath,
                 Path.Combine(UnityPythonObject.Instance.scriptEditor.projectWorkspacePath, "imports"),
                 Path.Combine(UnityPythonObject.Instance.scriptEditor.projectWorkspacePath, "examples"),
@@ -196,7 +196,7 @@ namespace PythonConsole
                                 PrintAsync("Execution took " + _stopWatch.ElapsedMilliseconds + " ms\n");
                                 break;
                             default:
-                                _remoteFuncManager.HandleAPICall(header.payload, header.messageType, header.requestId);
+                                _remoteFuncManager.HandleAPICall(header.payload, header.messageType, long.Parse(header.requestId));
                                 break;
                         }
                     }
