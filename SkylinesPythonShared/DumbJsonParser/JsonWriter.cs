@@ -100,6 +100,7 @@ namespace DumbJsonParser
             }
             char c;
             int i;
+            bool lastWasCR = false;
 
             for (i = 0; i < s.Length; i += 1) {
                 c = s[i];
@@ -109,8 +110,16 @@ namespace DumbJsonParser
                         b.Append('\\');
                         b.Append(c);
                         break;
-                    case '\n':
+                    case '\r':
                         b.Append("\\n");
+                        lastWasCR = true;
+                        break;
+                    case '\n':
+                        if (lastWasCR) {
+                            lastWasCR = false;
+                        } else {
+                            b.Append("\\n");
+                        }
                         break;
                     default:
                         b.Append(c);
