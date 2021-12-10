@@ -66,11 +66,10 @@ namespace SkylinesRemotePython
                 Console.WriteLine("Abort script");
                 throw new AbortScriptException();
             }
-            long msgRequestId = long.Parse(msg.requestId);
-            if (msgRequestId != 0) {
-                var callback = callbackDict[msgRequestId];
-                callbackDict.Remove(msgRequestId);
-                requestId = msgRequestId;
+            if (msg.requestId != 0) {
+                var callback = callbackDict[msg.requestId];
+                callbackDict.Remove(msg.requestId);
+                requestId = msg.requestId;
                 callback.Resolved = true;
                 if(msg.messageType != "s_exception") {
                     result = callback.Callback.Invoke(msg.payload, null);

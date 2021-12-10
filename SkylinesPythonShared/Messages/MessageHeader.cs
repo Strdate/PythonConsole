@@ -10,7 +10,7 @@ namespace SkylinesPythonShared
     {
         public string version { get; set; }
         public string messageType { get; set; }
-        public string requestId { get; set; }
+        public long requestId { get; set; }
         public object payload { get; set; }
     }
 }

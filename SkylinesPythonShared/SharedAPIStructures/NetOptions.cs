@@ -39,6 +39,8 @@ namespace SkylinesPythonShared.API
             this.node_spacing = node_spacing;
         }
 
+        private NetOptions() { }
+
         public override string ToString()
         {
             return Util.RuntimeToString(this);

@@ -196,7 +196,7 @@ namespace PythonConsole
                                 PrintAsync("Execution took " + _stopWatch.ElapsedMilliseconds + " ms\n");
                                 break;
                             default:
-                                _remoteFuncManager.HandleAPICall(header.payload, header.messageType, long.Parse(header.requestId));
+                                _remoteFuncManager.HandleAPICall(header.payload, header.messageType, header.requestId);
                                 break;
                         }
                     }

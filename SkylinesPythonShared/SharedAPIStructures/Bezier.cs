@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Xml.Serialization;
 
 namespace SkylinesPythonShared.API
 {
@@ -17,6 +18,8 @@ namespace SkylinesPythonShared.API
 			this.c = _c;
 			this.d = _d;
 		}
+
+		private Bezier() { }
 
 		[Doc("Returns point on bezier (t is number from 0 to 1)")]
 		public Vector position(float t)
@@ -46,6 +49,7 @@ namespace SkylinesPythonShared.API
 			return tangent(t).flat_rotate(Vector.pi / 2);
         }
 
+		[XmlIgnore]
 		[ToStringIgnore]
 		[Doc("Returns inverted bezier")]
 		public Bezier inverted => new Bezier(this.d, this.c, this.b, this.a);

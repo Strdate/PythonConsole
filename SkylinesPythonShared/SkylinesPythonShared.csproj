@@ -31,6 +31,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="DumbJsonSerializer">
+      <HintPath>..\..\DumbJsonSerializer.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -39,10 +42,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DumbJsonParser\JsonParser.cs" />
-    <Compile Include="DumbJsonParser\JsonReader.cs" />
-    <Compile Include="DumbJsonParser\JsonWriter.cs" />
-    <Compile Include="DumbJsonParser\TypeManager.cs" />
     <Compile Include="MessagesIn\GetObjectMessage.cs" />
     <Compile Include="MessagesIn\GetObjectsFromIndexMessage.cs" />
     <Compile Include="MessagesIn\SetNaturalResourceMessage.cs" />

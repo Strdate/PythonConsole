@@ -1,4 +1,4 @@
-﻿using DumbJsonParser;
+﻿using DumbJsonSerializer;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -13,10 +13,12 @@ namespace SkylinesPythonShared
 {
     public class TcpConversation
     {
+        public static string DumbJsonSerializerVersion => JsonSerializer.VERSION;
+
         protected Socket _client;
         private byte[] _buffer = new byte[0];
         private Queue<MessageHeader> _msgQueue = new Queue<MessageHeader>();
-        private JsonParser _jsonParser = new JsonParser();
+        private JsonSerializer _jsonParser = new JsonSerializer();
 
         protected TcpConversation(Socket client)
         {
@@ -67,7 +69,7 @@ namespace SkylinesPythonShared
         protected virtual void SendMessage(object obj, string type, long requestId = 0, bool ignoreReturnValue = false)
         {
             MessageHeader msg = new MessageHeader();
-            msg.requestId = requestId.ToString();
+            msg.requestId = requestId;
             msg.payload = obj;
             msg.messageType = type;
             _client.Send(Serialize(msg));

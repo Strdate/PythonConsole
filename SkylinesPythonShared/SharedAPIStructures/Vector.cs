@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Xml.Serialization;
 
 namespace SkylinesPythonShared.API
 {
@@ -21,6 +22,7 @@ namespace SkylinesPythonShared.API
         [Doc("Is height (Y coord) defined")]
         public bool is_height_defined { get; private set; }
 
+        [XmlIgnore]
         [Doc("Returns itself")]
         public Vector position => this;
 
@@ -109,12 +111,15 @@ namespace SkylinesPythonShared.API
             return new Vector(x, y + value, z);
         }
 
+        [XmlIgnore]
         [Doc("Vector length")]
         public double magnitude => Math.Sqrt(x * x + y * y + z * z);
 
+        [XmlIgnore]
         [Doc("Returns new vectors with length 1")]
         public Vector normalized => new Vector(x / magnitude, y / magnitude, z / magnitude);
 
+        [XmlIgnore]
         [Doc("Returns new vector with undefined Y coord")]
         public Vector flat => new Vector() {
             x = this.x,
