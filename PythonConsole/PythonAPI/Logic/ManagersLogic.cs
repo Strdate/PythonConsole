@@ -63,7 +63,7 @@ namespace PythonConsole
             ushort i;
             for (i = id; i < buffer.Length; i++) {
                 if (ManagersUtil.ExistsProp(i)) {
-                    resultArray[resultArrayIndex] = PrepareProp(i);
+                    resultArray.Add(PrepareProp(i));
                     resultArrayIndex++;
                     if (resultArrayIndex == 500) {
                         endOfStream = false;
@@ -90,7 +90,7 @@ namespace PythonConsole
             uint i;
             for (i = id; i < buffer.Length; i++) {
                 if (ManagersUtil.ExistsTree(i)) {
-                    resultArray[resultArrayIndex] = PrepareTree(i);
+                    resultArray.Add(PrepareTree(i));
                     resultArrayIndex++;
                     if (resultArrayIndex == 500) {
                         endOfStream = false;
@@ -117,7 +117,7 @@ namespace PythonConsole
             ushort i;
             for (i = id; i < buffer.Length; i++) {
                 if (ManagersUtil.ExistsBuilding(i)) {
-                    resultArray[resultArrayIndex] = PrepareBuilding(i);
+                    resultArray.Add(PrepareBuilding(i));
                     resultArrayIndex++;
                     if (resultArrayIndex == 500) {
                         endOfStream = false;

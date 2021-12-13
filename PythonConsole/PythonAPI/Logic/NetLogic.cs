@@ -161,7 +161,7 @@ namespace PythonConsole
             ushort i;
             for (i = id; i < buffer.Length; i++) {
                 if (NetUtil.ExistsNode(i)) {
-                    resultArray[resultArrayIndex] = PrepareNode(i);
+                    resultArray.Add(PrepareNode(i));
                     resultArrayIndex++;
                     if (resultArrayIndex == 500) {
                         endOfStream = false;
@@ -188,7 +188,7 @@ namespace PythonConsole
             ushort i;
             for (i = id; i < buffer.Length; i++) {
                 if (NetUtil.ExistsSegment(i)) {
-                    resultArray[resultArrayIndex] = PrepareSegment(i);
+                    resultArray.Add(PrepareSegment(i));
                     resultArrayIndex++;
                     if (resultArrayIndex == 500) {
                         endOfStream = false;
