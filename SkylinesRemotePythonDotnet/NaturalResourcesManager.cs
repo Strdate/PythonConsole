@@ -40,7 +40,7 @@ namespace SkylinesRemotePython
                     }
                     return ref wrapper._base;
                 }
-                _cachedCells = _client.SynchronousCall<NaturalResourceCellBase[]>(Contracts.GetNaturalResourceCells, null);
+                _cachedCells = _client.SynchronousCall<NaturalCellBaseListMessage>(Contracts.GetNaturalResourceCells, null).cells.ToArray();
             }
             return ref _cachedCells[id];
         }
