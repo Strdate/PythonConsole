@@ -31,6 +31,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="DumbJsonSerializer">
+      <HintPath>..\..\DumbJsonSerializer.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -50,6 +53,7 @@
     <Compile Include="MessagesIn\CreateSegmentMessage.cs" />
     <Compile Include="MessagesIn\CreateTreeMessage.cs" />
     <Compile Include="MessagesIn\DeleteObjectMessage.cs" />
+    <Compile Include="MessagesOut\NaturalCellBaseListMessage.cs" />
     <Compile Include="Messages\InstanceData.cs" />
     <Compile Include="Messages\InstanceDataBase.cs" />
     <Compile Include="Messages\MessageHeader.cs" />

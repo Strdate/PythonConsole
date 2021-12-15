@@ -8,7 +8,7 @@ namespace SkylinesPythonShared
     [Serializable]
     public class BatchObjectMessage
     {
-        public object[] array { get; set; }
+        public List<object> array { get; set; }
 
         public uint lastVisitedIndex { get; set; }
 

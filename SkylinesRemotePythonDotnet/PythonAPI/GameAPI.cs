@@ -214,15 +214,15 @@ namespace SkylinesRemotePython.API
         }
 
         [Doc("Returns terrain height at a given point (height is Y coord)")]
-        public float terrain_height(IPositionable pos)
+        public double terrain_height(IPositionable pos)
         {
-            return client.SynchronousCall<float>(Contracts.GetTerrainHeight, pos.position);
+            return client.SynchronousCall<double>(Contracts.GetTerrainHeight, pos.position);
         }
 
         [Doc("Returns terrain height inlucing water level at a given point")]
-        public float surface_level(IPositionable pos)
+        public double surface_level(IPositionable pos)
         {
-            return client.SynchronousCall<float>(Contracts.GetWaterLevel, pos.position);
+            return client.SynchronousCall<double>(Contracts.GetWaterLevel, pos.position);
         }
 
         [Doc("Draws line on map. Returns handle which can be used to delete the line. Use clear() to delete all lines")]

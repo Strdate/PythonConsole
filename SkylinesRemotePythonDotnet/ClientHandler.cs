@@ -57,9 +57,6 @@ namespace SkylinesRemotePython
             error = null;
 
             MessageHeader msg = AwaitMessage();
-#if DEBUG
-            Console.WriteLine("In: " + msg.messageType);
-#endif
             if (msg.messageType == "s_script_run") {
                 engine.RunScript(msg.payload);
                 return;
@@ -69,7 +66,6 @@ namespace SkylinesRemotePython
                 Console.WriteLine("Abort script");
                 throw new AbortScriptException();
             }
-
             if (msg.requestId != 0) {
                 var callback = callbackDict[msg.requestId];
                 callbackDict.Remove(msg.requestId);
@@ -168,9 +164,6 @@ namespace SkylinesRemotePython
         protected override void SendMessage(object obj, string type, long requestId = 0, bool ignoreReturnValue = false)
         {
             base.SendMessage(obj, type, requestId, ignoreReturnValue);
-#if DEBUG
-            Console.WriteLine("Out: " + type);
-#endif
         }
     }
 

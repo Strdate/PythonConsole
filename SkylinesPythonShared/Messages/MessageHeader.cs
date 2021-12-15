@@ -8,9 +8,9 @@ namespace SkylinesPythonShared
     [Serializable]
     public class MessageHeader
     {
-        public string version;
-        public string messageType;
-        public long requestId;
-        public object payload;
+        public string version { get; set; }
+        public string messageType { get; set; }
+        public long requestId { get; set; }
+        public object payload { get; set; }
     }
 }

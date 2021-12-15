@@ -110,11 +110,11 @@ namespace SkylinesRemotePython
             _scope.SetVariable(name, obj);
         }
 
-        private void PrepareDynamicLocals(object[] arr)
+        private void PrepareDynamicLocals(List<object> arr)
         {
             List<object> res = new List<object>();
             object obj;
-            for(int i = 0; i < arr.Length; i++) {
+            for(int i = 0; i < arr.Count; i++) {
                 if(arr[i] is Vector) {
                     obj = new Point((Vector)arr[i]);
                 } else if(arr[i] is NetNodeData d1) {

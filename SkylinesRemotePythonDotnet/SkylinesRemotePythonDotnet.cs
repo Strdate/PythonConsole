@@ -1,4 +1,5 @@
-﻿using SkylinesRemotePython;
+﻿using SkylinesPythonShared;
+using SkylinesRemotePython;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,6 +23,7 @@ namespace SkylinesRemotePython
             try {
                 Console.WriteLine("\nThis is remote python engine window for Cities:Skylines\n");
                 Console.WriteLine("You can change the default tcp port in Cities_Skylines\\PythonConsoleMod.xml");
+                Console.WriteLine("DumbJsonParser version: " + TcpConversation.DumbJsonSerializerVersion);
                 Console.WriteLine("Startup...");
                 int port = 0;
                 for (var i = 0; i < args.Length; i++) {

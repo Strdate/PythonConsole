@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DumbJsonSerializer;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -12,9 +13,12 @@ namespace SkylinesPythonShared
 {
     public class TcpConversation
     {
+        public static string DumbJsonSerializerVersion => JsonSerializer.VERSION;
+
         protected Socket _client;
         private byte[] _buffer = new byte[0];
         private Queue<MessageHeader> _msgQueue = new Queue<MessageHeader>();
+        private JsonSerializer _jsonParser = new JsonSerializer();
 
         protected TcpConversation(Socket client)
         {
@@ -71,24 +75,29 @@ namespace SkylinesPythonShared
             _client.Send(Serialize(msg));
         }
 
-        public static MessageHeader Deserialize(byte[] data)
+        public MessageHeader Deserialize(byte[] data)
         {
-            /*string text = Encoding.UTF8.GetString(data);
-            return XmlDeserializeFromString<MessageHeader>(text);*/
-            using (var memoryStream = new MemoryStream(data))
-                return (MessageHeader)(new BinaryFormatter()).Deserialize(memoryStream);
+            string text = Encoding.UTF8.GetString(data);
+#if DEBUG
+            Console.WriteLine("In: " + text);
+#endif
+            return (MessageHeader)_jsonParser.ReadJson(text, "MessageHeader");
+            /*using (var memoryStream = new MemoryStream(data))
+                return (MessageHeader)(new BinaryFormatter()).Deserialize(memoryStream);*/
         }
 
-        public static byte[] Serialize(MessageHeader obj)
+        public byte[] Serialize(MessageHeader obj)
         {
-            /*string xml = XmlSerializeToString(obj);
-
-            var bytes1 = Encoding.UTF8.GetBytes(xml);
+            string json = _jsonParser.WriteJson(obj);
+#if DEBUG
+            Console.WriteLine("Out: " + json);
+#endif
+            var bytes1 = Encoding.UTF8.GetBytes(json);
             byte[] bytes = new byte[bytes1.Length + 4];
             BitConverter.GetBytes(bytes1.Length).CopyTo(bytes, 0);
             bytes1.CopyTo(bytes, 4);
-            return bytes;*/
-            using (var memoryStream = new MemoryStream())
+            return bytes;
+            /*using (var memoryStream = new MemoryStream())
             {
                 (new BinaryFormatter()).Serialize(memoryStream, obj);
                 byte[] res = memoryStream.ToArray();
@@ -96,36 +105,7 @@ namespace SkylinesPythonShared
                 BitConverter.GetBytes(res.Length).CopyTo(bytes, 0);
                 res.CopyTo(bytes, 4);
                 return bytes;
-            }
+            }*/
         }
-
-        /*public static string XmlSerializeToString(object objectInstance)
-        {
-            var serializer = new XmlSerializer(objectInstance.GetType());
-            var sb = new StringBuilder();
-
-            using (TextWriter writer = new StringWriter(sb)) {
-                serializer.Serialize(writer, objectInstance);
-            }
-
-            return sb.ToString();
-        }
-
-        public static T XmlDeserializeFromString<T>(string objectData)
-        {
-            return (T)XmlDeserializeFromString(objectData, typeof(T));
-        }
-
-        public static object XmlDeserializeFromString(string objectData, Type type)
-        {
-            var serializer = new XmlSerializer(type);
-            object result;
-
-            using (TextReader reader = new StringReader(objectData)) {
-                result = serializer.Deserialize(reader);
-            }
-
-            return result;
-        }*/
     }
 }

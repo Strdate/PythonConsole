@@ -188,9 +188,9 @@ namespace PythonConsole
         public static object GetNaturalResourceCells(object msg)
         {
             var cells = Singleton<NaturalResourceManager>.instance.m_naturalResources;
-            var mapped = new NaturalResourceCellBase[cells.Length];
+            List<NaturalResourceCellBase> mapped = new List<NaturalResourceCellBase>(cells.Length);
             for (int i = 0; i < cells.Length; i++) {
-                mapped[i] = ManagersLogic.ConvertResourceCell(i);
+                mapped.Add(ManagersLogic.ConvertResourceCell(i));
                 /*mapped[i].ore = cells[i].m_ore;
                 mapped[i].oil = cells[i].m_oil;
                 mapped[i].forest = cells[i].m_forest;
@@ -198,7 +198,9 @@ namespace PythonConsole
                 mapped[i].pollution = cells[i].m_pollution;
                 mapped[i].water = cells[i].m_water;*/
             }
-            return mapped;
+            return new NaturalCellBaseListMessage() {
+                cells = mapped
+            };
         }
 
         public static object GetNaturalResourceCellSingle(object msg)
